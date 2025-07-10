@@ -1,0 +1,16 @@
+{% if pagination.pageCount > 1 %}
+  <p class="govuk-body">
+    Showing <b>{{ pagination.firstResultNumber | numeral("0,0") }}</b> to <b>{{ pagination.lastResultNumber | numeral("0,0") }}</b> of <b>{{ pagination.totalCount | numeral("0,0") }}</b> results
+  </p>
+
+  {{ govukPagination({
+    classes: "govuk-!-margin-top-5",
+    previous: {
+      href: pagination.previousPage.href
+    },
+    next: {
+      href: pagination.nextPage.href
+    },
+    items: pagination.pageItems
+  }) }}
+{% endif %}
