@@ -1,0 +1,9 @@
+{
+  "serviceName": "Register of placement schools",
+  "useNjkExtensions": true,
+  "plugins": {
+    "govuk-frontend": {
+      "reband": true
+    }
+  }
+}

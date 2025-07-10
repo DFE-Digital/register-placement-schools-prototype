@@ -1,0 +1,22 @@
+
+{{ govukFooter({
+  rebrand: true,
+  meta: {
+    items: [{
+      href: "#",
+      text: "How to use this service"
+    }, {
+      href: "#",
+      text: "Accessibility"
+    }, {
+      href: "#",
+      text: "Cookies"
+    }, {
+      href: "#",
+      text: "Privacy notice"
+    }, {
+      href: "#",
+      text: "Terms and conditions"
+    }] if not hideFooterLinks
+  }
+}) }}
