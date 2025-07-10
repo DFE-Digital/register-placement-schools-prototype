@@ -1,6 +1,6 @@
 # Register of placement schools prototype
 
-The ‘Register of placement schools’ is a proof of concept for DfE and, more specifically, Becoming a teacher (BAT) to manage a canonical list of placement schools.
+The ‘Register of placement schools’ is a proof of concept for DfE and, more specifically, the Schools Group to provide a canonical list of placement schools held in the ‘Register trainee teachers’ service.
 
 This prototype is based on the:
 
