@@ -1,0 +1,104 @@
+{% extends "layouts/main.njk" %}
+
+{% set primaryNavId = "users" %}
+
+{% block pageTitle -%}
+{{ "Error: " if errors.length -}}
+{% if currentUser -%}
+  Change support user - personal details
+{%- else -%}
+  Add support user - personal details
+{%- endif %}
+ - {{ serviceName }} - GOV.UK
+{%- endblock %}
+
+{% set title = "Personal details" %}
+
+{% if currentUser %}
+  {% set caption = "Support user - " + currentUser.firstName + " " + currentUser.lastName %}
+{% else %}
+  {% set caption = "Add support user" %}
+{% endif %}
+
+{% block beforeContent %}
+{{ govukBackLink({
+  text: "Back",
+  href: actions.back
+}) }}
+{% endblock %}
+
+{% block content %}
+
+{% include "_includes/error-summary.njk" %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% set headingHtml %}
+      {% include "_includes/page-heading-legend.njk" %}
+    {% endset %}
+
+    <form action="{{ actions.save }}" method="post" accept-charset="utf-8" novalidate>
+
+      {% call govukFieldset({
+        legend: {
+          html: headingHtml,
+          classes: "govuk-fieldset__legend--l",
+          isPageHeading: true
+        }
+      }) %}
+
+      {{ govukInput({
+        id: "firstName",
+        name: "user[firstName]",
+        label: {
+          text: "First name",
+          classes: "govuk-label--s"
+        },
+          errorMessage: errors | getErrorMessage("firstName"),
+        value: user.firstName,
+        classes: "govuk-!-width-two-thirds"
+      }) }}
+
+      {{ govukInput({
+        id: "lastName",
+        name: "user[lastName]",
+        label: {
+          text: "Last name",
+          classes: "govuk-label--s"
+        },
+        errorMessage: errors | getErrorMessage("lastName"),
+        value: user.lastName,
+        classes: "govuk-!-width-two-thirds"
+      }) }}
+
+      {{ govukInput({
+        id: "email",
+        name: "user[email]",
+        label: {
+          text: "Email address",
+          classes: "govuk-label--s"
+        },
+        hint: {
+          text: "Email must be a valid Department for Education address, like name@education.gov.uk"
+        },
+        errorMessage: errors | getErrorMessage("email"),
+        value: user.email
+      }) }}
+
+      {{ govukButton({
+        text: "Continue"
+      }) }}
+
+      {% endcall %}
+
+    </form>
+
+    <p class="govuk-body">
+      <a class="govuk-link" href="{{ actions.cancel }}">Cancel</a>
+    </p>
+
+  </div>
+</div>
+
+{% endblock %}
