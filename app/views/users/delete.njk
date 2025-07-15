@@ -1,0 +1,47 @@
+{% extends "layouts/main.njk" %}
+
+{% set primaryNavId = "users" %}
+
+{% block pageTitle -%}
+  Confirm you want to delete support user - {{ serviceName }} - GOV.UK
+{%- endblock %}
+
+{% set title = "Confirm you want to delete " + user.firstName + " " + user.lastName %}
+{% set caption = "Delete support user" %}
+
+{% block beforeContent %}
+{{ govukBackLink({
+  text: "Back",
+  href: actions.back
+}) }}
+{% endblock %}
+
+{% block content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% include "_includes/page-heading.njk" %}
+
+    <form action="{{ actions.delete }}" method="post" accept-charset="utf-8" novalidate>
+
+      {{ govukWarningText({
+        text: "Deleting a user is permanent – you cannot undo it.",
+        iconFallbackText: "Warning"
+      }) }}
+
+      {{ govukButton({
+        text: "Delete user",
+        classes: "govuk-button--warning"
+      }) }}
+
+    </form>
+
+    <p class="govuk-body">
+      <a class="govuk-link" href="{{ actions.cancel }}">Cancel</a>
+    </p>
+
+  </div>
+</div>
+
+{% endblock %}

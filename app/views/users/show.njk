@@ -1,0 +1,94 @@
+{% extends "layouts/main.njk" %}
+
+{% set primaryNavId = "users" %}
+
+{% block pageTitle -%}
+  View support user - {{ serviceName }} - GOV.UK
+{%- endblock %}
+
+{% set title = user.firstName + " " + user.lastName %}
+{% set caption = "Support user" %}
+
+{% block beforeContent %}
+{{ govukBackLink({
+  text: "Back",
+  href: "/users"
+}) }}
+{% endblock %}
+
+{% block content %}
+
+{% include "_includes/notification-banner.njk" %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% include "_includes/page-heading.njk" %}
+
+    {# only show delete link if it's not the signed in user #}
+    {% if showDeleteLink %}
+      <p class="govuk-body">
+        <a href="{{ actions.delete }}" class="govuk-link">Delete user</a>
+      </p>
+    {% endif %}
+
+    {{ govukSummaryList({
+      rows: [
+        {
+          key: {
+            text: "First name"
+          },
+          value: {
+            text: user.firstName
+          },
+          actions: {
+            items: [
+              {
+                href: actions.change,
+                text: "Change",
+                visuallyHiddenText: "first name"
+              }
+            ]
+          }
+        },
+        {
+          key: {
+            text: "Last name"
+          },
+          value: {
+            text: user.lastName
+          },
+          actions: {
+            items: [
+              {
+                href: actions.change,
+                text: "Change",
+                visuallyHiddenText: "last name"
+              }
+            ]
+          }
+        },
+        {
+          key: {
+            text: "Email"
+          },
+          value: {
+            text: user.email
+          },
+          actions: {
+            items: [
+              {
+                href: actions.change,
+                text: "Change",
+                visuallyHiddenText: "email"
+              }
+            ]
+          }
+        }
+      ]
+    }) }}
+
+  </div>
+</div>
+
+{% endblock %}

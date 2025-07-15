@@ -13,6 +13,74 @@ const flash = require('connect-flash')
 router.use(flash())
 
 /// ------------------------------------------------------------------------ ///
+/// User authentication
+/// ------------------------------------------------------------------------ ///
+// TODO: Replace with Passport
+const passport = {
+  user: {
+    id: '3faa7586-951b-495c-9999-e5fc4367b507',
+    first_name: 'Colin',
+    last_name: 'Chapman',
+    email: 'colin.chapman@example.gov.uk'
+  }
+}
+
+/// ------------------------------------------------------------------------ ///
+/// Controller modules
+/// ------------------------------------------------------------------------ ///
+const accountController = require('./controllers/account')
+const userController = require('./controllers/user')
+
+/// ------------------------------------------------------------------------ ///
+/// Authentication middleware
+/// ------------------------------------------------------------------------ ///
+const checkIsAuthenticated = (req, res, next) => {
+  // the signed in user
+  req.session.passport = passport
+  // the base URL for navigation
+  res.locals.baseUrl = ''
+  next()
+}
+
+/// ------------------------------------------------------------------------ ///
+/// ALL ROUTES
+/// ------------------------------------------------------------------------ ///
+router.all('*', (req, res, next) => {
+  res.locals.referrer = req.query.referrer
+  res.locals.query = req.query
+  res.locals.flash = req.flash('success') // pass through 'success' messages only
+  next()
+})
+
+/// ------------------------------------------------------------------------ ///
+/// USER ROUTES
+/// ------------------------------------------------------------------------ ///
+router.get('/users/new', checkIsAuthenticated, userController.newUser_get)
+router.post('/users/new', checkIsAuthenticated, userController.newUser_post)
+
+router.get('/users/new/check', checkIsAuthenticated, userController.newUserCheck_get)
+router.post('/users/new/check', checkIsAuthenticated, userController.newUserCheck_post)
+
+router.get('/users/:userId/edit', checkIsAuthenticated, userController.editUser_get)
+router.post('/users/:userId/edit', checkIsAuthenticated, userController.editUser_post)
+
+router.get('/users/:userId/edit/check', checkIsAuthenticated, userController.editUserCheck_get)
+router.post('/users/:userId/edit/check', checkIsAuthenticated, userController.editUserCheck_post)
+
+router.get('/users/:userId/delete', checkIsAuthenticated, userController.deleteUser_get)
+router.post('/users/:userId/delete', checkIsAuthenticated, userController.deleteUser_post)
+
+router.get('/users/:userId', checkIsAuthenticated, userController.userDetails)
+
+router.get('/users', checkIsAuthenticated, userController.usersList)
+
+/// ------------------------------------------------------------------------ ///
+/// MY ACCOUNT ROUTES
+/// ------------------------------------------------------------------------ ///
+
+router.get('/account', checkIsAuthenticated, accountController.userAccount)
+
+/// ------------------------------------------------------------------------ ///
 ///
 /// ------------------------------------------------------------------------ ///
 

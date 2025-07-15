@@ -1,4 +1,5 @@
 # Ignore database files
+app/database/*.sqlite3
 
 # Prototype ignores - per-user
 .tmp/

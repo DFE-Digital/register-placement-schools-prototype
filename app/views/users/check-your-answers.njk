@@ -1,0 +1,105 @@
+{% extends "layouts/main.njk" %}
+
+{% set primaryNavId = "users" %}
+
+{% block pageTitle -%}
+  Change support user - {{ serviceName }} - GOV.UK
+{%- endblock %}
+
+{% set title = "Check your answers" %}
+
+{% if currentUser %}
+  {% set caption = "Support user - " + currentUser.firstName + " " + currentUser.lastName %}
+{% else %}
+  {% set caption = "Add support user" %}
+{% endif %}
+
+{% block beforeContent %}
+{{ govukBackLink({
+  text: "Back",
+  href: actions.back
+}) }}
+{% endblock %}
+
+{% block content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h1 class="govuk-heading-l">
+      <span class="govuk-caption-l">{{ caption }}</span>
+      {{ title }}
+    </h1>
+
+    <form action="{{ actions.save }}" method="post" accept-charset="utf-8" novalidate>
+
+      {{ govukSummaryList({
+        rows: [
+          {
+            key: {
+              text: "First name"
+            },
+            value: {
+              text: user.firstName
+            },
+            actions: {
+              items: [
+                {
+                  href: actions.change,
+                  text: "Change",
+                  visuallyHiddenText: "first name"
+                }
+              ]
+            }
+          },
+          {
+            key: {
+              text: "Last name"
+            },
+            value: {
+              text: user.lastName
+            },
+            actions: {
+              items: [
+                {
+                  href: actions.change,
+                  text: "Change",
+                  visuallyHiddenText: "last name"
+                }
+              ]
+            }
+          },
+          {
+            key: {
+              text: "Email"
+            },
+            value: {
+              text: user.email
+            },
+            actions: {
+              items: [
+                {
+                  href: actions.change,
+                  text: "Change",
+                  visuallyHiddenText: "email"
+                }
+              ]
+            }
+          }
+        ]
+      }) }}
+
+      {{ govukButton({
+        text: "Save user"
+      }) }}
+
+    </form>
+
+    <p class="govuk-body">
+      <a class="govuk-link" href="{{ actions.cancel }}">Cancel</a>
+    </p>
+
+  </div>
+</div>
+
+{% endblock %}
