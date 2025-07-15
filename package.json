@@ -13,6 +13,8 @@
     "connect-flash": "^0.1.1",
     "dotenv": "^17.1.0",
     "govuk-frontend": "^5.11.0",
-    "govuk-prototype-kit": "^13.17.0"
+    "govuk-prototype-kit": "^13.17.0",
+    "sequelize": "^6.37.7",
+    "sequelize-cli": "^6.6.3"
   }
 }
