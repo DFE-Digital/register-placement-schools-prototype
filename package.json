@@ -5,6 +5,10 @@
     "node": "22.x"
   },
   "scripts": {
+    "build-database": "npm run migrate && npm run seed",
+    "migrate": "npx sequelize db:migrate --migrations-path ./app/migrations --config ./app/database/config.json",
+    "seed": "npx sequelize db:seed:all --seeders-path ./app/seeders --config ./app/database/config.json",
+    "postinstall": "npm run build-database",
     "dev": "govuk-prototype-kit dev",
     "serve": "govuk-prototype-kit serve",
     "start": "govuk-prototype-kit start"
@@ -13,6 +17,10 @@
     "connect-flash": "^0.1.1",
     "dotenv": "^17.1.0",
     "govuk-frontend": "^5.11.0",
-    "govuk-prototype-kit": "^13.17.0"
+    "govuk-prototype-kit": "^13.17.0",
+    "sequelize": "^6.37.7",
+    "sequelize-cli": "^6.6.3",
+    "sqlite3": "^5.1.7",
+    "uuid": "^11.1.0"
   }
 }
