@@ -34,12 +34,6 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
-      open_date: {
-        type: Sequelize.DATE
-      },
-      close_date: {
-        type: Sequelize.DATE
-      },
       website: {
         type: Sequelize.STRING
       },
