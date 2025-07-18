@@ -25,10 +25,6 @@ module.exports = {
         JSON.parse(fs.readFileSync(path.join(__dirname, file), 'utf8'))
       )
 
-      // const dataPath = path.join(__dirname, '20250717140600-seed-schools-open.json')
-      // const rawData = fs.readFileSync(dataPath, 'utf8')
-      // const schools = JSON.parse(rawData)
-
       const createdAt = new Date()
       const userId = '354751f2-c5f7-483c-b9e4-b6103f50f970'
 
