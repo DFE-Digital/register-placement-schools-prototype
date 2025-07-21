@@ -1,5 +1,6 @@
 const fs = require('fs')
 const path = require('path')
+const { parse } = require('csv-parse/sync')
 
 // const createRevision = require('./helpers/createRevision')
 // const createActivityLog = require('./helpers/createActivityLog')
@@ -16,14 +17,14 @@ module.exports = {
       //   entity_type: 'school'
       // }, { transaction })
 
-      const files = [
-        '20250717140600-seed-schools-open.json',
-        '20250717140601-seed-schools-other.json'
-      ]
+      const csvPath = path.join(__dirname, '/data/seed-schools.csv')
+      const csvContent = fs.readFileSync(csvPath, 'utf8')
 
-      const schools = files.flatMap(file =>
-        JSON.parse(fs.readFileSync(path.join(__dirname, file), 'utf8'))
-      )
+      const schools = parse(csvContent, {
+        columns: true, // use header row as keys
+        skip_empty_lines: true,
+        trim: true
+      })
 
       const createdAt = new Date()
       const userId = '354751f2-c5f7-483c-b9e4-b6103f50f970'

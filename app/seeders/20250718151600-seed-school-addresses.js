@@ -1,5 +1,6 @@
 const fs = require('fs')
 const path = require('path')
+const { parse } = require('csv-parse/sync')
 const { v4: uuidv4 } = require('uuid')
 
 // const createRevision = require('./helpers/createRevision')
@@ -17,35 +18,35 @@ module.exports = {
       //   entity_type: 'school_address'
       // }, { transaction })
 
-      const files = [
-        '20250718151700-seed-school-addresses-open.json',
-        '20250718151701-seed-school-addresses-other.json'
-      ]
+      const csvPath = path.join(__dirname, '/data/seed-schools.csv')
+      const csvContent = fs.readFileSync(csvPath, 'utf8')
 
-      const schoolAddresses = files.flatMap(file =>
-        JSON.parse(fs.readFileSync(path.join(__dirname, file), 'utf8'))
-      )
+      const schools = parse(csvContent, {
+        columns: true, // use header row as keys
+        skip_empty_lines: true,
+        trim: true
+      })
 
       const createdAt = new Date()
       const userId = '354751f2-c5f7-483c-b9e4-b6103f50f970'
 
-      for (const address of schoolAddresses) {
-        if (!address.address1 || !address.town || !address.postcode) continue
+      for (const school of schools) {
+        if (!school.address1 || !school.town || !school.postcode) continue
 
         const addressId = uuidv4()
         // const revisionNumber = 1
 
         const baseFields = {
           id: addressId,
-          school_id: address.school_id,
-          line_1: address.address1,
-          line_2: nullIfEmpty(address.address2),
-          line_3: nullIfEmpty(address.address3),
-          town: address.town,
-          county: nullIfEmpty(address.county),
-          postcode: address.postcode,
-          latitude: nullIfEmpty(address.latitude),
-          longitude: nullIfEmpty(address.longitude),
+          school_id: school.id,
+          line_1: school.address1,
+          line_2: nullIfEmpty(school.address2),
+          line_3: nullIfEmpty(school.address3),
+          town: school.town,
+          county: nullIfEmpty(school.county),
+          postcode: school.postcode,
+          latitude: nullIfEmpty(school.latitude),
+          longitude: nullIfEmpty(school.longitude),
           created_at: createdAt,
           created_by_id: userId,
           updated_at: createdAt,
