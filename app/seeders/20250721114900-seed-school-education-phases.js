@@ -10,9 +10,9 @@ module.exports = {
 
     try {
       await queryInterface.bulkDelete('school_education_phases', null, { transaction })
-      // await queryInterface.bulkDelete('school_phase_revisions', null, { transaction })
+      // await queryInterface.bulkDelete('school_education_phase_revisions', null, { transaction })
       // await queryInterface.bulkDelete('activity_logs', {
-      //   entity_type: 'school_phase'
+      //   entity_type: 'school_education_phase'
       // }, { transaction })
 
       const createdAt = new Date()
@@ -39,7 +39,7 @@ module.exports = {
         // const { id: _, ...revisionDataWithoutId } = baseFields
 
         // const revisionId = await createRevision({
-        //   revisionTable: 'school_phase_revisions',
+        //   revisionTable: 'school_education_phase_revisions',
         //   entityId: item.id,
         //   revisionData: revisionDataWithoutId,
         //   revisionNumber,
@@ -49,9 +49,9 @@ module.exports = {
 
         // 3. Create activity log
         // await createActivityLog({
-        //   revisionTable: 'school_phase_revisions',
+        //   revisionTable: 'school_education_phase_revisions',
         //   revisionId,
-        //   entityType: 'school_phase',
+        //   entityType: 'school_education_phase',
         //   entityId: item.id,
         //   revisionNumber,
         //   changedById: systemUserId,
@@ -70,9 +70,9 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     // await queryInterface.bulkDelete('activity_logs', {
-    //   entity_type: 'school_phase'
+    //   entity_type: 'school_education_phase'
     // })
-    // await queryInterface.bulkDelete('school_phase_revisions', null, {})
+    // await queryInterface.bulkDelete('school_education_phase_revisions', null, {})
     await queryInterface.bulkDelete('school_education_phases', null, {})
   }
 }
