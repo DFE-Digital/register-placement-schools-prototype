@@ -14,25 +14,25 @@ module.exports = (sequelize) => {
       })
 
       School.belongsTo(models.SchoolType, {
-        foreignKey: 'type',
+        foreignKey: 'typeCode',
         targetKey: 'code',
         as: 'schoolType'
       })
 
       School.belongsTo(models.SchoolGroup, {
-        foreignKey: 'group',
+        foreignKey: 'groupCode',
         targetKey: 'code',
         as: 'schoolGroup'
       })
 
       School.belongsTo(models.SchoolStatus, {
-        foreignKey: 'status',
+        foreignKey: 'statusCode',
         targetKey: 'code',
         as: 'schoolStatus'
       })
 
       School.belongsTo(models.SchoolEducationPhase, {
-        foreignKey: 'educationPhase',
+        foreignKey: 'educationPhaseCode',
         targetKey: 'code',
         as: 'schoolEducationPhase'
       })
@@ -74,31 +74,34 @@ module.exports = (sequelize) => {
           notEmpty: true
         }
       },
-      type: {
+      typeCode: {
         type: DataTypes.STRING,
         allowNull: false,
+        field: 'type_code',
         validate: {
           notEmpty: true
         }
       },
-      group: {
+      groupCode: {
         type: DataTypes.STRING,
         allowNull: false,
+        field: 'group_code',
         validate: {
           notEmpty: true
         }
       },
-      status: {
+      statusCode: {
         type: DataTypes.STRING,
         allowNull: false,
+        field: 'status_code',
         validate: {
           notEmpty: true
         }
       },
-      educationPhase: {
+      educationPhaseCode: {
         type: DataTypes.STRING,
         allowNull: false,
-        field: 'education_phase',
+        field: 'education_phase_code',
         validate: {
           notEmpty: true
         }
