@@ -19,7 +19,7 @@ module.exports = {
       const systemUserId = '354751f2-c5f7-483c-b9e4-b6103f50f970' // Acting user ID for changes
       // const revisionNumber = 1
 
-      const items = JSON.parse(fs.readFileSync(path.join(__dirname, '/data/seed-school-admission-policies.json'), 'utf8'))
+      const items = JSON.parse(fs.readFileSync(path.join(__dirname, '/data/seed-school-admissions-policies.json'), 'utf8'))
 
       for (const item of items) {
         const baseFields = {
