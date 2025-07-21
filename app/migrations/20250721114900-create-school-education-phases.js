@@ -12,7 +12,11 @@ module.exports = {
         allowNull: false
       },
       name: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      rank: {
+        type: Sequelize.TINYINT
       },
       created_at: {
         type: Sequelize.DATE,
