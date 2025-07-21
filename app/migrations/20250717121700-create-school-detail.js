@@ -22,10 +22,10 @@ module.exports = {
         type: Sequelize.STRING
       },
       statutory_low_age: {
-        type: Sequelize.STRING
+        type: Sequelize.INTEGER
       },
       statutory_high_age: {
-        type: Sequelize.STRING
+        type: Sequelize.INTEGER
       },
       boarders_code: {
         type: Sequelize.STRING
