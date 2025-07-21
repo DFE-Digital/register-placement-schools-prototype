@@ -9,17 +9,17 @@ module.exports = {
     const transaction = await queryInterface.sequelize.transaction()
 
     try {
-      await queryInterface.bulkDelete('school_six_form', null, { transaction })
-      // await queryInterface.bulkDelete('school_six_form_revisions', null, { transaction })
+      await queryInterface.bulkDelete('school_sixth_form', null, { transaction })
+      // await queryInterface.bulkDelete('school_sixth_form_revisions', null, { transaction })
       // await queryInterface.bulkDelete('activity_logs', {
-      //   entity_type: 'school_six_form'
+      //   entity_type: 'school_sixth_form'
       // }, { transaction })
 
       const createdAt = new Date()
       const systemUserId = '354751f2-c5f7-483c-b9e4-b6103f50f970' // Acting user ID for changes
       // const revisionNumber = 1
 
-      const items = JSON.parse(fs.readFileSync(path.join(__dirname, '/data/seed-school-six-form.json'), 'utf8'))
+      const items = JSON.parse(fs.readFileSync(path.join(__dirname, '/data/seed-school-sixth-form.json'), 'utf8'))
 
       for (const item of items) {
         const baseFields = {
@@ -33,13 +33,13 @@ module.exports = {
         }
 
         // 1. Insert into users table
-        await queryInterface.bulkInsert('school_six_form', [baseFields], { transaction })
+        await queryInterface.bulkInsert('school_sixth_form', [baseFields], { transaction })
 
         // 2. Create revision
         // const { id: _, ...revisionDataWithoutId } = baseFields
 
         // const revisionId = await createRevision({
-        //   revisionTable: 'school_six_form_revisions',
+        //   revisionTable: 'school_sixth_form_revisions',
         //   entityId: item.id,
         //   revisionData: revisionDataWithoutId,
         //   revisionNumber,
@@ -49,9 +49,9 @@ module.exports = {
 
         // 3. Create activity log
         // await createActivityLog({
-        //   revisionTable: 'school_six_form_revisions',
+        //   revisionTable: 'school_sixth_form_revisions',
         //   revisionId,
-        //   entityType: 'school_six_form',
+        //   entityType: 'school_sixth_form',
         //   entityId: item.id,
         //   revisionNumber,
         //   changedById: systemUserId,
@@ -61,8 +61,8 @@ module.exports = {
 
       await transaction.commit()
     } catch (error) {
-      // console.error('School six form seeding error with revisions and activity logs:', error)
-      console.error('School six form seeding error:', error)
+      // console.error('School sixth form seeding error with revisions and activity logs:', error)
+      console.error('School sixth form seeding error:', error)
       await transaction.rollback()
       throw error
     }
@@ -70,9 +70,9 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     // await queryInterface.bulkDelete('activity_logs', {
-    //   entity_type: 'school_six_form'
+    //   entity_type: 'school_sixth_form'
     // })
-    // await queryInterface.bulkDelete('school_six_form_revisions', null, {})
-    await queryInterface.bulkDelete('school_six_form', null, {})
+    // await queryInterface.bulkDelete('school_sixth_form_revisions', null, {})
+    await queryInterface.bulkDelete('school_sixth_form', null, {})
   }
 }
