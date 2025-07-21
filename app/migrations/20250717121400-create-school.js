@@ -18,19 +18,19 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
-      type: {
+      type_code: {
         type: Sequelize.STRING,
         allowNull: false
       },
-      group: {
+      group_code: {
         type: Sequelize.STRING,
         allowNull: false
       },
-      status: {
+      status_code: {
         type: Sequelize.STRING,
         allowNull: false
       },
-      education_phase: {
+      education_phase_code: {
         type: Sequelize.STRING,
         allowNull: false
       },
