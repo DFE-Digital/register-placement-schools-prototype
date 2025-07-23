@@ -24,7 +24,10 @@ module.exports = {
       urn: {
         type: Sequelize.STRING
       },
-      code: {
+      accredited_provider_number: {
+        type: Sequelize.STRING
+      },
+      provider_code: {
         type: Sequelize.STRING,
         allowNull: false
       },
