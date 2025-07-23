@@ -38,7 +38,7 @@ module.exports = {
           id: providerId,
           operating_name: provider.operatingName,
           legal_name: nullIfEmpty(provider.legalName),
-          type: provider.type,
+          type_code: nullIfEmpty(provider.typeCode),
           ukprn: nullIfEmpty(provider.ukprn),
           urn: nullIfEmpty(provider.urn),
           accredited_provider_number: nullIfEmpty(provider.accreditedProviderNumber),
@@ -78,8 +78,8 @@ module.exports = {
 
       await transaction.commit()
     } catch (error) {
-      // console.error('provider seeding error with revisions and activity logs:', error)
-      console.error('provider seeding error:', error)
+      // console.error('Provider seeding error with revisions and activity logs:', error)
+      console.error('Provider seeding error:', error)
       await transaction.rollback()
       throw error
     }
