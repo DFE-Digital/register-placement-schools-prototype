@@ -21,24 +21,50 @@
     }) }} #}
 
     {% if placementSchools.length %}
-      <table class="govuk-table">
-        <thead class="govuk-table__head">
-          <tr class="govuk-table__row">
-            <th scope="col" class="govuk-table__header govuk-!-width-one-third">Name</th>
-          </tr>
-        </thead>
-        <tbody class="govuk-table__body">
-          {% for placementSchool in placementSchools %}
-            <tr class="govuk-table__row">
-              <td class="govuk-table__cell">
-                <a class="govuk-link" href="{{ actions.view }}/{{ placementSchool.id }}">
-                  {{ placementSchool.name }}
-                </a>
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+
+      {% for school in placementSchools %}
+
+        {% set nameHtml %}
+          <a href="{{ actions.view }}/{{ school.id }}" class="govuk-link">
+            {{ school.name }}
+          </a>
+        {% endset %}
+
+        {% set academicYearsHtml %}
+          <ul class="govuk-list govuk-list--spaced">
+            {% for year in school.academicYears %}
+              <li>
+                <strong>{{ year.name }}</strong>
+                <ul class="govuk-list govuk-list--bullet">
+                  {% for provider in year.providers %}
+                    <li>{{ provider.name }}</li>
+                  {% endfor %}
+                </ul>
+              </li>
+            {% endfor %}
+          </ul>
+        {% endset %}
+
+        {{ govukSummaryList({
+          card: {
+            title: {
+              html: nameHtml
+            }
+          },
+          rows: [
+            {
+              key: {
+                text: "Partnerships"
+              },
+              value: {
+                html: academicYearsHtml
+              }
+            }
+          ]
+        }) }}
+
+      {% endfor %}
+
       {% include "_includes/pagination.njk" %}
     {% else %}
       <p class="govuk-body">There are no placement schools.</p>
