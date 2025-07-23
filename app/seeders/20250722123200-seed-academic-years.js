@@ -61,8 +61,8 @@ module.exports = {
 
       await transaction.commit()
     } catch (error) {
-      // console.error('School admissions policies seeding error with revisions and activity logs:', error)
-      console.error('School admissions policies seeding error:', error)
+      // console.error('Academic years seeding error with revisions and activity logs:', error)
+      console.error('Academic years seeding error:', error)
       await transaction.rollback()
       throw error
     }
