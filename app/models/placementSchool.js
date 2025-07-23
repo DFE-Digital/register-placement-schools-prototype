@@ -13,7 +13,7 @@ module.exports = (sequelize) => {
         as: 'provider'
       })
 
-      PlacementSchool.belongsTo(models.academicYear, {
+      PlacementSchool.belongsTo(models.AcademicYear, {
         foreignKey: 'academicYearId',
         as: 'academicYear'
       })
