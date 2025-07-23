@@ -1,0 +1,50 @@
+{% extends "layouts/main.njk" %}
+
+{% set primaryNavId = "placementSchools" %}
+
+{% set title = "Placement schools (" + pagination.totalCount | numeral("0,0") + ")" %}
+
+{% block content %}
+
+{% include "_includes/notification-banner.njk" %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h1 class="govuk-heading-l">
+      {{ title }}
+    </h1>
+
+    {# {{ govukButton({
+      text: "Add placement school",
+      href: actions.new
+    }) }} #}
+
+    {% if placementSchools.length %}
+      <table class="govuk-table">
+        <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header govuk-!-width-one-third">Name</th>
+          </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+          {% for placementSchool in placementSchools %}
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell">
+                <a class="govuk-link" href="{{ actions.view }}/{{ placementSchool.id }}">
+                  {{ placementSchool.name }}
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% include "_includes/pagination.njk" %}
+    {% else %}
+      <p class="govuk-body">There are no placement schools.</p>
+    {% endif %}
+
+  </div>
+</div>
+
+{% endblock %}
