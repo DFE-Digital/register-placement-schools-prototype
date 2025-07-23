@@ -66,7 +66,7 @@ module.exports = (sequelize) => {
     {
       sequelize,
       modelName: 'AcademicYear',
-      tableName: 'academic_year',
+      tableName: 'academic_years',
       timestamps: true
     }
   )
