@@ -1,7 +1,9 @@
 const Pagination = require('../helpers/pagination')
 const { getSchoolTypeLabel, getSchoolGroupLabel, getSchoolStatusLabel, getSchoolEducationPhaseLabel, getAcademicYearLabel } = require('../helpers/content')
 
-// const { PlacementSchool } = require('../models')
+const { PlacementSchool, School, Provider, AcademicYear } = require('../models')
+
+const { Op } = require('sequelize')
 
 const getCheckboxValues = (name, data) => {
   return name && (Array.isArray(name)
@@ -19,6 +21,45 @@ const removeFilter = (value, data) => {
   } else {
     return null
   }
+}
+
+const groupPlacementSchools = (rows) => {
+  const grouped = {}
+
+  rows.forEach(row => {
+    const s = row.school
+    const a = row.academicYear
+    const p = row.provider
+
+    if (!grouped[s.id]) {
+      grouped[s.id] = {
+        id: s.id,
+        name: s.name,
+        academicYears: {}
+      }
+    }
+    if (!grouped[s.id].academicYears[a.id]) {
+      grouped[s.id].academicYears[a.id] = {
+        id: a.id,
+        name: a.name,
+        providers: {}
+      }
+    }
+    if (!grouped[s.id].academicYears[a.id].providers[p.id]) {
+      grouped[s.id].academicYears[a.id].providers[p.id] = {
+        id: p.id,
+        name: p.operatingName
+      }
+    }
+  })
+
+  return Object.values(grouped).map(school => ({
+    ...school,
+    academicYears: Object.values(school.academicYears).map(year => ({
+      ...year,
+      providers: Object.values(year.providers)
+    }))
+  }))
 }
 
 exports.placementSchoolsList = async (req, res) => {
@@ -193,17 +234,55 @@ exports.placementSchoolsList = async (req, res) => {
     selectedClosedSchool = filters.showClosedSchool
   }
 
-  // QUERY
-  const placementSchools = []
-  const totalCount = 0
+  const wherePlacementSchool = {}
+  const whereSchool = {}
 
-  // create the Pagination object
-  // using the chunk + the overall total count
-  const pagination = new Pagination(placementSchools, totalCount, page, limit)
+  if (schoolTypes?.length) {
+    whereSchool.typeCode = { [Op.in]: schoolTypes }
+  }
+  if (schoolGroups?.length) {
+    whereSchool.groupCode = { [Op.in]: schoolGroups }
+  }
+  if (schoolStatuses?.length) {
+    whereSchool.statusCode = { [Op.in]: schoolStatuses }
+  }
+  if (schoolEducationPhases?.length) {
+    whereSchool.educationPhaseCode = { [Op.in]: schoolEducationPhases }
+  }
+  if (academicYears?.length) {
+    wherePlacementSchool.academicYearId = { [Op.in]: academicYears }
+  }
+  if (keywords && keywords.trim() !== '') {
+    whereSchool.name = { [Op.like]: `%${keywords.trim()}%` }
+  }
+
+  // Run query to get ALL matches (we'll paginate after grouping)
+  const rows = await PlacementSchool.findAll({
+    where: wherePlacementSchool,
+    include: [
+      { model: School, as: 'school', where: whereSchool },
+      { model: Provider, as: 'provider' },
+      { model: AcademicYear, as: 'academicYear' }
+    ],
+    order: [
+      [{ model: School, as: 'school' }, 'name', 'ASC'],
+      [{ model: AcademicYear, as: 'academicYear' }, 'name', 'ASC'],
+      [{ model: Provider, as: 'provider' }, 'operatingName', 'ASC']
+    ]
+  })
+
+  const groupedPlacementSchools = groupPlacementSchools(rows)
+
+  // Paginate AFTER grouping
+  const totalCount = groupedPlacementSchools.length
+  const pagedPlacementSchools = groupedPlacementSchools.slice(offset, offset + limit)
+
+  // Build pagination object
+  const pagination = new Pagination(pagedPlacementSchools, totalCount, page, limit)
 
   res.render('placement-schools/index', {
     // placement schools for *this* page
-    placementSchools: pagination.getData(),
+    placementSchools: pagination.getData(), // paged + grouped
     // the pagination metadata (pageItems, nextPage, etc.)
     pagination,
     // the selected filters
