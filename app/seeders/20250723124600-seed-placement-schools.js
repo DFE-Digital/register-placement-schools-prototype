@@ -1,6 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const { parse } = require('csv-parse/sync')
+const { v4: uuidv4 } = require('uuid')
 
 // const createRevision = require('./helpers/createRevision')
 // const createActivityLog = require('./helpers/createActivityLog')
@@ -29,14 +30,18 @@ module.exports = {
       const userId = '354751f2-c5f7-483c-b9e4-b6103f50f970'
 
       for (const placementSchool of placementSchools) {
-        const placementSchoolId = placementSchool.id
+        const placementSchoolId = uuidv4()
+        const providerId = placementSchool.partnerId ? placementSchool.partnerId : placementSchool.providerId
+
+        if (!providerId || !placementSchool.schoolId || !placementSchool.academicYearId) continue
+
         // const revisionNumber = 1
 
         // Prepare base fields for both insert and revision
         const baseFields = {
           id: placementSchoolId,
           school_id: placementSchool.schoolId,
-          provider_id: placementSchool.providerId,
+          provider_id: providerId,
           academic_year_id: placementSchool.academicYearId,
           created_at: createdAt,
           created_by_id: userId,
@@ -73,8 +78,8 @@ module.exports = {
 
       await transaction.commit()
     } catch (error) {
-      // console.error('placement_school seeding error with revisions and activity logs:', error)
-      console.error('placement_school seeding error:', error)
+      // console.error('Placement school seeding error with revisions and activity logs:', error)
+      console.error('Placement school seeding error:', error)
       await transaction.rollback()
       throw error
     }
