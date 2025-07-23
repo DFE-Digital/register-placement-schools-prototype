@@ -1,4 +1,4 @@
-id,operatingName,legalName,type_code,providerCode,ukprn,urn,accreditedProviderNumber
+id,operatingName,legalName,typeCode,providerCode,ukprn,urn,accreditedProviderNumber
 91b73ade-1703-4475-aef7-9f6a84fb947c,2Schools Consortium,Oakthorpe Primary School,school,T92,10045988,,5606
 f492b075-3102-48c1-b9a4-9703fc8a3db3,Oakthorpe Primary School,,school,151,10045988,131407,
 8c748117-6c7b-4807-a6e1-7593b4c42c84,AA Teamworks West Yorkshire SCITT,Great Heights Trust,school,2AT,10032342,,5697
