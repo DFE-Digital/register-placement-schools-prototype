@@ -54,7 +54,14 @@ router.all('*', (req, res, next) => {
 })
 
 /// ------------------------------------------------------------------------ ///
-/// USER ROUTES
+/// HOMEPAGE ROUTE
+/// ------------------------------------------------------------------------ ///
+router.get('/', (req, res) => {
+  res.redirect('/placement-schools')
+})
+
+/// ------------------------------------------------------------------------ ///
+/// PLACEMENT SCHOOL ROUTES
 /// ------------------------------------------------------------------------ ///
 
 router.get('/placement-schools/remove-school-type-filter/:schoolType', checkIsAuthenticated, placementSchoolController.removeSchoolTypeFilter)
