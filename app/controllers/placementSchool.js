@@ -281,7 +281,12 @@ exports.placementSchoolsList = async (req, res) => {
     wherePlacementSchool.academicYearId = { [Op.in]: academicYears }
   }
   if (keywords && keywords.trim() !== '') {
-    whereSchool.name = { [Op.like]: `%${keywords.trim()}%` }
+    const term = `%${keywords.trim()}%`
+    whereSchool[Op.or] = [
+      { name: { [Op.like]: term } },
+      { ukprn: { [Op.like]: term } },
+      { urn: { [Op.like]: term } }
+    ]
   }
 
   // Step 1: get distinct school IDs for page
