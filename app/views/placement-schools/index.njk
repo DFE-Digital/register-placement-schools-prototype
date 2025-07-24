@@ -25,9 +25,9 @@
       {% for school in placementSchools %}
 
         {% set nameHtml %}
-          <a href="{{ actions.view }}/{{ school.id }}" class="govuk-link">
+          {# <a href="{{ actions.view }}/{{ school.id }}" class="govuk-link"> #}
             {{ school.name }}
-          </a>
+          {# </a> #}
         {% endset %}
 
         {% set academicYearsHtml %}
@@ -52,6 +52,42 @@
             }
           },
           rows: [
+            {
+              key: {
+                text: "Group"
+              },
+              value: {
+                text: school.group if school.group.length else "Not known",
+                classes: "govuk-hint" if not school.group.length
+              }
+            },
+            {
+              key: {
+                text: "Type"
+              },
+              value: {
+                text: school.type if school.type.length else "Not known",
+                classes: "govuk-hint" if not school.type.length
+              }
+            },
+            {
+              key: {
+                text: "Education phase"
+              },
+              value: {
+                text: school.educationPhase if school.educationPhase.length else "Not known",
+                classes: "govuk-hint" if not school.educationPhase.length
+              }
+            },
+            {
+              key: {
+                text: "Status"
+              },
+              value: {
+                text: school.status if school.status.length else "Not known",
+                classes: "govuk-hint" if not school.status.length
+              }
+            },
             {
               key: {
                 text: "Partnerships"
