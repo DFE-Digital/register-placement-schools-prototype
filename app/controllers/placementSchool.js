@@ -127,7 +127,7 @@ exports.placementSchoolsList = async (req, res) => {
   }
 
   let schoolStatuses
-  if (filters?.schoolStatuse) {
+  if (filters?.schoolStatus) {
     schoolStatuses = getCheckboxValues(schoolStatus, filters.schoolStatus)
   }
 
