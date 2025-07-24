@@ -256,11 +256,41 @@ exports.placementSchoolsList = async (req, res) => {
     whereSchool.name = { [Op.like]: `%${keywords.trim()}%` }
   }
 
-  // Run query to get ALL matches (we'll paginate after grouping)
-  const rows = await PlacementSchool.findAll({
-    where: wherePlacementSchool,
+  // Step 1: get distinct school IDs for page
+  const distinctSchools = await PlacementSchool.findAll({
+    attributes: ['schoolId'],
     include: [
-      { model: School, as: 'school', where: whereSchool },
+      { model: School, as: 'school', attributes: [], where: whereSchool },
+    ],
+    where: wherePlacementSchool,
+    group: ['schoolId'],
+    order: [[{ model: School, as: 'school' }, 'name', 'ASC']],
+    limit,
+    offset,
+    raw: true
+  })
+
+  // extract IDs
+  const pageSchoolIds = distinctSchools.map(row => row.schoolId)
+
+  // Step 2: count total distinct schools
+  const totalCount = await PlacementSchool.count({
+    distinct: true,
+    col: 'school_id',
+    include: [
+      { model: School, as: 'school', attributes: [], where: whereSchool },
+    ],
+    where: wherePlacementSchool
+  })
+
+  // Step 3: fetch full rows only for those IDs
+  const rows = await PlacementSchool.findAll({
+    where: {
+      ...wherePlacementSchool,
+      schoolId: { [Op.in]: pageSchoolIds }
+    },
+    include: [
+      { model: School, as: 'school' },
       { model: Provider, as: 'provider' },
       { model: AcademicYear, as: 'academicYear' }
     ],
@@ -271,14 +301,11 @@ exports.placementSchoolsList = async (req, res) => {
     ]
   })
 
+  // Step 4: group as before
   const groupedPlacementSchools = groupPlacementSchools(rows)
 
-  // Paginate AFTER grouping
-  const totalCount = groupedPlacementSchools.length
-  const pagedPlacementSchools = groupedPlacementSchools.slice(offset, offset + limit)
-
-  // Build pagination object
-  const pagination = new Pagination(pagedPlacementSchools, totalCount, page, limit)
+  // Step 5: build pagination
+  const pagination = new Pagination(groupedPlacementSchools, totalCount, page, limit)
 
   res.render('placement-schools/index', {
     // placement schools for *this* page
