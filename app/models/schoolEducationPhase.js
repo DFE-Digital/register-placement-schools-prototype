@@ -70,7 +70,7 @@ module.exports = (sequelize) => {
     {
       sequelize,
       modelName: 'SchoolEducationPhase',
-      tableName: 'school_statuses',
+      tableName: 'school_education_phases',
       timestamps: true
     }
   )
