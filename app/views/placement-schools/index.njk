@@ -11,14 +11,28 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
 
-    <h1 class="govuk-heading-l">
-      {{ title }}
-    </h1>
+    {% include "_includes/page-heading.njk" %}
 
     {# {{ govukButton({
       text: "Add placement school",
       href: actions.new
     }) }} #}
+
+  </div>
+</div>
+
+<div class="app-filter-layout">
+  <div class="app-filter-layout__filter">
+    {% include "./_filter-panel.njk" %}
+  </div>
+
+  <div class="app-filter-layout__content">
+
+    <div class="app-action-bar">
+      <div class="app-action-bar__filter"></div>
+    </div>
+
+    {% include "./_search-panel.njk" %}
 
     {% if placementSchools.length %}
 
@@ -54,7 +68,7 @@
           rows: [
             {
               key: {
-                text: "Group"
+                text: "School group"
               },
               value: {
                 text: school.group if school.group.length else "Not known",
@@ -63,7 +77,7 @@
             },
             {
               key: {
-                text: "Type"
+                text: "School type"
               },
               value: {
                 text: school.type if school.type.length else "Not known",
@@ -81,7 +95,7 @@
             },
             {
               key: {
-                text: "Status"
+                text: "School status"
               },
               value: {
                 text: school.status if school.status.length else "Not known",
