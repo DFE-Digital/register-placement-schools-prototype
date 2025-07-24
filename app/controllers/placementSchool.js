@@ -1,7 +1,22 @@
 const Pagination = require('../helpers/pagination')
-const { getSchoolTypeLabel, getSchoolGroupLabel, getSchoolStatusLabel, getSchoolEducationPhaseLabel, getAcademicYearLabel } = require('../helpers/content')
+const {
+  getSchoolTypeLabel,
+  getSchoolGroupLabel,
+  getSchoolStatusLabel,
+  getSchoolEducationPhaseLabel,
+  getAcademicYearLabel
+} = require('../helpers/content')
 
-const { PlacementSchool, School, Provider, AcademicYear } = require('../models')
+const {
+  PlacementSchool,
+  School,
+  Provider,
+  AcademicYear,
+  SchoolType,
+  SchoolGroup,
+  SchoolStatus,
+  SchoolEducationPhase
+} = require('../models')
 
 const { Op } = require('sequelize')
 
@@ -27,9 +42,22 @@ const groupPlacementSchools = (rows) => {
   const grouped = {}
 
   rows.forEach(row => {
+
     const s = row.school
     const a = row.academicYear
     const p = row.provider
+
+    if (!grouped[s.id]) {
+      grouped[s.id] = {
+        id: s.id,
+        name: s.name,
+        type: s.schoolType ? s.schoolType.name : null,
+        group: s.schoolGroup ? s.schoolGroup.name : null,
+        status: s.schoolStatus ? s.schoolStatus.name : null,
+        educationPhase: s.schoolEducationPhase ? s.schoolEducationPhase.name : null,
+        academicYears: {}
+      }
+    }
 
     if (!grouped[s.id]) {
       grouped[s.id] = {
@@ -290,7 +318,16 @@ exports.placementSchoolsList = async (req, res) => {
       schoolId: { [Op.in]: pageSchoolIds }
     },
     include: [
-      { model: School, as: 'school' },
+      {
+        model: School,
+        as: 'school',
+        include: [
+          { model: SchoolType, as: 'schoolType' },
+          { model: SchoolGroup, as: 'schoolGroup' },
+          { model: SchoolStatus, as: 'schoolStatus' },
+          { model: SchoolEducationPhase, as: 'schoolEducationPhase' }
+        ]
+      },
       { model: Provider, as: 'provider' },
       { model: AcademicYear, as: 'academicYear' }
     ],
