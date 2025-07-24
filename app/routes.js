@@ -29,6 +29,7 @@ const passport = {
 /// Controller modules
 /// ------------------------------------------------------------------------ ///
 const accountController = require('./controllers/account')
+const placementSchoolController = require('./controllers/placementSchool')
 const userController = require('./controllers/user')
 
 /// ------------------------------------------------------------------------ ///
@@ -51,6 +52,31 @@ router.all('*', (req, res, next) => {
   res.locals.flash = req.flash('success') // pass through 'success' messages only
   next()
 })
+
+/// ------------------------------------------------------------------------ ///
+/// HOMEPAGE ROUTE
+/// ------------------------------------------------------------------------ ///
+router.get('/', (req, res) => {
+  res.redirect('/placement-schools')
+})
+
+/// ------------------------------------------------------------------------ ///
+/// PLACEMENT SCHOOL ROUTES
+/// ------------------------------------------------------------------------ ///
+
+router.get('/placement-schools/remove-school-type-filter/:schoolType', checkIsAuthenticated, placementSchoolController.removeSchoolTypeFilter)
+router.get('/placement-schools/remove-school-group-filter/:schoolGroup', checkIsAuthenticated, placementSchoolController.removeSchoolGroupFilter)
+router.get('/placement-schools/remove-school-status-filter/:schoolStatus', checkIsAuthenticated, placementSchoolController.removeSchoolStatusFilter)
+router.get('/placement-schools/remove-school-education-phase-filter/:schoolEducationPhase', checkIsAuthenticated, placementSchoolController.removeSchoolEducationPhaseFilter)
+router.get('/placement-schools/remove-academic-year-filter/:academicYear', checkIsAuthenticated, placementSchoolController.removeAcademicYearFilter)
+router.get('/placement-schools/remove-show-closed-school-filter/:showClosedSchool', checkIsAuthenticated, placementSchoolController.removeShowClosedSchoolFilter)
+
+router.get('/placement-schools/remove-all-filters', checkIsAuthenticated, placementSchoolController.removeAllFilters)
+
+router.get('/placement-schools/remove-keyword-search', checkIsAuthenticated, placementSchoolController.removeKeywordSearch)
+
+router.get('/placement-schools', checkIsAuthenticated, placementSchoolController.placementSchoolsList)
+
 
 /// ------------------------------------------------------------------------ ///
 /// USER ROUTES

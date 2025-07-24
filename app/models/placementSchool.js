@@ -1,27 +1,36 @@
 const { Model, DataTypes } = require('sequelize')
 
 module.exports = (sequelize) => {
-  class SchoolEducationPhase extends Model {
+  class PlacementSchool extends Model {
     static associate(models) {
-      SchoolEducationPhase.hasMany(models.School, {
-        foreignKey: 'educationPhaseCode',
-        sourceKey: 'code',
-        as: 'schools'
+      PlacementSchool.belongsTo(models.School, {
+        foreignKey: 'schoolId',
+        as: 'school'
       })
 
-      SchoolEducationPhase.belongsTo(models.User, {
+      PlacementSchool.belongsTo(models.Provider, {
+        foreignKey: 'providerId',
+        as: 'provider'
+      })
+
+      PlacementSchool.belongsTo(models.AcademicYear, {
+        foreignKey: 'academicYearId',
+        as: 'academicYear'
+      })
+
+      PlacementSchool.belongsTo(models.User, {
         foreignKey: 'createdById',
         as: 'createdByUser'
       })
 
-      SchoolEducationPhase.belongsTo(models.User, {
+      PlacementSchool.belongsTo(models.User, {
         foreignKey: 'updatedById',
         as: 'updatedByUser'
       })
     }
   }
 
-  SchoolEducationPhase.init(
+  PlacementSchool.init(
     {
       id: {
         type: DataTypes.UUID,
@@ -29,14 +38,20 @@ module.exports = (sequelize) => {
         allowNull: false,
         primaryKey: true
       },
-      code:  {
-        type: DataTypes.STRING
+      schoolId:  {
+        type: DataTypes.UUID,
+        allowNull: false,
+        field: 'school_id'
       },
-      name:  {
-        type: DataTypes.STRING
+      providerId:  {
+        type: DataTypes.UUID,
+        allowNull: false,
+        field: 'provider_id'
       },
-      rank:  {
-        type: DataTypes.TINYINT
+      academicYearId:  {
+        type: DataTypes.UUID,
+        allowNull: false,
+        field: 'academic_year_id'
       },
       createdAt: {
         type: DataTypes.DATE,
@@ -69,28 +84,28 @@ module.exports = (sequelize) => {
     },
     {
       sequelize,
-      modelName: 'SchoolEducationPhase',
-      tableName: 'school_education_phases',
+      modelName: 'PlacementSchool',
+      tableName: 'placement_schools',
       timestamps: true
     }
   )
 
   // const createRevisionHook = require('../hooks/revisionHook')
 
-  // SchoolEducationPhase.addHook('afterCreate', (instance, options) =>
-  //   createRevisionHook({ revisionModelName: 'SchoolEducationPhaseRevision', modelKey: 'schoolEducationPhase' })(instance, {
+  // PlacementSchool.addHook('afterCreate', (instance, options) =>
+  //   createRevisionHook({ revisionModelName: 'PlacementSchoolRevision', modelKey: 'placementSchool' })(instance, {
   //     ...options,
   //     hookName: 'afterCreate'
   //   })
   // )
 
-  // SchoolEducationPhase.addHook('afterUpdate', (instance, options) => {
+  // PlacementSchool.addHook('afterUpdate', (instance, options) => {
   //   const hookName = instance.deletedById !== null ? 'afterDestroy' : 'afterUpdate'
-  //   createRevisionHook({ revisionModelName: 'SchoolEducationPhaseRevision', modelKey: 'schoolEducationPhase' })(instance, {
+  //   createRevisionHook({ revisionModelName: 'PlacementSchoolRevision', modelKey: 'placementSchool' })(instance, {
   //     ...options,
   //     hookName
   //   })
   // })
 
-  return SchoolEducationPhase
+  return PlacementSchool
 }

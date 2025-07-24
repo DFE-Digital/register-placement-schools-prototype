@@ -1,0 +1,112 @@
+{% extends "layouts/main.njk" %}
+
+{% set primaryNavId = "placementSchools" %}
+
+{% set title = "Placement schools (" + pagination.totalCount | numeral("0,0") + ")" %}
+
+{% block content %}
+
+{% include "_includes/notification-banner.njk" %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h1 class="govuk-heading-l">
+      {{ title }}
+    </h1>
+
+    {# {{ govukButton({
+      text: "Add placement school",
+      href: actions.new
+    }) }} #}
+
+    {% if placementSchools.length %}
+
+      {% for school in placementSchools %}
+
+        {% set nameHtml %}
+          {# <a href="{{ actions.view }}/{{ school.id }}" class="govuk-link"> #}
+            {{ school.name }}
+          {# </a> #}
+        {% endset %}
+
+        {% set academicYearsHtml %}
+          <ul class="govuk-list govuk-list--spaced">
+            {% for year in school.academicYears %}
+              <li>
+                <strong>{{ year.name }}</strong>
+                <ul class="govuk-list govuk-list--bullet">
+                  {% for provider in year.providers %}
+                    <li>{{ provider.name }}</li>
+                  {% endfor %}
+                </ul>
+              </li>
+            {% endfor %}
+          </ul>
+        {% endset %}
+
+        {{ govukSummaryList({
+          card: {
+            title: {
+              html: nameHtml
+            }
+          },
+          rows: [
+            {
+              key: {
+                text: "Group"
+              },
+              value: {
+                text: school.group if school.group.length else "Not known",
+                classes: "govuk-hint" if not school.group.length
+              }
+            },
+            {
+              key: {
+                text: "Type"
+              },
+              value: {
+                text: school.type if school.type.length else "Not known",
+                classes: "govuk-hint" if not school.type.length
+              }
+            },
+            {
+              key: {
+                text: "Education phase"
+              },
+              value: {
+                text: school.educationPhase if school.educationPhase.length else "Not known",
+                classes: "govuk-hint" if not school.educationPhase.length
+              }
+            },
+            {
+              key: {
+                text: "Status"
+              },
+              value: {
+                text: school.status if school.status.length else "Not known",
+                classes: "govuk-hint" if not school.status.length
+              }
+            },
+            {
+              key: {
+                text: "Partnerships"
+              },
+              value: {
+                html: academicYearsHtml
+              }
+            }
+          ]
+        }) }}
+
+      {% endfor %}
+
+      {% include "_includes/pagination.njk" %}
+    {% else %}
+      <p class="govuk-body">There are no placement schools.</p>
+    {% endif %}
+
+  </div>
+</div>
+
+{% endblock %}

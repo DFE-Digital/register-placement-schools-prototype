@@ -1,27 +1,26 @@
 const { Model, DataTypes } = require('sequelize')
 
 module.exports = (sequelize) => {
-  class SchoolEducationPhase extends Model {
+  class AcademicYear extends Model {
     static associate(models) {
-      SchoolEducationPhase.hasMany(models.School, {
-        foreignKey: 'educationPhaseCode',
-        sourceKey: 'code',
-        as: 'schools'
+      AcademicYear.hasMany(models.PlacementSchool, {
+        foreignKey: 'academicYearId',
+        as: 'placements'
       })
 
-      SchoolEducationPhase.belongsTo(models.User, {
+      AcademicYear.belongsTo(models.User, {
         foreignKey: 'createdById',
         as: 'createdByUser'
       })
 
-      SchoolEducationPhase.belongsTo(models.User, {
+      AcademicYear.belongsTo(models.User, {
         foreignKey: 'updatedById',
         as: 'updatedByUser'
       })
     }
   }
 
-  SchoolEducationPhase.init(
+  AcademicYear.init(
     {
       id: {
         type: DataTypes.UUID,
@@ -34,9 +33,6 @@ module.exports = (sequelize) => {
       },
       name:  {
         type: DataTypes.STRING
-      },
-      rank:  {
-        type: DataTypes.TINYINT
       },
       createdAt: {
         type: DataTypes.DATE,
@@ -69,28 +65,28 @@ module.exports = (sequelize) => {
     },
     {
       sequelize,
-      modelName: 'SchoolEducationPhase',
-      tableName: 'school_education_phases',
+      modelName: 'AcademicYear',
+      tableName: 'academic_years',
       timestamps: true
     }
   )
 
   // const createRevisionHook = require('../hooks/revisionHook')
 
-  // SchoolEducationPhase.addHook('afterCreate', (instance, options) =>
-  //   createRevisionHook({ revisionModelName: 'SchoolEducationPhaseRevision', modelKey: 'schoolEducationPhase' })(instance, {
+  // AcademicYear.addHook('afterCreate', (instance, options) =>
+  //   createRevisionHook({ revisionModelName: 'AcademicYearRevision', modelKey: 'academicYear' })(instance, {
   //     ...options,
   //     hookName: 'afterCreate'
   //   })
   // )
 
-  // SchoolEducationPhase.addHook('afterUpdate', (instance, options) => {
+  // AcademicYear.addHook('afterUpdate', (instance, options) => {
   //   const hookName = instance.deletedById !== null ? 'afterDestroy' : 'afterUpdate'
-  //   createRevisionHook({ revisionModelName: 'SchoolEducationPhaseRevision', modelKey: 'schoolEducationPhase' })(instance, {
+  //   createRevisionHook({ revisionModelName: 'AcademicYearRevision', modelKey: 'academicYear' })(instance, {
   //     ...options,
   //     hookName
   //   })
   // })
 
-  return SchoolEducationPhase
+  return AcademicYear
 }
