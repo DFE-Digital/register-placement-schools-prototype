@@ -51,6 +51,8 @@ const groupPlacementSchools = (rows) => {
       grouped[s.id] = {
         id: s.id,
         name: s.name,
+        ukprn: s.ukprn ? s.ukprn : null,
+        urn: s.urn ? s.urn : null,
         type: s.schoolType ? s.schoolType.name : null,
         group: s.schoolGroup ? s.schoolGroup.name : null,
         status: s.schoolStatus ? s.schoolStatus.name : null,
