@@ -4,7 +4,7 @@
   name: "filters[schoolGroup]",
   fieldset: {
     legend: {
-      text: "School group",
+      html: 'School group<span class="govuk-visually-hidden"> filter</span>',
       isPageHeading: false,
       classes: "govuk-fieldset__legend--s"
     }
@@ -13,21 +13,8 @@
     classes: "app-filter__group"
   },
   classes: "govuk-checkboxes--small",
-  values: data.filters.schoolGroup,
-  items: [
-    {
-      value: "1",
-      text: "One"
-    },
-    {
-      value: "2",
-      text: "Two"
-    },
-    {
-      value: "3",
-      text: "Three"
-    }
-  ]
+  values: selectedSchoolGroup,
+  items: filterSchoolGroupItems
 }) }}
 
 {{ govukCheckboxes({
@@ -35,7 +22,7 @@
   name: "filters[schoolType]",
   fieldset: {
     legend: {
-      text: "School type",
+      html: 'School type<span class="govuk-visually-hidden"> filter</span>',
       isPageHeading: false,
       classes: "govuk-fieldset__legend--s"
     }
@@ -44,19 +31,8 @@
     classes: "app-filter__group"
   },
   classes: "govuk-checkboxes--small",
-  values: data.filters.schoolType,
-  items: [{
-      value: "1",
-      text: "One"
-    },
-    {
-      value: "2",
-      text: "Two"
-    },
-    {
-      value: "3",
-      text: "Three"
-    }]
+  values: selectedSchoolType,
+  items: filterSchoolTypeItems
 }) }}
 
 {{ govukCheckboxes({
@@ -64,7 +40,7 @@
   name: "filters[schoolEducationPhase]",
   fieldset: {
     legend: {
-      text: "Education phase",
+      html: 'Education phase<span class="govuk-visually-hidden"> filter</span>',
       isPageHeading: false,
       classes: "govuk-fieldset__legend--s"
     }
@@ -73,19 +49,8 @@
     classes: "app-filter__group"
   },
   classes: "govuk-checkboxes--small",
-  values: data.filters.schoolEducationPhase,
-  items: [{
-      value: "1",
-      text: "One"
-    },
-    {
-      value: "2",
-      text: "Two"
-    },
-    {
-      value: "3",
-      text: "Three"
-    }]
+  values: selectedSchoolEducationPhase,
+  items: filterSchoolEducationPhaseItems
 }) }}
 
 {{ govukCheckboxes({
@@ -93,7 +58,7 @@
   name: "filters[schoolStatus]",
   fieldset: {
     legend: {
-      text: "School status",
+      html: 'School status<span class="govuk-visually-hidden"> filter</span>',
       isPageHeading: false,
       classes: "govuk-fieldset__legend--s"
     }
@@ -102,43 +67,9 @@
     classes: "app-filter__group"
   },
   classes: "govuk-checkboxes--small",
-  values: data.filters.schoolStatus,
-  items: [{
-      value: "1",
-      text: "One"
-    },
-    {
-      value: "2",
-      text: "Two"
-    },
-    {
-      value: "3",
-      text: "Three"
-    }]
+  values: selectedSchoolStatus,
+  items: filterSchoolStatusItems
 }) }}
-
-{# {{ govukCheckboxes({
-  id: "filters-show-closed-schools",
-  name: "filters[showClosedSchool]",
-  fieldset: {
-    legend: {
-      text: "Closed schools",
-      isPageHeading: false,
-      classes: "govuk-fieldset__legend--s"
-    }
-  },
-  formGroup: {
-    classes: "app-filter__group"
-  },
-  classes: "govuk-checkboxes--small",
-  values: data.filters.showClosedSchool,
-  items: [
-    {
-      value: "showClosedSchool",
-      text: "Include closed schools"
-    }
-  ]
-}) }} #}
 {% endset %}
 
 <div class="app-filter">
