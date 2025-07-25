@@ -54,6 +54,22 @@ const getSchoolTypeOptions = async () => {
   return items
 }
 
+const getSchoolTypeLabel = async (code) => {
+  let label
+
+  const schoolType = await SchoolType.findOne({ where: {
+    code: code
+  }})
+
+  if (schoolType) {
+    label = schoolType.name
+  } else {
+    label = code
+  }
+
+  return label
+}
+
 const getSchoolStatusOptions = async () => {
   const items = []
 
@@ -68,6 +84,22 @@ const getSchoolStatusOptions = async () => {
   })
 
   return items
+}
+
+const getSchoolStatusLabel = async (code) => {
+  let label
+
+  const schoolStatus = await SchoolStatus.findOne({ where: {
+    code: code
+  }})
+
+  if (schoolStatus) {
+    label = schoolStatus.name
+  } else {
+    label = code
+  }
+
+  return label
 }
 
 const getSchoolEducationPhaseOptions = async () => {
@@ -86,10 +118,29 @@ const getSchoolEducationPhaseOptions = async () => {
   return items
 }
 
+const getSchoolEducationPhaseLabel = async (code) => {
+  let label
+
+  const schoolEducationPhase = await SchoolEducationPhase.findOne({ where: {
+    code: code
+  }})
+
+  if (schoolEducationPhase) {
+    label = schoolEducationPhase.name
+  } else {
+    label = code
+  }
+
+  return label
+}
+
 module.exports = {
   getSchoolTypeOptions,
+  getSchoolTypeLabel,
   getSchoolGroupOptions,
   getSchoolGroupLabel,
   getSchoolStatusOptions,
-  getSchoolEducationPhaseOptions
+  getSchoolStatusLabel,
+  getSchoolEducationPhaseOptions,
+  getSchoolEducationPhaseLabel
 }
