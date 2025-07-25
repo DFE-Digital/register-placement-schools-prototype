@@ -2,13 +2,14 @@ const Pagination = require('../helpers/pagination')
 const {
   getSchoolTypeOptions,
   getSchoolGroupOptions,
+  getSchoolGroupLabel,
   getSchoolStatusOptions,
   getSchoolEducationPhaseOptions
 } = require('../helpers/gias')
 
 const {
   getSchoolTypeLabel,
-  getSchoolGroupLabel,
+  // getSchoolGroupLabel,
   getSchoolStatusLabel,
   getSchoolEducationPhaseLabel,
   getAcademicYearLabel
@@ -169,14 +170,19 @@ exports.placementSchoolsList = async (req, res) => {
     }
 
     if (schoolGroups?.length) {
-      selectedFilters.categories.push({
-        heading: { text: 'School group' },
-        items: schoolGroups.map((schoolGroup) => {
+      const items = await Promise.all(
+        schoolGroups.map(async (schoolGroup) => {
+          const label = await getSchoolGroupLabel(schoolGroup)
           return {
-            text: getSchoolGroupLabel(schoolGroup),
+            text: label,
             href: `/placement-schools/remove-school-group-filter/${schoolGroup}`
           }
         })
+      )
+
+      selectedFilters.categories.push({
+        heading: { text: 'School group' },
+        items: items
       })
     }
 
