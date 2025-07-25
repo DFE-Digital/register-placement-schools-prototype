@@ -1,0 +1,172 @@
+{% set filterOptionsHtml %}
+{% if filterSchoolGroupItems.length > 5 %}
+  {{ appCheckboxFilter({
+    id: "filters-school-group",
+    name: "filters[schoolGroup]",
+    fieldset: {
+      legend: {
+        html: 'School type<span class="govuk-visually-hidden"> filter</span>',
+        isPageHeading: false,
+        classes: "govuk-fieldset__legend--s"
+      }
+    },
+    values: selectedSchoolGroup,
+    items: filterSchoolGroupItems,
+    showSelectedTags: false,
+    classes: "govuk-!-margin-bottom-7"
+  }) }}
+{% else %}
+  {{ govukCheckboxes({
+    id: "filters-school-group",
+    name: "filters[schoolGroup]",
+    fieldset: {
+      legend: {
+        html: 'School type<span class="govuk-visually-hidden"> filter</span>',
+        isPageHeading: false,
+        classes: "govuk-fieldset__legend--s"
+      }
+    },
+    formGroup: {
+      classes: "app-filter__group"
+    },
+    classes: "govuk-checkboxes--small",
+    values: selectedSchoolGroup,
+    items: filterSchoolGroupItems
+  }) }}
+{% endif %}
+
+{# {% if filterSchoolTypeItems.length > 5 %}
+  {{ appCheckboxFilter({
+    id: "filters-school-type",
+    name: "filters[schoolType]",
+    fieldset: {
+      legend: {
+        html: 'School type<span class="govuk-visually-hidden"> filter</span>',
+        isPageHeading: false,
+        classes: "govuk-fieldset__legend--s"
+      }
+    },
+    values: selectedSchoolType,
+    items: filterSchoolTypeItems,
+    showSelectedTags: false,
+    classes: "govuk-!-margin-bottom-7"
+  }) }}
+{% else %}
+  {{ govukCheckboxes({
+    id: "filters-school-type",
+    name: "filters[schoolType]",
+    fieldset: {
+      legend: {
+        html: 'School type<span class="govuk-visually-hidden"> filter</span>',
+        isPageHeading: false,
+        classes: "govuk-fieldset__legend--s"
+      }
+    },
+    formGroup: {
+      classes: "app-filter__group"
+    },
+    classes: "govuk-checkboxes--small",
+    values: selectedSchoolType,
+    items: filterSchoolTypeItems
+  }) }}
+{% endif %} #}
+
+{% if filterSchoolTypeItems.length > 5 %}
+  {{ appCheckboxFilter({
+    id: "filters-school-education-phase",
+    name: "filters[schoolEducationPhase]",
+    fieldset: {
+      legend: {
+        html: 'Education phase<span class="govuk-visually-hidden"> filter</span>',
+        isPageHeading: false,
+        classes: "govuk-fieldset__legend--s"
+      }
+    },
+    values: selectedSchoolEducationPhase,
+    items: filterSchoolEducationPhaseItems,
+    showSelectedTags: false,
+    classes: "govuk-!-margin-bottom-7"
+  }) }}
+{% else %}
+  {{ govukCheckboxes({
+    id: "filters-school-education-phase",
+    name: "filters[schoolEducationPhase]",
+    fieldset: {
+      legend: {
+        html: 'Education phase<span class="govuk-visually-hidden"> filter</span>',
+        isPageHeading: false,
+        classes: "govuk-fieldset__legend--s"
+      }
+    },
+    formGroup: {
+      classes: "app-filter__group"
+    },
+    classes: "govuk-checkboxes--small",
+    values: selectedSchoolEducationPhase,
+    items: filterSchoolEducationPhaseItems
+  }) }}
+{% endif %}
+
+{{ govukCheckboxes({
+  id: "filters-school-status",
+  name: "filters[schoolStatus]",
+  fieldset: {
+    legend: {
+      html: 'School status<span class="govuk-visually-hidden"> filter</span>',
+      isPageHeading: false,
+      classes: "govuk-fieldset__legend--s"
+    }
+  },
+  formGroup: {
+    classes: "app-filter__group"
+  },
+  classes: "govuk-checkboxes--small",
+  values: selectedSchoolStatus,
+  items: filterSchoolStatusItems
+}) }}
+{% endset %}
+
+<div class="app-filter">
+  <div class="app-filter__header">
+    <div class="app-filter__header-title">
+      <h2 class="govuk-heading-m">Filter</h2>
+    </div>
+    <div class="app-filter__header-action">
+
+    </div>
+  </div>
+  <div class="app-filter__content">
+    {% if selectedFilters %}
+      <div class="app-filter__selected">
+        <div class="app-filter__selected-heading">
+          <div class="app-filter__heading-title">
+            <h2 class="govuk-heading-m govuk-!-margin-bottom-1">Selected filters</h2>
+            <p class="govuk-body">
+              <a class="govuk-link govuk-link--no-visited-state" href="{{ actions.filters.remove }}">Clear filters</a>
+            </p>
+          </div>
+        </div>
+        {% for category in selectedFilters.categories %}
+          <h3 class="govuk-heading-s govuk-!-margin-bottom-0">{{ category.heading.text }}</h3>
+          <ul class="app-filter-tags">
+            {% for item in category.items %}
+              <li>
+                <a class="app-filter__tag" href="{{ item.href }}">
+                  <span class="govuk-visually-hidden">Remove this filter</span> {{ item.text }}
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        {% endfor %}
+      </div>
+    {% endif %}
+    <div class="app-filter__options">
+      <form method="get" action="{{ actions.filters.apply }}" novalidate>
+        <button class="govuk-button" data-module="govuk-button">
+          Apply filters
+        </button>
+        {{ filterOptionsHtml | safe }}
+      </form>
+    </div>
+  </div>
+</div>
