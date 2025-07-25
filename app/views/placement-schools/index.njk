@@ -59,7 +59,7 @@
           <ul class="govuk-list govuk-list--spaced">
             {% for year in school.academicYears %}
               <li>
-                <strong>{{ year.name }}</strong>
+                {{ year.name }}
                 <ul class="govuk-list govuk-list--bullet">
                   {% for provider in year.providers %}
                     <li>{{ provider.name }}</li>
@@ -123,7 +123,7 @@
             },
             {
               key: {
-                text: "Partnerships"
+                text: "Latest partnership"
               },
               value: {
                 html: academicYearsHtml

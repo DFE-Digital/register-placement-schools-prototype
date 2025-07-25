@@ -18,7 +18,8 @@ const {
   SchoolType,
   SchoolGroup,
   SchoolStatus,
-  SchoolEducationPhase
+  SchoolEducationPhase,
+  Sequelize
 } = require('../models')
 
 const { Op } = require('sequelize')
@@ -346,11 +347,33 @@ exports.placementSchoolsList = async (req, res) => {
     where: wherePlacementSchool
   })
 
-  // Step 3: fetch full rows only for those IDs
+  // Step 3: get latest academic year for each school
+  const latestAcademicYears = await PlacementSchool.findAll({
+    attributes: [
+      'schoolId',
+      [Sequelize.fn('MAX', Sequelize.col('academic_year_id')), 'latestAcademicYearId']
+    ],
+    where: {
+      schoolId: { [Op.in]: pageSchoolIds },
+      ...wherePlacementSchool
+    },
+    group: ['schoolId'],
+    raw: true
+  })
+
+  // Turn into a lookup (schoolId -> latest academicYearId)
+  const schoolToLatestYear = {}
+  latestAcademicYears.forEach(row => {
+    schoolToLatestYear[row.schoolId] = row.latestAcademicYearId
+  })
+
+  // Step 4: fetch only latest academic year rows for those schools
   const rows = await PlacementSchool.findAll({
     where: {
-      ...wherePlacementSchool,
-      schoolId: { [Op.in]: pageSchoolIds }
+      [Op.or]: Object.entries(schoolToLatestYear).map(([schoolId, academicYearId]) => ({
+        schoolId,
+        academicYearId
+      }))
     },
     include: [
       {
@@ -368,7 +391,6 @@ exports.placementSchoolsList = async (req, res) => {
     ],
     order: [
       [{ model: School, as: 'school' }, 'name', 'ASC'],
-      [{ model: AcademicYear, as: 'academicYear' }, 'name', 'ASC'],
       [{ model: Provider, as: 'provider' }, 'operatingName', 'ASC']
     ]
   })
