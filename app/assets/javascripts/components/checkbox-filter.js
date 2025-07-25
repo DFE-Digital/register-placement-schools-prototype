@@ -89,7 +89,7 @@ export class CheckboxFilter {
       const label = item.querySelector('.govuk-checkboxes__label')
       const labelValue = this.cleanString(label.textContent)
       if (labelValue.includes(textValue)) {
-        item.style.display = 'block'
+        item.style.display = ''
       } else {
         item.style.display = 'none'
       }
