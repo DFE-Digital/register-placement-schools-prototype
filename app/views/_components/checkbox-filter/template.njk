@@ -1,5 +1,5 @@
-{#- If an id 'prefix' is not passed, fall back to using the name attribute -#}
-{%- set idPrefix = params.idPrefix if params.idPrefix else params.name -%}
+{#- If an id is not passed, fall back to using the name attribute -#}
+{%- set idPrefix = params.id if params.id else params.name -%}
 
 <div id="{{ idPrefix }}" class="app-checkbox-filter {{- ' ' + params.classes if params.classes }}" {%- for attribute, value in params.attributes %} {{ attribute }}="{{ value }}"{% endfor %}>
 
