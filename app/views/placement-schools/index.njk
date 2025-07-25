@@ -44,6 +44,17 @@
           {# </a> #}
         {% endset %}
 
+        {% set schoolTypeGroupHtml %}
+          <ul class="govuk-list">
+            <li>
+              {{ school.group }}
+            </li>
+            <li class="govuk-!-font-size-16">
+              {{ school.type }}
+            </li>
+          </ul>
+        {% endset %}
+
         {% set academicYearsHtml %}
           <ul class="govuk-list govuk-list--spaced">
             {% for year in school.academicYears %}
@@ -86,20 +97,10 @@
             },
             {
               key: {
-                text: "School group"
-              },
-              value: {
-                text: school.group if school.group.length else "Not known",
-                classes: "govuk-hint" if not school.group.length
-              }
-            },
-            {
-              key: {
                 text: "School type"
               },
               value: {
-                text: school.type if school.type.length else "Not known",
-                classes: "govuk-hint" if not school.type.length
+                html: schoolTypeGroupHtml
               }
             },
             {
