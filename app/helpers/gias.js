@@ -22,6 +22,22 @@ const getSchoolGroupOptions = async () => {
   return items
 }
 
+const getSchoolGroupLabel = async (code) => {
+  let label
+
+  const schoolGroup = await SchoolGroup.findOne({ where: {
+    code: code
+  }})
+
+  if (schoolGroup) {
+    label = schoolGroup.name
+  } else {
+    label = code
+  }
+
+  return label
+}
+
 const getSchoolTypeOptions = async () => {
   const items = []
 
@@ -73,6 +89,7 @@ const getSchoolEducationPhaseOptions = async () => {
 module.exports = {
   getSchoolTypeOptions,
   getSchoolGroupOptions,
+  getSchoolGroupLabel,
   getSchoolStatusOptions,
   getSchoolEducationPhaseOptions
 }
