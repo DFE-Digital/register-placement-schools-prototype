@@ -1,19 +1,14 @@
 const Pagination = require('../helpers/pagination')
 const {
   getSchoolTypeOptions,
+  getSchoolTypeLabel,
   getSchoolGroupOptions,
   getSchoolGroupLabel,
   getSchoolStatusOptions,
-  getSchoolEducationPhaseOptions
-} = require('../helpers/gias')
-
-const {
-  getSchoolTypeLabel,
-  // getSchoolGroupLabel,
   getSchoolStatusLabel,
-  getSchoolEducationPhaseLabel,
-  getAcademicYearLabel
-} = require('../helpers/content')
+  getSchoolEducationPhaseOptions,
+  getSchoolEducationPhaseLabel
+} = require('../helpers/gias')
 
 const {
   PlacementSchool,
@@ -187,38 +182,53 @@ exports.placementSchoolsList = async (req, res) => {
     }
 
     if (schoolTypes?.length) {
-      selectedFilters.categories.push({
-        heading: { text: 'School type' },
-        items: schoolTypes.map((schoolType) => {
+      const items = await Promise.all(
+        schoolTypes.map(async (schoolType) => {
+          const label = await getSchoolTypeLabel(schoolType)
           return {
-            text: getSchoolTypeLabel(schoolType),
+            text: label,
             href: `/placement-schools/remove-school-type-filter/${schoolType}`
           }
         })
+      )
+
+      selectedFilters.categories.push({
+        heading: { text: 'School type' },
+        items: items
       })
     }
 
     if (schoolEducationPhases?.length) {
-      selectedFilters.categories.push({
-        heading: { text: 'School education phase' },
-        items: schoolEducationPhases.map((schoolEducationPhase) => {
+      const items = await Promise.all(
+        schoolEducationPhases.map(async (schoolEducationPhase) => {
+          const label = await getSchoolEducationPhaseLabel(schoolEducationPhase)
           return {
-            text: getSchoolEducationPhaseLabel(schoolEducationPhase),
+            text: label,
             href: `/placement-schools/remove-school-education-phase-filter/${schoolEducationPhase}`
           }
         })
+      )
+
+      selectedFilters.categories.push({
+        heading: { text: 'School education phase' },
+        items: items
       })
     }
 
     if (schoolStatuses?.length) {
-      selectedFilters.categories.push({
-        heading: { text: 'School status' },
-        items: schoolStatuses.map((schoolStatus) => {
+      const items = await Promise.all(
+        schoolStatuses.map(async (schoolStatus) => {
+          const label = await getSchoolStatusLabel(schoolStatus)
           return {
-            text: getSchoolStatusLabel(schoolStatus),
+            text: label,
             href: `/placement-schools/remove-school-status-filter/${schoolStatus}`
           }
         })
+      )
+
+      selectedFilters.categories.push({
+        heading: { text: 'School status' },
+        items: items
       })
     }
 
