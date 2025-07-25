@@ -1,15 +1,14 @@
-//
-// For guidance on how to add JavaScript see:
-// https://prototype-kit.service.gov.uk/docs/adding-css-javascript-and-images
-//
 import { FilterToggleButton } from '/public/javascripts/components/filter-toggle-button.js'
+import { CheckboxFilter } from '/public/javascripts/components/checkbox-filter.js'
 
 window.GOVUKPrototypeKit.documentReady(() => {
+  // -----------------------------------
+  // Filter toggle button
+  // -----------------------------------
   const filterContainer = document.querySelector('.app-filter-layout__filter')
   const actionBarFilterContainer = document.querySelector('.app-action-bar__filter')
   const filterHeaderActionContainer = document.querySelector('.app-filter__header-action')
 
-  // Only create / init if filterContainer is present
   if (filterContainer && actionBarFilterContainer && filterHeaderActionContainer) {
     const filterToggleButton = new FilterToggleButton({
       bigModeMediaQuery: '(min-width: 48.063em)',
@@ -29,5 +28,35 @@ window.GOVUKPrototypeKit.documentReady(() => {
       }
     })
     filterToggleButton.init()
+  }
+
+  // -----------------------------------
+  // Checkbox filters
+  // -----------------------------------
+  const groupContainer = document.querySelector('#filters-school-group')
+  if (groupContainer) {
+    const checkboxFilterSchoolGroup = new CheckboxFilter({
+      container: groupContainer,
+      textBox: { label: 'Search for group' }
+    })
+    checkboxFilterSchoolGroup.init()
+  }
+
+  const typeContainer = document.querySelector('#filters-school-type')
+  if (typeContainer) {
+    const checkboxFilterSchoolType = new CheckboxFilter({
+      container: typeContainer,
+      textBox: { label: 'Search for type' }
+    })
+    checkboxFilterSchoolType.init()
+  }
+
+  const phaseContainer = document.querySelector('#filters-school-education-phase')
+  if (phaseContainer) {
+    const checkboxFilterSchoolEducationPhase = new CheckboxFilter({
+      container: phaseContainer,
+      textBox: { label: 'Search for education phase' }
+    })
+    checkboxFilterSchoolEducationPhase.init()
   }
 })
