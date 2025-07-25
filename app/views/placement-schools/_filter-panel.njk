@@ -1,57 +1,111 @@
 {% set filterOptionsHtml %}
-{{ govukCheckboxes({
-  id: "filters-school-group",
-  name: "filters[schoolGroup]",
-  fieldset: {
-    legend: {
-      html: 'School group<span class="govuk-visually-hidden"> filter</span>',
-      isPageHeading: false,
-      classes: "govuk-fieldset__legend--s"
-    }
-  },
-  formGroup: {
-    classes: "app-filter__group"
-  },
-  classes: "govuk-checkboxes--small",
-  values: selectedSchoolGroup,
-  items: filterSchoolGroupItems
-}) }}
+{% if filterSchoolGroupItems.length > 5 %}
+  {{ appCheckboxFilter({
+    id: "filters-school-group",
+    name: "filters[schoolGroup]",
+    fieldset: {
+      legend: {
+        html: 'School group<span class="govuk-visually-hidden"> filter</span>',
+        isPageHeading: false,
+        classes: "govuk-fieldset__legend--s"
+      }
+    },
+    values: selectedSchoolGroup,
+    items: filterSchoolGroupItems,
+    showSelectedTags: false,
+    classes: "govuk-!-margin-bottom-7"
+  }) }}
+{% else %}
+  {{ govukCheckboxes({
+    id: "filters-school-group",
+    name: "filters[schoolGroup]",
+    fieldset: {
+      legend: {
+        html: 'School group<span class="govuk-visually-hidden"> filter</span>',
+        isPageHeading: false,
+        classes: "govuk-fieldset__legend--s"
+      }
+    },
+    formGroup: {
+      classes: "app-filter__group"
+    },
+    classes: "govuk-checkboxes--small",
+    values: selectedSchoolGroup,
+    items: filterSchoolGroupItems
+  }) }}
+{% endif %}
 
-{{ govukCheckboxes({
-  id: "filters-school-type",
-  name: "filters[schoolType]",
-  fieldset: {
-    legend: {
-      html: 'School type<span class="govuk-visually-hidden"> filter</span>',
-      isPageHeading: false,
-      classes: "govuk-fieldset__legend--s"
-    }
-  },
-  formGroup: {
-    classes: "app-filter__group"
-  },
-  classes: "govuk-checkboxes--small",
-  values: selectedSchoolType,
-  items: filterSchoolTypeItems
-}) }}
+{% if filterSchoolTypeItems.length > 5 %}
+  {{ appCheckboxFilter({
+    id: "filters-school-type",
+    name: "filters[schoolType]",
+    fieldset: {
+      legend: {
+        html: 'School type<span class="govuk-visually-hidden"> filter</span>',
+        isPageHeading: false,
+        classes: "govuk-fieldset__legend--s"
+      }
+    },
+    values: selectedSchoolType,
+    items: filterSchoolTypeItems,
+    showSelectedTags: false,
+    classes: "govuk-!-margin-bottom-7"
+  }) }}
+{% else %}
+  {{ govukCheckboxes({
+    id: "filters-school-type",
+    name: "filters[schoolType]",
+    fieldset: {
+      legend: {
+        html: 'School type<span class="govuk-visually-hidden"> filter</span>',
+        isPageHeading: false,
+        classes: "govuk-fieldset__legend--s"
+      }
+    },
+    formGroup: {
+      classes: "app-filter__group"
+    },
+    classes: "govuk-checkboxes--small",
+    values: selectedSchoolType,
+    items: filterSchoolTypeItems
+  }) }}
+{% endif %}
 
-{{ govukCheckboxes({
-  id: "filters-school-education-phase",
-  name: "filters[schoolEducationPhase]",
-  fieldset: {
-    legend: {
-      html: 'Education phase<span class="govuk-visually-hidden"> filter</span>',
-      isPageHeading: false,
-      classes: "govuk-fieldset__legend--s"
-    }
-  },
-  formGroup: {
-    classes: "app-filter__group"
-  },
-  classes: "govuk-checkboxes--small",
-  values: selectedSchoolEducationPhase,
-  items: filterSchoolEducationPhaseItems
-}) }}
+{% if filterSchoolTypeItems.length > 5 %}
+  {{ appCheckboxFilter({
+    id: "filters-school-education-phase",
+    name: "filters[schoolEducationPhase]",
+    fieldset: {
+      legend: {
+        html: 'School education phase<span class="govuk-visually-hidden"> filter</span>',
+        isPageHeading: false,
+        classes: "govuk-fieldset__legend--s"
+      }
+    },
+    values: selectedSchoolEducationPhase,
+    items: filterSchoolEducationPhaseItems,
+    showSelectedTags: false,
+    classes: "govuk-!-margin-bottom-7"
+  }) }}
+{% else %}
+  {{ govukCheckboxes({
+    id: "filters-school-education-phase",
+    name: "filters[schoolEducationPhase]",
+    fieldset: {
+      legend: {
+        html: 'Education phase<span class="govuk-visually-hidden"> filter</span>',
+        isPageHeading: false,
+        classes: "govuk-fieldset__legend--s"
+      }
+    },
+    formGroup: {
+      classes: "app-filter__group"
+    },
+    classes: "govuk-checkboxes--small",
+    values: selectedSchoolEducationPhase,
+    items: filterSchoolEducationPhaseItems
+  }) }}
+{% endif %}
 
 {{ govukCheckboxes({
   id: "filters-school-status",
