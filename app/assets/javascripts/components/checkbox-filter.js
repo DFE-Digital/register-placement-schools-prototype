@@ -15,7 +15,14 @@ export class CheckboxFilter {
     this.heading = document.createElement('p')
     this.heading.className = 'app-checkbox-filter__title'
     this.heading.setAttribute('aria-hidden', 'true')
-    this.heading.textContent = this.legend ? this.legend.textContent : ''
+
+    if (this.legend) {
+      // Get the inner HTML of the legend (includes visually hidden spans)
+      const legendHtml = this.legend.innerHTML.trim()
+      // Insert the same HTML into the new heading
+      this.heading.innerHTML = legendHtml
+    }
+
     this.container.prepend(this.heading)
   }
 
