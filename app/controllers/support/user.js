@@ -1,6 +1,6 @@
-const Pagination = require('../helpers/pagination')
-const { isValidEmail, isValidEducationEmail } = require('../helpers/validation')
-const { User } = require('../models')
+const Pagination = require('../../helpers/pagination')
+const { isValidEmail, isValidEducationEmail } = require('../../helpers/validation')
+const { User } = require('../../models')
 
 const { Op } = require('sequelize')
 
@@ -34,15 +34,15 @@ exports.usersList = async (req, res) => {
     // the pagination metadata (pageItems, nextPage, etc.)
     pagination,
     actions: {
-      new: '/users/new/',
-      view: '/users',
+      new: '/support/users/new/',
+      view: '/support/users',
       filters: {
-        apply: '/users',
-        remove: '/users/remove-all-filters'
+        apply: '/support/users',
+        remove: '/support/users/remove-all-filters'
       },
       search: {
-        find: '/users',
-        remove: '/users/remove-keyword-search'
+        find: '/support/users',
+        remove: '/support/users/remove-keyword-search'
       }
     }
   })
@@ -58,7 +58,7 @@ exports.userDetails = async (req, res) => {
     user,
     showDeleteLink,
     actions: {
-      back: '/users',
+      back: '/support/users',
       change: `/users/${user.id}/edit`,
       delete: `/users/${user.id}/delete`
     }
@@ -70,9 +70,9 @@ exports.newUser_get = async (req, res) => {
   res.render('users/edit', {
     user,
     actions: {
-      back: '/users',
-      cancel: '/users',
-      save: '/users/new'
+      back: '/support/users',
+      cancel: '/support/users',
+      save: '/support/users/new'
     }
   })
 }
@@ -136,13 +136,13 @@ exports.newUser_post = async (req, res) => {
       user,
       errors,
       actions: {
-        back: '/users',
-        cancel: '/users',
-        save: '/users/new'
+        back: '/support/users',
+        cancel: '/support/users',
+        save: '/support/users/new'
       }
     })
   } else {
-    res.redirect('/users/new/check')
+    res.redirect('/support/users/new/check')
   }
 }
 
@@ -172,7 +172,7 @@ exports.newUserCheck_post = async (req, res) => {
   delete req.session.data.user
 
   req.flash('success', 'Support user added')
-  res.redirect('/users')
+  res.redirect('/support/users')
 }
 
 exports.editUser_get = async (req, res) => {
@@ -332,5 +332,5 @@ exports.deleteUser_post = async (req, res) => {
   })
 
   req.flash('success', 'Support user deleted')
-  res.redirect('/users')
+  res.redirect('/support/users')
 }
