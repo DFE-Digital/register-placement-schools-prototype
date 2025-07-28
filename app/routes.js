@@ -28,6 +28,7 @@ const passport = {
 /// ------------------------------------------------------------------------ ///
 /// Controller modules
 /// ------------------------------------------------------------------------ ///
+const placementSchoolController = require('./controllers/placementSchool')
 const supportAccountController = require('./controllers/support/account')
 const supportPlacementSchoolController = require('./controllers/support/placementSchool')
 const supportUserController = require('./controllers/support/user')
@@ -57,7 +58,7 @@ router.all('*', (req, res, next) => {
 /// ------------------------------------------------------------------------ ///
 /// HOMEPAGE ROUTE
 /// ------------------------------------------------------------------------ ///
-router.get('/', (req, res) => {
+router.get('/support', (req, res) => {
   res.redirect('/support/placement-schools')
 })
 
@@ -68,6 +69,14 @@ router.get('/support/sign-out', (req, res) => {
 
 /// ------------------------------------------------------------------------ ///
 /// PLACEMENT SCHOOL ROUTES
+/// ------------------------------------------------------------------------ ///
+
+router.get('/search', checkIsAuthenticated, placementSchoolController.search_get)
+router.post('/search', checkIsAuthenticated, placementSchoolController.search_post)
+
+
+/// ------------------------------------------------------------------------ ///
+/// SUPPORT - PLACEMENT SCHOOL ROUTES
 /// ------------------------------------------------------------------------ ///
 
 router.get('/support/placement-schools/remove-school-type-filter/:schoolType', checkIsAuthenticated, supportPlacementSchoolController.removeSchoolTypeFilter)
@@ -85,10 +94,10 @@ router.get('/support/placement-schools/:schoolId', checkIsAuthenticated, support
 
 router.get('/support/placement-schools', checkIsAuthenticated, supportPlacementSchoolController.placementSchoolsList)
 
+/// ------------------------------------------------------------------------ ///
+/// SUPPORT - USER ROUTES
+/// ------------------------------------------------------------------------ ///
 
-/// ------------------------------------------------------------------------ ///
-/// USER ROUTES
-/// ------------------------------------------------------------------------ ///
 router.get('/support/users/new', checkIsAuthenticated, supportUserController.newUser_get)
 router.post('/support/users/new', checkIsAuthenticated, supportUserController.newUser_post)
 
@@ -109,7 +118,7 @@ router.get('/support/users/:userId', checkIsAuthenticated, supportUserController
 router.get('/support/users', checkIsAuthenticated, supportUserController.usersList)
 
 /// ------------------------------------------------------------------------ ///
-/// MY ACCOUNT ROUTES
+/// SUPPORT - YOUR ACCOUNT ROUTES
 /// ------------------------------------------------------------------------ ///
 
 router.get('/support/account', checkIsAuthenticated, supportAccountController.userAccount)
