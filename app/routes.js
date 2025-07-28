@@ -29,7 +29,7 @@ const passport = {
 /// Controller modules
 /// ------------------------------------------------------------------------ ///
 const accountController = require('./controllers/account')
-const placementSchoolController = require('./controllers/placementSchool')
+const supportPlacementSchoolController = require('./controllers/support/placementSchool')
 const userController = require('./controllers/user')
 
 /// ------------------------------------------------------------------------ ///
@@ -40,6 +40,7 @@ const checkIsAuthenticated = (req, res, next) => {
   req.session.passport = passport
   // the base URL for navigation
   res.locals.baseUrl = `/placement-schools/${req.params.schoolId}`
+  res.locals.supportBaseUrl = `/support/placement-schools/${req.params.schoolId}`
   next()
 }
 
@@ -57,27 +58,27 @@ router.all('*', (req, res, next) => {
 /// HOMEPAGE ROUTE
 /// ------------------------------------------------------------------------ ///
 router.get('/', (req, res) => {
-  res.redirect('/placement-schools')
+  res.redirect('/support/placement-schools')
 })
 
 /// ------------------------------------------------------------------------ ///
 /// PLACEMENT SCHOOL ROUTES
 /// ------------------------------------------------------------------------ ///
 
-router.get('/placement-schools/remove-school-type-filter/:schoolType', checkIsAuthenticated, placementSchoolController.removeSchoolTypeFilter)
-router.get('/placement-schools/remove-school-group-filter/:schoolGroup', checkIsAuthenticated, placementSchoolController.removeSchoolGroupFilter)
-router.get('/placement-schools/remove-school-status-filter/:schoolStatus', checkIsAuthenticated, placementSchoolController.removeSchoolStatusFilter)
-router.get('/placement-schools/remove-school-education-phase-filter/:schoolEducationPhase', checkIsAuthenticated, placementSchoolController.removeSchoolEducationPhaseFilter)
+router.get('/support/placement-schools/remove-school-type-filter/:schoolType', checkIsAuthenticated, supportPlacementSchoolController.removeSchoolTypeFilter)
+router.get('/support/placement-schools/remove-school-group-filter/:schoolGroup', checkIsAuthenticated, supportPlacementSchoolController.removeSchoolGroupFilter)
+router.get('/support/placement-schools/remove-school-status-filter/:schoolStatus', checkIsAuthenticated, supportPlacementSchoolController.removeSchoolStatusFilter)
+router.get('/support/placement-schools/remove-school-education-phase-filter/:schoolEducationPhase', checkIsAuthenticated, supportPlacementSchoolController.removeSchoolEducationPhaseFilter)
 
-router.get('/placement-schools/remove-all-filters', checkIsAuthenticated, placementSchoolController.removeAllFilters)
+router.get('/support/placement-schools/remove-all-filters', checkIsAuthenticated, supportPlacementSchoolController.removeAllFilters)
 
-router.get('/placement-schools/remove-keyword-search', checkIsAuthenticated, placementSchoolController.removeKeywordSearch)
+router.get('/support/placement-schools/remove-keyword-search', checkIsAuthenticated, supportPlacementSchoolController.removeKeywordSearch)
 
-router.get('/placement-schools/:schoolId/partnerships', checkIsAuthenticated, placementSchoolController.placementSchoolPartnerships)
+router.get('/support/placement-schools/:schoolId/partnerships', checkIsAuthenticated, supportPlacementSchoolController.placementSchoolPartnerships)
 
-router.get('/placement-schools/:schoolId', checkIsAuthenticated, placementSchoolController.placementSchoolDetails)
+router.get('/support/placement-schools/:schoolId', checkIsAuthenticated, supportPlacementSchoolController.placementSchoolDetails)
 
-router.get('/placement-schools', checkIsAuthenticated, placementSchoolController.placementSchoolsList)
+router.get('/support/placement-schools', checkIsAuthenticated, supportPlacementSchoolController.placementSchoolsList)
 
 
 /// ------------------------------------------------------------------------ ///
