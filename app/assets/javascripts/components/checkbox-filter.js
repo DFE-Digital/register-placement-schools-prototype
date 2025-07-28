@@ -76,7 +76,6 @@ export class CheckboxFilter {
     const ENTER_KEY = 13
     if (e.keyCode === ENTER_KEY) {
       e.preventDefault()
-      // this.filterCheckboxes()
     } else {
       this.filterCheckboxes()
     }
