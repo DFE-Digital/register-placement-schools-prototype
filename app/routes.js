@@ -73,6 +73,8 @@ router.get('/placement-schools/remove-all-filters', checkIsAuthenticated, placem
 
 router.get('/placement-schools/remove-keyword-search', checkIsAuthenticated, placementSchoolController.removeKeywordSearch)
 
+router.get('/placement-schools/:schoolId/partnerships', checkIsAuthenticated, placementSchoolController.placementSchoolPartnerships)
+
 router.get('/placement-schools/:schoolId', checkIsAuthenticated, placementSchoolController.placementSchoolDetails)
 
 router.get('/placement-schools', checkIsAuthenticated, placementSchoolController.placementSchoolsList)
