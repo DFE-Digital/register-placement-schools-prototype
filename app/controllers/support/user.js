@@ -28,7 +28,7 @@ exports.usersList = async (req, res) => {
   // using the chunk + the overall total count
   const pagination = new Pagination(users, totalCount, page, limit)
 
-  res.render('users/index', {
+  res.render('support/users/index', {
     // users for *this* page
     users: pagination.getData(),
     // the pagination metadata (pageItems, nextPage, etc.)
@@ -54,7 +54,7 @@ exports.userDetails = async (req, res) => {
   const user = await User.findOne({ where: { id: req.params.userId } })
   const showDeleteLink = !(req.params.userId === req.session.passport.user.id)
 
-  res.render('users/show', {
+  res.render('support/users/show', {
     user,
     showDeleteLink,
     actions: {
@@ -67,7 +67,7 @@ exports.userDetails = async (req, res) => {
 
 exports.newUser_get = async (req, res) => {
   const { user } = req.session.data
-  res.render('users/edit', {
+  res.render('support/users/edit', {
     user,
     actions: {
       back: '/support/users',
@@ -132,7 +132,7 @@ exports.newUser_post = async (req, res) => {
   }
 
   if (errors.length) {
-    res.render('users/edit', {
+    res.render('support/users/edit', {
       user,
       errors,
       actions: {
@@ -148,7 +148,7 @@ exports.newUser_post = async (req, res) => {
 
 exports.newUserCheck_get = async (req, res) => {
   const { user } = req.session.data
-  res.render('users/check-your-answers', {
+  res.render('support/users/check-your-answers', {
     user,
     actions: {
       back: `/users/new`,
@@ -186,7 +186,7 @@ exports.editUser_get = async (req, res) => {
     user = currentUser
   }
 
-  res.render('users/edit', {
+  res.render('support/users/edit', {
     currentUser,
     user,
     actions: {
@@ -258,7 +258,7 @@ exports.editUser_post = async (req, res) => {
   }
 
   if (errors.length) {
-    res.render('users/edit', {
+    res.render('support/users/edit', {
       currentUser,
       user,
       errors,
@@ -279,7 +279,7 @@ exports.editUserCheck_get = async (req, res) => {
 
   const currentUser = await User.findByPk(userId)
 
-  res.render('users/check-your-answers', {
+  res.render('support/users/check-your-answers', {
     currentUser,
     user,
     actions: {
@@ -312,7 +312,7 @@ exports.editUserCheck_post = async (req, res) => {
 exports.deleteUser_get = async (req, res) => {
   const { userId } = req.params
   const user = await User.findByPk(userId)
-  res.render('users/delete', {
+  res.render('support/users/delete', {
     user,
     actions: {
       back: `/users/${userId}`,
