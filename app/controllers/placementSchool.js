@@ -11,14 +11,16 @@ const {
 } = require('../helpers/gias')
 
 const {
-  PlacementSchool,
-  School,
-  Provider,
   AcademicYear,
-  SchoolType,
+  PlacementSchool,
+  Provider,
+  School,
+  SchoolAddress,
+  SchoolDetail,
+  SchoolEducationPhase,
   SchoolGroup,
   SchoolStatus,
-  SchoolEducationPhase,
+  SchoolType,
   Sequelize
 } = require('../models')
 
@@ -420,4 +422,34 @@ exports.removeAllFilters = (req, res) => {
 exports.removeKeywordSearch = (req, res) => {
   delete req.session.data.keywords
   res.redirect('/placement-schools')
+}
+
+/// ------------------------------------------------------------------------ ///
+/// Show placement school
+/// ------------------------------------------------------------------------ ///
+
+exports.placementSchoolDetails = async (req, res) => {
+  // Clear session provider data
+  delete req.session.data.keywords
+  delete req.session.data.filters
+  delete req.session.data.find
+
+  const { schoolId } = req.params
+
+  // Fetch the provider
+  const placementSchool = await School.findOne({
+    where: { id: schoolId },
+    include: [
+      { model: SchoolDetail, as: 'schoolDetail' },
+      { model: SchoolAddress, as: 'schoolAddress' },
+      { model: SchoolType, as: 'schoolType' },
+      { model: SchoolGroup, as: 'schoolGroup' },
+      { model: SchoolEducationPhase, as: 'schoolEducationPhase' },
+      { model: SchoolStatus, as: 'schoolStatus' }
+    ]
+  })
+
+  res.render('placement-schools/show', {
+    placementSchool
+   })
 }
