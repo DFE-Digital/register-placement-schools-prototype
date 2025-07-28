@@ -30,7 +30,7 @@ const passport = {
 /// ------------------------------------------------------------------------ ///
 const accountController = require('./controllers/account')
 const supportPlacementSchoolController = require('./controllers/support/placementSchool')
-const userController = require('./controllers/user')
+const supportUserController = require('./controllers/support/user')
 
 /// ------------------------------------------------------------------------ ///
 /// Authentication middleware
@@ -84,24 +84,24 @@ router.get('/support/placement-schools', checkIsAuthenticated, supportPlacementS
 /// ------------------------------------------------------------------------ ///
 /// USER ROUTES
 /// ------------------------------------------------------------------------ ///
-router.get('/users/new', checkIsAuthenticated, userController.newUser_get)
-router.post('/users/new', checkIsAuthenticated, userController.newUser_post)
+router.get('/support/users/new', checkIsAuthenticated, supportUserController.newUser_get)
+router.post('/support/users/new', checkIsAuthenticated, supportUserController.newUser_post)
 
-router.get('/users/new/check', checkIsAuthenticated, userController.newUserCheck_get)
-router.post('/users/new/check', checkIsAuthenticated, userController.newUserCheck_post)
+router.get('/support/users/new/check', checkIsAuthenticated, supportUserController.newUserCheck_get)
+router.post('/support/users/new/check', checkIsAuthenticated, supportUserController.newUserCheck_post)
 
-router.get('/users/:userId/edit', checkIsAuthenticated, userController.editUser_get)
-router.post('/users/:userId/edit', checkIsAuthenticated, userController.editUser_post)
+router.get('/support/users/:userId/edit', checkIsAuthenticated, supportUserController.editUser_get)
+router.post('/support/users/:userId/edit', checkIsAuthenticated, supportUserController.editUser_post)
 
-router.get('/users/:userId/edit/check', checkIsAuthenticated, userController.editUserCheck_get)
-router.post('/users/:userId/edit/check', checkIsAuthenticated, userController.editUserCheck_post)
+router.get('/support/users/:userId/edit/check', checkIsAuthenticated, supportUserController.editUserCheck_get)
+router.post('/support/users/:userId/edit/check', checkIsAuthenticated, supportUserController.editUserCheck_post)
 
-router.get('/users/:userId/delete', checkIsAuthenticated, userController.deleteUser_get)
-router.post('/users/:userId/delete', checkIsAuthenticated, userController.deleteUser_post)
+router.get('/support/users/:userId/delete', checkIsAuthenticated, supportUserController.deleteUser_get)
+router.post('/support/users/:userId/delete', checkIsAuthenticated, supportUserController.deleteUser_post)
 
-router.get('/users/:userId', checkIsAuthenticated, userController.userDetails)
+router.get('/support/users/:userId', checkIsAuthenticated, supportUserController.userDetails)
 
-router.get('/users', checkIsAuthenticated, userController.usersList)
+router.get('/support/users', checkIsAuthenticated, supportUserController.usersList)
 
 /// ------------------------------------------------------------------------ ///
 /// MY ACCOUNT ROUTES
