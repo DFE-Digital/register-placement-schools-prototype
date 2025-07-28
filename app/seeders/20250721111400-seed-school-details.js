@@ -43,7 +43,7 @@ module.exports = {
           statutory_high_age: nullIfEmpty(school.statutory_high_age),
           boarders_code: nullIfEmpty(school.boarders_code),
           nursery_provision_code: nullIfEmpty(school.nursery_provision_code),
-          official_six_form_code: nullIfEmpty(school.official_six_form_code),
+          official_sixth_form_code: nullIfEmpty(school.official_six_form_code),
           gender_code: nullIfEmpty(school.gender_code),
           religious_character_code: nullIfEmpty(school.religious_character_code),
           admissions_policy_code: nullIfEmpty(school.admissions_policy_code),

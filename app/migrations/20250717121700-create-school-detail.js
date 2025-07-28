@@ -33,7 +33,7 @@ module.exports = {
       nursery_provision_code: {
         type: Sequelize.STRING
       },
-      official_six_form_code: {
+      official_sixth_form_code: {
         type: Sequelize.STRING
       },
       gender_code: {
