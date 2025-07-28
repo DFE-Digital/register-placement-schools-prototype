@@ -11,14 +11,16 @@ const {
 } = require('../helpers/gias')
 
 const {
-  PlacementSchool,
-  School,
-  Provider,
   AcademicYear,
-  SchoolType,
+  PlacementSchool,
+  Provider,
+  School,
+  SchoolAddress,
+  SchoolDetail,
+  SchoolEducationPhase,
   SchoolGroup,
   SchoolStatus,
-  SchoolEducationPhase,
+  SchoolType,
   Sequelize
 } = require('../models')
 
@@ -83,6 +85,35 @@ const groupPlacementSchools = (rows) => {
       ...year,
       providers: Object.values(year.providers)
     }))
+  }))
+}
+
+const groupPartnershipsByAcademicYear = (rows) => {
+  const academicYears = {}
+
+  rows.forEach(row => {
+    const a = row.academicYear
+    const p = row.provider
+
+    if (!academicYears[a.id]) {
+      academicYears[a.id] = {
+        id: a.id,
+        name: a.name,
+        providers: {}
+      }
+    }
+
+    if (!academicYears[a.id].providers[p.id]) {
+      academicYears[a.id].providers[p.id] = {
+        id: p.id,
+        name: p.operatingName
+      }
+    }
+  })
+
+  return Object.values(academicYears).map(year => ({
+    ...year,
+    providers: Object.values(year.providers)
   }))
 }
 
@@ -420,4 +451,65 @@ exports.removeAllFilters = (req, res) => {
 exports.removeKeywordSearch = (req, res) => {
   delete req.session.data.keywords
   res.redirect('/placement-schools')
+}
+
+/// ------------------------------------------------------------------------ ///
+/// Show placement school
+/// ------------------------------------------------------------------------ ///
+
+exports.placementSchoolDetails = async (req, res) => {
+  delete req.session.data.keywords
+  delete req.session.data.filters
+  delete req.session.data.find
+
+  const { schoolId } = req.params
+
+  const placementSchool = await School.findOne({
+    where: { id: schoolId },
+    include: [
+      { model: SchoolDetail, as: 'schoolDetail' },
+      { model: SchoolAddress, as: 'schoolAddress' },
+      { model: SchoolType, as: 'schoolType' },
+      { model: SchoolGroup, as: 'schoolGroup' },
+      { model: SchoolEducationPhase, as: 'schoolEducationPhase' },
+      { model: SchoolStatus, as: 'schoolStatus' }
+    ]
+  })
+
+  res.render('placement-schools/show', {
+    placementSchool
+   })
+}
+
+exports.placementSchoolPartnerships = async (req, res) => {
+  // Clear session provider data
+  delete req.session.data.keywords
+  delete req.session.data.filters
+  delete req.session.data.find
+
+  const { schoolId } = req.params
+
+  const placementSchool = await School.findOne({
+    where: { id: schoolId }
+  })
+
+  const partnerships = await PlacementSchool.findAll({
+    where: { schoolId },
+    include: [
+      { model: Provider, as: 'provider', attributes: ['id', 'operatingName'] },
+      { model: AcademicYear, as: 'academicYear', attributes: ['id', 'name'] }
+    ],
+    order: [
+      [{ model: AcademicYear, as: 'academicYear' }, 'name', 'DESC'],
+      [{ model: Provider, as: 'provider' }, 'operatingName', 'ASC']
+    ]
+  })
+
+  const groupedPartnerships = groupPartnershipsByAcademicYear(partnerships)
+
+
+  res.render('placement-schools/partnerships/index', {
+    placementSchool,
+    groupedPartnerships
+   })
 }

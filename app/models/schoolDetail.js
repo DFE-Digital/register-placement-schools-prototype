@@ -49,17 +49,17 @@ module.exports = (sequelize) => {
         type: DataTypes.INTEGER,
         field: 'statutory_high_age'
       },
-      boardersCode:  {
+      boarderCode:  {
         type: DataTypes.STRING,
-        field: 'boarders_code'
+        field: 'boarder_code'
       },
       nurseryProvisionCode:  {
         type: DataTypes.STRING,
         field: 'nursery_provision_code'
       },
-      officialSixFormCode:  {
+      officialSixthFormCode:  {
         type: DataTypes.STRING,
-        field: 'official_six_form_code'
+        field: 'official_sixth_form_code'
       },
       genderCode:  {
         type: DataTypes.STRING,
@@ -103,7 +103,7 @@ module.exports = (sequelize) => {
       },
       parliamentaryConstituencyCode:  {
         type: DataTypes.STRING,
-        field: 'parliamentart_constituency_code'
+        field: 'parliamentary_constituency_code'
       },
       urbanRuralCode:  {
         type: DataTypes.STRING,

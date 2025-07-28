@@ -1,0 +1,20 @@
+{{ appSecondaryNavigation({
+  label: "Placement school navigation",
+  items: [
+    {
+      href: baseUrl,
+      text: "School details",
+      active: secondaryNavId == "details"
+    },
+    {
+      href: baseUrl + "/partnerships",
+      text: "Partnerships",
+      active: secondaryNavId == "partnerships"
+    },
+    {
+      href: baseUrl + "/activity",
+      text: "Activity log",
+      active: secondaryNavId == "activity"
+    } if 1==0
+  ]
+}) }}

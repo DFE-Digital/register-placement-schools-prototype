@@ -9,7 +9,7 @@ module.exports = {
     const transaction = await queryInterface.sequelize.transaction()
 
     try {
-      await queryInterface.bulkDelete('school_sixth_form', null, { transaction })
+      await queryInterface.bulkDelete('school_sixth_forms', null, { transaction })
       // await queryInterface.bulkDelete('school_sixth_form_revisions', null, { transaction })
       // await queryInterface.bulkDelete('activity_logs', {
       //   entity_type: 'school_sixth_form'
@@ -33,7 +33,7 @@ module.exports = {
         }
 
         // 1. Insert into users table
-        await queryInterface.bulkInsert('school_sixth_form', [baseFields], { transaction })
+        await queryInterface.bulkInsert('school_sixth_forms', [baseFields], { transaction })
 
         // 2. Create revision
         // const { id: _, ...revisionDataWithoutId } = baseFields
@@ -73,6 +73,6 @@ module.exports = {
     //   entity_type: 'school_sixth_form'
     // })
     // await queryInterface.bulkDelete('school_sixth_form_revisions', null, {})
-    await queryInterface.bulkDelete('school_sixth_form', null, {})
+    await queryInterface.bulkDelete('school_sixth_forms', null, {})
   }
 }

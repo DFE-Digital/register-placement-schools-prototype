@@ -1,6 +1,6 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('school_sixth_form', {
+    await queryInterface.createTable('school_sixth_forms', {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
@@ -48,6 +48,6 @@ module.exports = {
     })
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('school_sixth_form')
+    await queryInterface.dropTable('school_sixth_forms')
   }
 }
