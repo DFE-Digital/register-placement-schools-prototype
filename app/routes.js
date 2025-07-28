@@ -39,7 +39,7 @@ const checkIsAuthenticated = (req, res, next) => {
   // the signed in user
   req.session.passport = passport
   // the base URL for navigation
-  res.locals.baseUrl = ''
+  res.locals.baseUrl = `/placement-schools/${req.params.schoolId}`
   next()
 }
 
@@ -72,6 +72,8 @@ router.get('/placement-schools/remove-school-education-phase-filter/:schoolEduca
 router.get('/placement-schools/remove-all-filters', checkIsAuthenticated, placementSchoolController.removeAllFilters)
 
 router.get('/placement-schools/remove-keyword-search', checkIsAuthenticated, placementSchoolController.removeKeywordSearch)
+
+router.get('/placement-schools/:schoolId', checkIsAuthenticated, placementSchoolController.placementSchoolDetails)
 
 router.get('/placement-schools', checkIsAuthenticated, placementSchoolController.placementSchoolsList)
 
