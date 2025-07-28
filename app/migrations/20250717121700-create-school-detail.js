@@ -27,7 +27,7 @@ module.exports = {
       statutory_high_age: {
         type: Sequelize.INTEGER
       },
-      boarders_code: {
+      boarder_code: {
         type: Sequelize.STRING
       },
       nursery_provision_code: {
