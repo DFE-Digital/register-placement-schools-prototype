@@ -28,7 +28,7 @@ const passport = {
 /// ------------------------------------------------------------------------ ///
 /// Controller modules
 /// ------------------------------------------------------------------------ ///
-const accountController = require('./controllers/account')
+const supportAccountController = require('./controllers/support/account')
 const supportPlacementSchoolController = require('./controllers/support/placementSchool')
 const supportUserController = require('./controllers/support/user')
 
@@ -107,7 +107,7 @@ router.get('/support/users', checkIsAuthenticated, supportUserController.usersLi
 /// MY ACCOUNT ROUTES
 /// ------------------------------------------------------------------------ ///
 
-router.get('/account', checkIsAuthenticated, accountController.userAccount)
+router.get('/support/account', checkIsAuthenticated, supportAccountController.userAccount)
 
 /// ------------------------------------------------------------------------ ///
 ///
