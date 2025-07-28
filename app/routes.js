@@ -61,6 +61,11 @@ router.get('/', (req, res) => {
   res.redirect('/support/placement-schools')
 })
 
+// Temporary sign out - does nothing
+router.get('/support/sign-out', (req, res) => {
+  res.redirect('/support/placement-schools')
+})
+
 /// ------------------------------------------------------------------------ ///
 /// PLACEMENT SCHOOL ROUTES
 /// ------------------------------------------------------------------------ ///
