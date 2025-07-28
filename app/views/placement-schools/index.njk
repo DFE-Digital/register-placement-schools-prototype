@@ -39,9 +39,9 @@
       {% for school in placementSchools %}
 
         {% set nameHtml %}
-          {# <a href="{{ actions.view }}/{{ school.id }}" class="govuk-link"> #}
+          <a href="{{ actions.view }}/{{ school.id }}" class="govuk-link">
             {{ school.name }}
-          {# </a> #}
+          </a>
         {% endset %}
 
         {% set schoolTypeGroupHtml %}
