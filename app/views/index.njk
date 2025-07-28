@@ -1,13 +1,65 @@
 {% extends "layouts/main.njk" %}
 
+{% set title = "Find placement schools by location or training provider" %}
+
 {% block content %}
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
 
-    {# <h1 class="govuk-heading-l">
-      {{ serviceName }}
-    </h1> #}
+    <form action="{{ actions.continue }}" method="post" accept-charset="utf-8" novalidate>
+
+      {% set locationHtml %}
+        Location HTML
+      {% endset %}
+
+      {% set providerHtml %}
+        Provider HTML
+      {% endset %}
+
+      {{ govukRadios({
+        name: "q",
+        fieldset: {
+          legend: {
+            text: title,
+            isPageHeading: true,
+            classes: "govuk-fieldset__legend--l"
+          }
+        },
+        errorMessage: errors | getErrorMessage("q"),
+        items: [
+          {
+            value: "location",
+            text: "By city, town or postcode",
+            checked: (data.q == "location"),
+            conditional: {
+              html: locationHtml
+            }
+          },
+          {
+            value: "england",
+            text: "Across England",
+            checked: (data.q == "england")
+          } if 1==0,
+          {
+            divider: "or"
+          } if 1==0,
+          {
+            value: "provider",
+            text: "By university or other training provider",
+            checked: (data.q == "provider"),
+            conditional: {
+              html: providerHtml
+            }
+          }
+        ]
+      }) }}
+
+      {{ govukButton({
+        text: "Continue"
+      }) }}
+
+    </form>
 
   </div>
 </div>
