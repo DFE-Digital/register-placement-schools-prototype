@@ -1,0 +1,60 @@
+{% extends "layouts/main.njk" %}
+
+{% set primaryNavId = "placementSchools" %}
+{% set secondaryNavId = "partnerships" %}
+
+{% set title = placementSchool.name %}
+{% set caption = "Placement school" %}
+
+{% block beforeContent %}
+{{ govukBackLink({
+  text: "Back",
+  href: "/placement-schools"
+}) }}
+{% endblock %}
+
+{% block content %}
+
+{% include "_includes/notification-banner.njk" %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% include "_includes/page-heading.njk" %}
+
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    {% include "../_secondary-navigation.njk" %}
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h2 class="govuk-heading-m">Partnerships</h2>
+
+    {% if groupedPartnerships.length %}
+      <ul class="govuk-list govuk-list--spaced">
+        {% for year in groupedPartnerships %}
+          <li>
+            <strong>{{ year.name }}</strong>
+            <ul class="govuk-list govuk-list--bullet">
+              {% for provider in year.providers %}
+                <li>{{ provider.name }}</li>
+              {% endfor %}
+            </ul>
+          </li>
+        {% endfor %}
+      </ul>
+
+    {% else %}
+      <p class="govuk-body">There are no partnerships for {{ placementSchool.name if placementSchool.name else "this school" }}.</p>
+    {% endif %}
+
+  </div>
+</div>
+
+{% endblock %}
