@@ -88,6 +88,35 @@ const groupPlacementSchools = (rows) => {
   }))
 }
 
+const groupPartnershipsByAcademicYear = (rows) => {
+  const academicYears = {}
+
+  rows.forEach(row => {
+    const a = row.academicYear
+    const p = row.provider
+
+    if (!academicYears[a.id]) {
+      academicYears[a.id] = {
+        id: a.id,
+        name: a.name,
+        providers: {}
+      }
+    }
+
+    if (!academicYears[a.id].providers[p.id]) {
+      academicYears[a.id].providers[p.id] = {
+        id: p.id,
+        name: p.operatingName
+      }
+    }
+  })
+
+  return Object.values(academicYears).map(year => ({
+    ...year,
+    providers: Object.values(year.providers)
+  }))
+}
+
 exports.placementSchoolsList = async (req, res) => {
   // clear session data
   delete req.session.data.placementSchool
@@ -429,14 +458,12 @@ exports.removeKeywordSearch = (req, res) => {
 /// ------------------------------------------------------------------------ ///
 
 exports.placementSchoolDetails = async (req, res) => {
-  // Clear session provider data
   delete req.session.data.keywords
   delete req.session.data.filters
   delete req.session.data.find
 
   const { schoolId } = req.params
 
-  // Fetch the provider
   const placementSchool = await School.findOne({
     where: { id: schoolId },
     include: [
@@ -451,5 +478,38 @@ exports.placementSchoolDetails = async (req, res) => {
 
   res.render('placement-schools/show', {
     placementSchool
+   })
+}
+
+exports.placementSchoolPartnerships = async (req, res) => {
+  // Clear session provider data
+  delete req.session.data.keywords
+  delete req.session.data.filters
+  delete req.session.data.find
+
+  const { schoolId } = req.params
+
+  const placementSchool = await School.findOne({
+    where: { id: schoolId }
+  })
+
+  const partnerships = await PlacementSchool.findAll({
+    where: { schoolId },
+    include: [
+      { model: Provider, as: 'provider', attributes: ['id', 'operatingName'] },
+      { model: AcademicYear, as: 'academicYear', attributes: ['id', 'name'] }
+    ],
+    order: [
+      [{ model: AcademicYear, as: 'academicYear' }, 'name', 'DESC'],
+      [{ model: Provider, as: 'provider' }, 'operatingName', 'ASC']
+    ]
+  })
+
+  const groupedPartnerships = groupPartnershipsByAcademicYear(partnerships)
+
+
+  res.render('placement-schools/partnerships/index', {
+    placementSchool,
+    groupedPartnerships
    })
 }
