@@ -68,8 +68,6 @@ router.get('/placement-schools/remove-school-type-filter/:schoolType', checkIsAu
 router.get('/placement-schools/remove-school-group-filter/:schoolGroup', checkIsAuthenticated, placementSchoolController.removeSchoolGroupFilter)
 router.get('/placement-schools/remove-school-status-filter/:schoolStatus', checkIsAuthenticated, placementSchoolController.removeSchoolStatusFilter)
 router.get('/placement-schools/remove-school-education-phase-filter/:schoolEducationPhase', checkIsAuthenticated, placementSchoolController.removeSchoolEducationPhaseFilter)
-router.get('/placement-schools/remove-academic-year-filter/:academicYear', checkIsAuthenticated, placementSchoolController.removeAcademicYearFilter)
-router.get('/placement-schools/remove-show-closed-school-filter/:showClosedSchool', checkIsAuthenticated, placementSchoolController.removeShowClosedSchoolFilter)
 
 router.get('/placement-schools/remove-all-filters', checkIsAuthenticated, placementSchoolController.removeAllFilters)
 

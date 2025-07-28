@@ -1,11 +1,14 @@
 const Pagination = require('../helpers/pagination')
 const {
+  getSchoolTypeOptions,
   getSchoolTypeLabel,
+  getSchoolGroupOptions,
   getSchoolGroupLabel,
+  getSchoolStatusOptions,
   getSchoolStatusLabel,
-  getSchoolEducationPhaseLabel,
-  getAcademicYearLabel
-} = require('../helpers/content')
+  getSchoolEducationPhaseOptions,
+  getSchoolEducationPhaseLabel
+} = require('../helpers/gias')
 
 const {
   PlacementSchool,
@@ -15,7 +18,8 @@ const {
   SchoolType,
   SchoolGroup,
   SchoolStatus,
-  SchoolEducationPhase
+  SchoolEducationPhase,
+  Sequelize
 } = require('../models')
 
 const { Op } = require('sequelize')
@@ -29,8 +33,6 @@ const getCheckboxValues = (name, data) => {
 }
 
 const removeFilter = (value, data) => {
-  // do this check because if coming from overview page for example,
-  // the query/param will be a string value, not an array containing a string
   if (Array.isArray(data)) {
     return data.filter(item => item !== value)
   } else {
@@ -51,18 +53,12 @@ const groupPlacementSchools = (rows) => {
       grouped[s.id] = {
         id: s.id,
         name: s.name,
+        ukprn: s.ukprn ? s.ukprn : null,
+        urn: s.urn ? s.urn : null,
         type: s.schoolType ? s.schoolType.name : null,
         group: s.schoolGroup ? s.schoolGroup.name : null,
         status: s.schoolStatus ? s.schoolStatus.name : null,
         educationPhase: s.schoolEducationPhase ? s.schoolEducationPhase.name : null,
-        academicYears: {}
-      }
-    }
-
-    if (!grouped[s.id]) {
-      grouped[s.id] = {
-        id: s.id,
-        name: s.name,
         academicYears: {}
       }
     }
@@ -111,8 +107,6 @@ exports.placementSchoolsList = async (req, res) => {
   const schoolGroup = null
   const schoolStatus = null
   const schoolEducationPhase = null
-  const academicYear = null
-  const showClosedSchool = null
 
   let schoolTypes
   if (filters?.schoolType) {
@@ -125,7 +119,7 @@ exports.placementSchoolsList = async (req, res) => {
   }
 
   let schoolStatuses
-  if (filters?.schoolStatuse) {
+  if (filters?.schoolStatus) {
     schoolStatuses = getCheckboxValues(schoolStatus, filters.schoolStatus)
   }
 
@@ -134,22 +128,10 @@ exports.placementSchoolsList = async (req, res) => {
     schoolEducationPhases = getCheckboxValues(schoolEducationPhase, filters.schoolEducationPhase)
   }
 
-  let academicYears
-  if (filters?.academicYear) {
-    academicYears = getCheckboxValues(academicYear, filters.academicYear)
-  }
-
-  let showClosedSchools
-  if (filters?.showClosedSchool) {
-    showClosedSchools = getCheckboxValues(showClosedSchool, filters.showClosedSchool)
-  }
-
   const hasFilters = !!((schoolTypes?.length > 0)
    || (schoolGroups?.length > 0)
    || (schoolStatuses?.length > 0)
    || (schoolEducationPhases?.length > 0)
-   || (academicYears?.length > 0)
-   || (showClosedSchools?.length > 0)
   )
 
   let selectedFilters = null
@@ -159,78 +141,79 @@ exports.placementSchoolsList = async (req, res) => {
       categories: []
     }
 
-    if (schoolTypes?.length) {
-      selectedFilters.categories.push({
-        heading: { text: 'School type' },
-        items: schoolTypes.map((schoolType) => {
-          return {
-            text: getSchoolTypeLabel(schoolType),
-            href: `/placement-schools/remove-school-type-filter/${schoolType}`
-          }
-        })
-      })
-    }
-
     if (schoolGroups?.length) {
-      selectedFilters.categories.push({
-        heading: { text: 'School group' },
-        items: schoolGroups.map((schoolGroup) => {
+      const items = await Promise.all(
+        schoolGroups.map(async (schoolGroup) => {
+          const label = await getSchoolGroupLabel(schoolGroup)
           return {
-            text: getSchoolGroupLabel(schoolGroup),
+            text: label,
             href: `/placement-schools/remove-school-group-filter/${schoolGroup}`
           }
         })
+      )
+
+      selectedFilters.categories.push({
+        heading: { text: 'School group' },
+        items: items
       })
     }
 
-    if (schoolStatuses?.length) {
-      selectedFilters.categories.push({
-        heading: { text: 'School status' },
-        items: schoolStatuses.map((schoolStatus) => {
+    if (schoolTypes?.length) {
+      const items = await Promise.all(
+        schoolTypes.map(async (schoolType) => {
+          const label = await getSchoolTypeLabel(schoolType)
           return {
-            text: getSchoolStatusLabel(schoolStatus),
-            href: `/placement-schools/remove-school-status-filter/${schoolStatus}`
+            text: label,
+            href: `/placement-schools/remove-school-type-filter/${schoolType}`
           }
         })
+      )
+
+      selectedFilters.categories.push({
+        heading: { text: 'School type' },
+        items: items
       })
     }
 
     if (schoolEducationPhases?.length) {
-      selectedFilters.categories.push({
-        heading: { text: 'School education phase' },
-        items: schoolEducationPhases.map((schoolEducationPhase) => {
+      const items = await Promise.all(
+        schoolEducationPhases.map(async (schoolEducationPhase) => {
+          const label = await getSchoolEducationPhaseLabel(schoolEducationPhase)
           return {
-            text: getSchoolEducationPhaseLabel(schoolEducationPhase),
+            text: label,
             href: `/placement-schools/remove-school-education-phase-filter/${schoolEducationPhase}`
           }
         })
+      )
+
+      selectedFilters.categories.push({
+        heading: { text: 'School education phase' },
+        items: items
       })
     }
 
-    if (academicYears?.length) {
-      selectedFilters.categories.push({
-        heading: { text: 'Academic year' },
-        items: academicYears.map((academicYear) => {
+    if (schoolStatuses?.length) {
+      const items = await Promise.all(
+        schoolStatuses.map(async (schoolStatus) => {
+          const label = await getSchoolStatusLabel(schoolStatus)
           return {
-            text: getAcademicYearLabel(academicYear),
-            href: `/placement-schools/remove-academic-year-filter/${academicYear}`
+            text: label,
+            href: `/placement-schools/remove-school-status-filter/${schoolStatus}`
           }
         })
-      })
-    }
+      )
 
-    if (showClosedSchools?.length) {
       selectedFilters.categories.push({
-        heading: { text: 'Closed schools' },
-        items: showClosedSchools.map((showClosedSchool) => {
-          return {
-            text: 'Include closed schools',
-            href: `/placement-schools/remove-show-closed-school-filter/${showClosedSchool}`
-          }
-        })
+        heading: { text: 'School status' },
+        items: items
       })
     }
   }
+
+  const filterSchoolTypeItems = await getSchoolTypeOptions()
+  const filterSchoolGroupItems = await getSchoolGroupOptions()
+  const filterSchoolStatusItems = await getSchoolStatusOptions()
+  const filterSchoolEducationPhaseItems = await getSchoolEducationPhaseOptions()
 
   let selectedSchoolType = []
   if (filters?.schoolType) {
@@ -252,16 +235,6 @@ exports.placementSchoolsList = async (req, res) => {
     selectedSchoolEducationPhase = filters.schoolEducationPhase
   }
 
-  let selectedAcademicYear = []
-  if (filters?.academicYear) {
-    selectedAcademicYear = filters.academicYear
-  }
-
-  let selectedClosedSchool = []
-  if (filters?.showClosedSchool) {
-    selectedClosedSchool = filters.showClosedSchool
-  }
-
   const wherePlacementSchool = {}
   const whereSchool = {}
 
@@ -277,11 +250,13 @@ exports.placementSchoolsList = async (req, res) => {
   if (schoolEducationPhases?.length) {
     whereSchool.educationPhaseCode = { [Op.in]: schoolEducationPhases }
   }
-  if (academicYears?.length) {
-    wherePlacementSchool.academicYearId = { [Op.in]: academicYears }
-  }
   if (keywords && keywords.trim() !== '') {
-    whereSchool.name = { [Op.like]: `%${keywords.trim()}%` }
+    const term = `%${keywords.trim()}%`
+    whereSchool[Op.or] = [
+      { name: { [Op.like]: term } },
+      { ukprn: { [Op.like]: term } },
+      { urn: { [Op.like]: term } }
+    ]
   }
 
   // Step 1: get distinct school IDs for page
@@ -311,11 +286,33 @@ exports.placementSchoolsList = async (req, res) => {
     where: wherePlacementSchool
   })
 
-  // Step 3: fetch full rows only for those IDs
+  // Step 3: get latest academic year for each school
+  const latestAcademicYears = await PlacementSchool.findAll({
+    attributes: [
+      'schoolId',
+      [Sequelize.fn('MAX', Sequelize.col('academic_year_id')), 'latestAcademicYearId']
+    ],
+    where: {
+      schoolId: { [Op.in]: pageSchoolIds },
+      ...wherePlacementSchool
+    },
+    group: ['schoolId'],
+    raw: true
+  })
+
+  // Turn into a lookup (schoolId -> latest academicYearId)
+  const schoolToLatestYear = {}
+  latestAcademicYears.forEach(row => {
+    schoolToLatestYear[row.schoolId] = row.latestAcademicYearId
+  })
+
+  // Step 4: fetch only latest academic year rows for those schools
   const rows = await PlacementSchool.findAll({
     where: {
-      ...wherePlacementSchool,
-      schoolId: { [Op.in]: pageSchoolIds }
+      [Op.or]: Object.entries(schoolToLatestYear).map(([schoolId, academicYearId]) => ({
+        schoolId,
+        academicYearId
+      }))
     },
     include: [
       {
@@ -333,7 +330,6 @@ exports.placementSchoolsList = async (req, res) => {
     ],
     order: [
       [{ model: School, as: 'school' }, 'name', 'ASC'],
-      [{ model: AcademicYear, as: 'academicYear' }, 'name', 'ASC'],
       [{ model: Provider, as: 'provider' }, 'operatingName', 'ASC']
     ]
   })
@@ -357,6 +353,14 @@ exports.placementSchoolsList = async (req, res) => {
     hasSearch,
     //
     hasFilters,
+    filterSchoolTypeItems,
+    filterSchoolGroupItems,
+    filterSchoolStatusItems,
+    filterSchoolEducationPhaseItems,
+    selectedSchoolType,
+    selectedSchoolGroup,
+    selectedSchoolStatus,
+    selectedSchoolEducationPhase,
     actions: {
       new: '/placement-schools/new/',
       view: '/placement-schools',
@@ -404,24 +408,6 @@ exports.removeSchoolEducationPhaseFilter = (req, res) => {
   filters.schoolEducationPhase = removeFilter(
     req.params.schoolEducationPhase,
     filters.schoolEducationPhase
-  )
-  res.redirect('/placement-schools')
-}
-
-exports.removeAcademicYearFilter = (req, res) => {
-  const { filters } = req.session.data
-  filters.academicYear = removeFilter(
-    req.params.academicYear,
-    filters.academicYear
-  )
-  res.redirect('/placement-schools')
-}
-
-exports.removeShowClosedSchoolFilter = (req, res) => {
-  const { filters } = req.session.data
-  filters.showClosedSchool = removeFilter(
-    req.params.showClosedSchool,
-    filters.showClosedSchool
   )
   res.redirect('/placement-schools')
 }
