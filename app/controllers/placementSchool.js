@@ -64,14 +64,6 @@ const groupPlacementSchools = (rows) => {
         academicYears: {}
       }
     }
-
-    // if (!grouped[s.id]) {
-    //   grouped[s.id] = {
-    //     id: s.id,
-    //     name: s.name,
-    //     academicYears: {}
-    //   }
-    // }
     if (!grouped[s.id].academicYears[a.id]) {
       grouped[s.id].academicYears[a.id] = {
         id: a.id,
@@ -117,8 +109,6 @@ exports.placementSchoolsList = async (req, res) => {
   const schoolGroup = null
   const schoolStatus = null
   const schoolEducationPhase = null
-  // const academicYear = null
-  // const showClosedSchool = null
 
   let schoolTypes
   if (filters?.schoolType) {
@@ -140,22 +130,10 @@ exports.placementSchoolsList = async (req, res) => {
     schoolEducationPhases = getCheckboxValues(schoolEducationPhase, filters.schoolEducationPhase)
   }
 
-  // let academicYears
-  // if (filters?.academicYear) {
-  //   academicYears = getCheckboxValues(academicYear, filters.academicYear)
-  // }
-
-  // let showClosedSchools
-  // if (filters?.showClosedSchool) {
-  //   showClosedSchools = getCheckboxValues(showClosedSchool, filters.showClosedSchool)
-  // }
-
   const hasFilters = !!((schoolTypes?.length > 0)
    || (schoolGroups?.length > 0)
    || (schoolStatuses?.length > 0)
    || (schoolEducationPhases?.length > 0)
-  //  || (academicYears?.length > 0)
-  //  || (showClosedSchools?.length > 0)
   )
 
   let selectedFilters = null
@@ -232,30 +210,6 @@ exports.placementSchoolsList = async (req, res) => {
         items: items
       })
     }
-
-    // if (academicYears?.length) {
-    //   selectedFilters.categories.push({
-    //     heading: { text: 'Academic year' },
-    //     items: academicYears.map((academicYear) => {
-    //       return {
-    //         text: getAcademicYearLabel(academicYear),
-    //         href: `/placement-schools/remove-academic-year-filter/${academicYear}`
-    //       }
-    //     })
-    //   })
-    // }
-
-    // if (showClosedSchools?.length) {
-    //   selectedFilters.categories.push({
-    //     heading: { text: 'Closed schools' },
-    //     items: showClosedSchools.map((showClosedSchool) => {
-    //       return {
-    //         text: 'Include closed schools',
-    //         href: `/placement-schools/remove-show-closed-school-filter/${showClosedSchool}`
-    //       }
-    //     })
-    //   })
-    // }
   }
 
   const filterSchoolTypeItems = await getSchoolTypeOptions()
@@ -283,16 +237,6 @@ exports.placementSchoolsList = async (req, res) => {
     selectedSchoolEducationPhase = filters.schoolEducationPhase
   }
 
-  // let selectedAcademicYear = []
-  // if (filters?.academicYear) {
-  //   selectedAcademicYear = filters.academicYear
-  // }
-
-  // let selectedClosedSchool = []
-  // if (filters?.showClosedSchool) {
-  //   selectedClosedSchool = filters.showClosedSchool
-  // }
-
   const wherePlacementSchool = {}
   const whereSchool = {}
 
@@ -308,9 +252,6 @@ exports.placementSchoolsList = async (req, res) => {
   if (schoolEducationPhases?.length) {
     whereSchool.educationPhaseCode = { [Op.in]: schoolEducationPhases }
   }
-  // if (academicYears?.length) {
-  //   wherePlacementSchool.academicYearId = { [Op.in]: academicYears }
-  // }
   if (keywords && keywords.trim() !== '') {
     const term = `%${keywords.trim()}%`
     whereSchool[Op.or] = [
