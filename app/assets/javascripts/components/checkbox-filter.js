@@ -38,7 +38,7 @@ export class CheckboxFilter {
     }
 
     this.textBox = this.container.querySelector('.app-checkbox-filter__filter-input')
-    this.textBox.addEventListener('keyup', (e) => this.onTextBoxKeyUp(e))
+    this.textBox.addEventListener('keydown', (e) => this.onTextBoxKeyDown(e))
   }
 
   getTextBoxHtml () {
@@ -72,10 +72,11 @@ export class CheckboxFilter {
     this.statusBox.textContent = status
   }
 
-  onTextBoxKeyUp (e) {
+  onTextBoxKeyDown (e) {
     const ENTER_KEY = 13
     if (e.keyCode === ENTER_KEY) {
       e.preventDefault()
+      // this.filterCheckboxes()
     } else {
       this.filterCheckboxes()
     }
