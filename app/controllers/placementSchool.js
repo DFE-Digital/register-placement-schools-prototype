@@ -33,8 +33,6 @@ const getCheckboxValues = (name, data) => {
 }
 
 const removeFilter = (value, data) => {
-  // do this check because if coming from overview page for example,
-  // the query/param will be a string value, not an array containing a string
   if (Array.isArray(data)) {
     return data.filter(item => item !== value)
   } else {
@@ -410,24 +408,6 @@ exports.removeSchoolEducationPhaseFilter = (req, res) => {
   filters.schoolEducationPhase = removeFilter(
     req.params.schoolEducationPhase,
     filters.schoolEducationPhase
-  )
-  res.redirect('/placement-schools')
-}
-
-exports.removeAcademicYearFilter = (req, res) => {
-  const { filters } = req.session.data
-  filters.academicYear = removeFilter(
-    req.params.academicYear,
-    filters.academicYear
-  )
-  res.redirect('/placement-schools')
-}
-
-exports.removeShowClosedSchoolFilter = (req, res) => {
-  const { filters } = req.session.data
-  filters.showClosedSchool = removeFilter(
-    req.params.showClosedSchool,
-    filters.showClosedSchool
   )
   res.redirect('/placement-schools')
 }
