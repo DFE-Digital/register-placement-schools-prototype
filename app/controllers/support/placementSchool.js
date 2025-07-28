@@ -1,4 +1,5 @@
-const Pagination = require('../helpers/pagination')
+const Pagination = require('../../helpers/pagination')
+
 const {
   getSchoolTypeOptions,
   getSchoolTypeLabel,
@@ -8,7 +9,7 @@ const {
   getSchoolStatusLabel,
   getSchoolEducationPhaseOptions,
   getSchoolEducationPhaseLabel
-} = require('../helpers/gias')
+} = require('../../helpers/gias')
 
 const {
   AcademicYear,
@@ -22,7 +23,7 @@ const {
   SchoolStatus,
   SchoolType,
   Sequelize
-} = require('../models')
+} = require('../../models')
 
 const { Op } = require('sequelize')
 
@@ -178,7 +179,7 @@ exports.placementSchoolsList = async (req, res) => {
           const label = await getSchoolGroupLabel(schoolGroup)
           return {
             text: label,
-            href: `/placement-schools/remove-school-group-filter/${schoolGroup}`
+            href: `/support/placement-schools/remove-school-group-filter/${schoolGroup}`
           }
         })
       )
@@ -195,7 +196,7 @@ exports.placementSchoolsList = async (req, res) => {
           const label = await getSchoolTypeLabel(schoolType)
           return {
             text: label,
-            href: `/placement-schools/remove-school-type-filter/${schoolType}`
+            href: `/support/placement-schools/remove-school-type-filter/${schoolType}`
           }
         })
       )
@@ -212,7 +213,7 @@ exports.placementSchoolsList = async (req, res) => {
           const label = await getSchoolEducationPhaseLabel(schoolEducationPhase)
           return {
             text: label,
-            href: `/placement-schools/remove-school-education-phase-filter/${schoolEducationPhase}`
+            href: `/support/placement-schools/remove-school-education-phase-filter/${schoolEducationPhase}`
           }
         })
       )
@@ -229,7 +230,7 @@ exports.placementSchoolsList = async (req, res) => {
           const label = await getSchoolStatusLabel(schoolStatus)
           return {
             text: label,
-            href: `/placement-schools/remove-school-status-filter/${schoolStatus}`
+            href: `/support/placement-schools/remove-school-status-filter/${schoolStatus}`
           }
         })
       )
@@ -371,7 +372,7 @@ exports.placementSchoolsList = async (req, res) => {
   // Step 5: build pagination
   const pagination = new Pagination(groupedPlacementSchools, totalCount, page, limit)
 
-  res.render('placement-schools/index', {
+  res.render('support/placement-schools/index', {
     // placement schools for *this* page
     placementSchools: pagination.getData(), // paged + grouped
     // the pagination metadata (pageItems, nextPage, etc.)
@@ -393,15 +394,15 @@ exports.placementSchoolsList = async (req, res) => {
     selectedSchoolStatus,
     selectedSchoolEducationPhase,
     actions: {
-      new: '/placement-schools/new/',
-      view: '/placement-schools',
+      new: '/support/placement-schools/new/',
+      view: '/support/placement-schools',
       filters: {
-        apply: '/placement-schools',
-        remove: '/placement-schools/remove-all-filters'
+        apply: '/support/placement-schools',
+        remove: '/support/placement-schools/remove-all-filters'
       },
       search: {
-        find: '/placement-schools',
-        remove: '/placement-schools/remove-keyword-search'
+        find: '/support/placement-schools',
+        remove: '/support/placement-schools/remove-keyword-search'
       }
     }
   })
@@ -413,7 +414,7 @@ exports.removeSchoolTypeFilter = (req, res) => {
     req.params.schoolType,
     filters.schoolType
   )
-  res.redirect('/placement-schools')
+  res.redirect('/support/placement-schools')
 }
 
 exports.removeSchoolGroupFilter = (req, res) => {
@@ -422,7 +423,7 @@ exports.removeSchoolGroupFilter = (req, res) => {
     req.params.schoolGroup,
     filters.schoolGroup
   )
-  res.redirect('/placement-schools')
+  res.redirect('/support/placement-schools')
 }
 
 exports.removeSchoolStatusFilter = (req, res) => {
@@ -431,7 +432,7 @@ exports.removeSchoolStatusFilter = (req, res) => {
     req.params.schoolStatus,
     filters.schoolStatus
   )
-  res.redirect('/placement-schools')
+  res.redirect('/support/placement-schools')
 }
 
 exports.removeSchoolEducationPhaseFilter = (req, res) => {
@@ -440,17 +441,17 @@ exports.removeSchoolEducationPhaseFilter = (req, res) => {
     req.params.schoolEducationPhase,
     filters.schoolEducationPhase
   )
-  res.redirect('/placement-schools')
+  res.redirect('/support/placement-schools')
 }
 
 exports.removeAllFilters = (req, res) => {
   delete req.session.data.filters
-  res.redirect('/placement-schools')
+  res.redirect('/support/placement-schools')
 }
 
 exports.removeKeywordSearch = (req, res) => {
   delete req.session.data.keywords
-  res.redirect('/placement-schools')
+  res.redirect('/support/placement-schools')
 }
 
 /// ------------------------------------------------------------------------ ///
@@ -476,8 +477,11 @@ exports.placementSchoolDetails = async (req, res) => {
     ]
   })
 
-  res.render('placement-schools/show', {
-    placementSchool
+  res.render('support/placement-schools/show', {
+    placementSchool,
+    actions: {
+      back: '/support/placement-schools'
+    }
    })
 }
 
@@ -508,8 +512,11 @@ exports.placementSchoolPartnerships = async (req, res) => {
   const groupedPartnerships = groupPartnershipsByAcademicYear(partnerships)
 
 
-  res.render('placement-schools/partnerships/index', {
+  res.render('support/placement-schools/partnerships/index', {
     placementSchool,
-    groupedPartnerships
+    groupedPartnerships,
+    actions: {
+      back: '/support/placement-schools'
+    }
    })
 }

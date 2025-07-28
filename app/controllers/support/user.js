@@ -1,6 +1,6 @@
-const Pagination = require('../helpers/pagination')
-const { isValidEmail, isValidEducationEmail } = require('../helpers/validation')
-const { User } = require('../models')
+const Pagination = require('../../helpers/pagination')
+const { isValidEmail, isValidEducationEmail } = require('../../helpers/validation')
+const { User } = require('../../models')
 
 const { Op } = require('sequelize')
 
@@ -28,21 +28,21 @@ exports.usersList = async (req, res) => {
   // using the chunk + the overall total count
   const pagination = new Pagination(users, totalCount, page, limit)
 
-  res.render('users/index', {
+  res.render('support/users/index', {
     // users for *this* page
     users: pagination.getData(),
     // the pagination metadata (pageItems, nextPage, etc.)
     pagination,
     actions: {
-      new: '/users/new/',
-      view: '/users',
+      new: '/support/users/new/',
+      view: '/support/users',
       filters: {
-        apply: '/users',
-        remove: '/users/remove-all-filters'
+        apply: '/support/users',
+        remove: '/support/users/remove-all-filters'
       },
       search: {
-        find: '/users',
-        remove: '/users/remove-keyword-search'
+        find: '/support/users',
+        remove: '/support/users/remove-keyword-search'
       }
     }
   })
@@ -54,25 +54,25 @@ exports.userDetails = async (req, res) => {
   const user = await User.findOne({ where: { id: req.params.userId } })
   const showDeleteLink = !(req.params.userId === req.session.passport.user.id)
 
-  res.render('users/show', {
+  res.render('support/users/show', {
     user,
     showDeleteLink,
     actions: {
-      back: '/users',
-      change: `/users/${user.id}/edit`,
-      delete: `/users/${user.id}/delete`
+      back: '/support/users',
+      change: `/support/users/${user.id}/edit`,
+      delete: `/support/users/${user.id}/delete`
     }
   })
 }
 
 exports.newUser_get = async (req, res) => {
   const { user } = req.session.data
-  res.render('users/edit', {
+  res.render('support/users/edit', {
     user,
     actions: {
-      back: '/users',
-      cancel: '/users',
-      save: '/users/new'
+      back: '/support/users',
+      cancel: '/support/users',
+      save: '/support/users/new'
     }
   })
 }
@@ -132,29 +132,29 @@ exports.newUser_post = async (req, res) => {
   }
 
   if (errors.length) {
-    res.render('users/edit', {
+    res.render('support/users/edit', {
       user,
       errors,
       actions: {
-        back: '/users',
-        cancel: '/users',
-        save: '/users/new'
+        back: '/support/users',
+        cancel: '/support/users',
+        save: '/support/users/new'
       }
     })
   } else {
-    res.redirect('/users/new/check')
+    res.redirect('/support/users/new/check')
   }
 }
 
 exports.newUserCheck_get = async (req, res) => {
   const { user } = req.session.data
-  res.render('users/check-your-answers', {
+  res.render('support/users/check-your-answers', {
     user,
     actions: {
-      back: `/users/new`,
-      cancel: `/users`,
-      change: `/users/new`,
-      save: `/users/new/check`
+      back: `/support/users/new`,
+      cancel: `/support/users`,
+      change: `/support/users/new`,
+      save: `/support/users/new/check`
     }
   })
 }
@@ -172,7 +172,7 @@ exports.newUserCheck_post = async (req, res) => {
   delete req.session.data.user
 
   req.flash('success', 'Support user added')
-  res.redirect('/users')
+  res.redirect('/support/users')
 }
 
 exports.editUser_get = async (req, res) => {
@@ -186,13 +186,13 @@ exports.editUser_get = async (req, res) => {
     user = currentUser
   }
 
-  res.render('users/edit', {
+  res.render('support/users/edit', {
     currentUser,
     user,
     actions: {
-      back: `/users/${userId}`,
-      cancel: `/users/${userId}`,
-      save: `/users/${userId}/edit`
+      back: `/support/users/${userId}`,
+      cancel: `/support/users/${userId}`,
+      save: `/support/users/${userId}/edit`
     }
   })
 }
@@ -258,18 +258,18 @@ exports.editUser_post = async (req, res) => {
   }
 
   if (errors.length) {
-    res.render('users/edit', {
+    res.render('support/users/edit', {
       currentUser,
       user,
       errors,
       actions: {
-        back: `/users/${userId}`,
-        cancel: `/users/${userId}`,
-        save: `/users/${userId}/edit`
+        back: `/support/users/${userId}`,
+        cancel: `/support/users/${userId}`,
+        save: `/support/users/${userId}/edit`
       }
     })
   } else {
-    res.redirect(`/users/${userId}/edit/check`)
+    res.redirect(`/support/users/${userId}/edit/check`)
   }
 }
 
@@ -279,14 +279,14 @@ exports.editUserCheck_get = async (req, res) => {
 
   const currentUser = await User.findByPk(userId)
 
-  res.render('users/check-your-answers', {
+  res.render('support/users/check-your-answers', {
     currentUser,
     user,
     actions: {
-      back: `/users/${userId}/edit`,
-      cancel: `/users/${userId}`,
-      change: `/users/${userId}/edit`,
-      save: `/users/${userId}/edit/check`
+      back: `/support/users/${userId}/edit`,
+      cancel: `/support/users/${userId}`,
+      change: `/support/users/${userId}/edit`,
+      save: `/support/users/${userId}/edit/check`
     }
   })
 }
@@ -306,18 +306,18 @@ exports.editUserCheck_post = async (req, res) => {
   delete req.session.data.user
 
   req.flash('success', 'Support user updated')
-  res.redirect(`/users/${userId}`)
+  res.redirect(`/support/users/${userId}`)
 }
 
 exports.deleteUser_get = async (req, res) => {
   const { userId } = req.params
   const user = await User.findByPk(userId)
-  res.render('users/delete', {
+  res.render('support/users/delete', {
     user,
     actions: {
-      back: `/users/${userId}`,
-      cancel: `/users/${userId}`,
-      delete: `/users/${userId}/delete`
+      back: `/support/users/${userId}`,
+      cancel: `/support/users/${userId}`,
+      delete: `/support/users/${userId}/delete`
     }
   })
 }
@@ -332,5 +332,5 @@ exports.deleteUser_post = async (req, res) => {
   })
 
   req.flash('success', 'Support user deleted')
-  res.redirect('/users')
+  res.redirect('/support/users')
 }
