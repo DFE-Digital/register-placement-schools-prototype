@@ -8,6 +8,36 @@ module.exports = (sequelize) => {
         as: 'school'
       })
 
+      // SchoolDetail.belongsTo(models.SchoolAdmissionsPolicy, {
+      //   foreignKey: 'admissionsPolicyCode',
+      //   targetKey: 'code',
+      //   as: 'admissionsPolicy'
+      // })
+
+      // SchoolDetail.belongsTo(models.SchoolBoarder, {
+      //   foreignKey: 'boarderCode',
+      //   targetKey: 'code',
+      //   as: 'boarder'
+      // })
+
+      // SchoolDetail.belongsTo(models.SchoolGender, {
+      //   foreignKey: 'genderCode',
+      //   targetKey: 'code',
+      //   as: 'gender'
+      // })
+
+      // SchoolDetail.belongsTo(models.SchoolNurseryProvision, {
+      //   foreignKey: 'nurseryProvisionCode',
+      //   targetKey: 'code',
+      //   as: 'nurseryProvision'
+      // })
+
+      // SchoolDetail.belongsTo(models.SchoolReligiousCharacter, {
+      //   foreignKey: 'religiousCharacterCode',
+      //   targetKey: 'code',
+      //   as: 'religiousCharacter'
+      // })
+
       SchoolDetail.belongsTo(models.User, {
         foreignKey: 'createdById',
         as: 'createdByUser'
