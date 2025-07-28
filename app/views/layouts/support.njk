@@ -22,7 +22,7 @@
   }) }}
 
   {% set navigationEndHtml %}
-    <li class="govuk-service-navigation__item app-service-navigation__align-right">
+    <li class="govuk-service-navigation__item {{- ' govuk-service-navigation__item--active' if primaryNavId == 'account' }} app-service-navigation__align-right">
       <a class="govuk-service-navigation__link" href="/support/account" {{- ' aria-current="true"' if primaryNavId == "account" }}>Your account</a>
     </li>
     <li class="govuk-service-navigation__item">
