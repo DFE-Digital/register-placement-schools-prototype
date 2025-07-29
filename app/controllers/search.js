@@ -1,8 +1,124 @@
+const { Op } = require('sequelize')
+
+const {
+  AcademicYear,
+  PlacementSchool,
+  Provider,
+  School,
+  SchoolAddress,
+  SchoolAdmissionsPolicy,
+  SchoolBoarder,
+  SchoolDetail,
+  SchoolEducationPhase,
+  SchoolGender,
+  SchoolGroup,
+  SchoolNurseryProvision,
+  SchoolReligiousCharacter,
+  SchoolStatus,
+  SchoolType
+} = require('../models')
+
+const getPlacementSchoolDetails = async (schoolId) => {
+  const school = await School.findByPk(schoolId, {
+    include: [
+      // School address
+      { model: SchoolAddress, as: 'schoolAddress' },
+
+      // Look-up models for School
+      { model: SchoolType, as: 'schoolType' },
+      { model: SchoolGroup, as: 'schoolGroup' },
+      { model: SchoolStatus, as: 'schoolStatus' },
+      { model: SchoolEducationPhase, as: 'schoolEducationPhase' },
+
+      // School detail with its look-ups
+      {
+        model: SchoolDetail,
+        as: 'schoolDetail',
+        include: [
+          { model: SchoolAdmissionsPolicy, as: 'admissionsPolicy' },
+          { model: SchoolBoarder, as: 'boarder' },
+          { model: SchoolGender, as: 'gender' },
+          { model: SchoolNurseryProvision, as: 'nurseryProvision' },
+          { model: SchoolReligiousCharacter, as: 'religiousCharacter' }
+        ]
+      }
+    ]
+  })
+
+  if (!school) return null
+
+  // Get placement relationships
+  const placementRelationships = await PlacementSchool.findAll({
+    where: { schoolId: school.id },
+    include: [
+      { model: AcademicYear, as: 'academicYear' },
+      { model: Provider, as: 'provider' }
+    ],
+    order: [
+      [{ model: AcademicYear, as: 'academicYear' }, 'name', 'DESC'],
+      [{ model: Provider, as: 'provider' }, 'operatingName', 'ASC']
+    ]
+  })
+
+  // Group placements by academic year
+  const groupedByYear = {}
+
+  placementRelationships.forEach(row => {
+    const year = row.academicYear
+    const provider = row.provider
+
+    if (!groupedByYear[year.id]) {
+      groupedByYear[year.id] = {
+        id: year.id,
+        name: year.name,
+        providers: []
+      }
+    }
+
+    groupedByYear[year.id].providers.push({
+      id: provider.id,
+      name: provider.operatingName,
+      ukprn: provider.ukprn,
+      urn: provider.urn,
+      type: provider.type
+    })
+  })
+
+  const academicYears = Object.values(groupedByYear).sort((a, b) => b.name.localeCompare(a.name))
+
+  return {
+    id: school.id,
+    name: school.name,
+    ukprn: school.ukprn,
+    urn: school.urn,
+    type: school.schoolType?.name || null,
+    group: school.schoolGroup?.name || null,
+    status: school.schoolStatus?.name || null,
+    educationPhase: school.schoolEducationPhase?.name || null,
+    address: school.schoolAddress || null,
+    detail: {
+      ...school.schoolDetail?.toJSON(),
+      admissionsPolicy: school.schoolDetail?.admissionsPolicy?.name || null,
+      boarder: school.schoolDetail?.boarder?.name || null,
+      gender: school.schoolDetail?.gender?.name || null,
+      nurseryProvision: school.schoolDetail?.nurseryProvision?.name || null,
+      religiousCharacter: school.schoolDetail?.religiousCharacter?.name || null
+    },
+    academicYears
+  }
+}
+
 exports.search_get = async (req, res) => {
   delete req.session.data.search
   delete req.session.data.q
+  delete req.session.data.location
+  delete req.session.data.provider
+  delete req.session.data.school
+
+  const q = req.session.data.q || req.query.q
 
   res.render('search/index', {
+    q,
     actions: {
       continue: '/search'
     }
@@ -23,22 +139,31 @@ exports.search_post = async (req, res) => {
 
   if (errors.length) {
     res.render('search/index', {
+      q,
       errors,
       actions: {
         continue: '/search'
       }
     })
   } else {
-    if (req.session.data.q === 'location') {
+    if (q === 'location') {
       res.redirect('/search/location')
-    } else {
+    } else if (q === 'provider') {
       res.redirect('/search/provider')
+    } else if (q === 'school') {
+      res.redirect('/search/school')
+    } else {
+      res.send('Page not found')
     }
   }
 }
 
 exports.searchLocation_get = async (req, res) => {
+  delete req.session.data.provider
+  delete req.session.data.school
+
   const { search } = req.session.data
+
   res.render('search/location', {
     search,
     actions: {
@@ -76,8 +201,55 @@ exports.searchLocation_post = async (req, res) => {
   }
 }
 
-exports.searchProvider_get = async (req, res) => {
+exports.searchSchool_get = async (req, res) => {
+  delete req.session.data.location
+  delete req.session.data.provider
+
   const { search } = req.session.data
+
+  res.render('search/school', {
+    search,
+    actions: {
+      back: '/search',
+      cancel: '/search',
+      continue: '/search/school'
+    }
+  })
+}
+
+exports.searchSchool_post = async (req, res) => {
+  const { search } = req.session.data
+  const errors = []
+
+  if (!search.length) {
+    const error = {}
+    error.fieldName = 'school'
+    error.href = '#school'
+    error.text = 'Enter school name, UKPRN or URN'
+    errors.push(error)
+  }
+
+  if (errors.length) {
+    res.render('search/school', {
+      search,
+      errors,
+      actions: {
+        back: '/search',
+        cancel: '/search',
+        continue: '/search/school'
+      }
+    })
+  } else {
+    res.redirect('/results')
+  }
+}
+
+exports.searchProvider_get = async (req, res) => {
+  delete req.session.data.location
+  delete req.session.data.school
+
+  const { search } = req.session.data
+
   res.render('search/provider', {
     search,
     actions: {
@@ -113,4 +285,111 @@ exports.searchProvider_post = async (req, res) => {
   } else {
     res.redirect('/results')
   }
+}
+
+exports.results_get = async (req, res) => {
+  const q = req.session.data.q || req.query.q
+  const { search } = req.session.data
+console.log(req.session.data.q);
+
+  if (q === 'location') {
+    res.render('search/results-location', {
+      q,
+      search,
+      actions: {
+        search: '/search'
+      }
+    })
+  } else if (q === 'provider') {
+    res.render('search/results-provider', {
+      q,
+      search,
+      actions: {
+        search: '/search'
+      }
+    })
+  } else if (q === 'school') {
+    const { school } = req.session.data
+    const placementSchool = await getPlacementSchoolDetails(school.id)
+
+    res.render('search/results-school', {
+      q,
+      search,
+      placementSchool,
+      actions: {
+        search: '/search'
+      }
+    })
+  } else {
+    res.send('Page not found - Results')
+  }
+
+}
+
+/// ------------------------------------------------------------------------ ///
+/// Autocomplete data
+/// ------------------------------------------------------------------------ ///
+
+exports.locationSuggestions_json = async (req, res) => {
+  req.headers['Access-Control-Allow-Origin'] = true
+
+  const query = req.query.search || ''
+
+  const locations = []
+
+  res.json(locations)
+}
+
+exports.providerSuggestions_json = async (req, res) => {
+  req.headers['Access-Control-Allow-Origin'] = true
+
+  const query = req.query.search || ''
+
+  const providers = await Provider.findAll({
+    attributes: [
+      'id',
+      'operatingName',
+      'legalName',
+      'ukprn',
+      'urn'
+    ],
+    where: {
+      deletedAt: null,
+      [Op.or]: [
+        { operatingName: { [Op.like]: `%${query}%` } },
+        { legalName: { [Op.like]: `%${query}%` } },
+        { ukprn: { [Op.like]: `%${query}%` } },
+        { urn: { [Op.like]: `%${query}%` } }
+      ]
+    },
+    order: [['operatingName', 'ASC']]
+  })
+
+  res.json(providers)
+}
+
+exports.schoolSuggestions_json = async (req, res) => {
+  req.headers['Access-Control-Allow-Origin'] = true
+
+  const query = req.query.search || ''
+
+  const schools = await School.findAll({
+    attributes: [
+      'id',
+      'name',
+      'ukprn',
+      'urn'
+    ],
+    where: {
+      deletedAt: null,
+      [Op.or]: [
+        { name: { [Op.like]: `%${query}%` } },
+        { ukprn: { [Op.like]: `%${query}%` } },
+        { urn: { [Op.like]: `%${query}%` } }
+      ]
+    },
+    order: [['name', 'ASC']]
+  })
+
+  res.json(schools)
 }
