@@ -28,10 +28,7 @@ const passport = {
 /// ------------------------------------------------------------------------ ///
 /// Controller modules
 /// ------------------------------------------------------------------------ ///
-const placementSchoolController = require('./controllers/placementSchool')
 const searchController = require('./controllers/search')
-const locationController = require('./controllers/location')
-const providerController = require('./controllers/provider')
 const supportAccountController = require('./controllers/support/account')
 const supportPlacementSchoolController = require('./controllers/support/placementSchool')
 const supportUserController = require('./controllers/support/user')
@@ -71,7 +68,7 @@ router.get('/support/sign-out', (req, res) => {
 })
 
 /// ------------------------------------------------------------------------ ///
-/// PLACEMENT SCHOOL ROUTES
+/// SEARCH ROUTES
 /// ------------------------------------------------------------------------ ///
 
 router.get('/search', checkIsAuthenticated, searchController.search_get)
@@ -80,8 +77,13 @@ router.post('/search', checkIsAuthenticated, searchController.search_post)
 router.get('/search/location', checkIsAuthenticated, searchController.searchLocation_get)
 router.post('/search/location', checkIsAuthenticated, searchController.searchLocation_post)
 
+router.get('/search/school', checkIsAuthenticated, searchController.searchSchool_get)
+router.post('/search/school', checkIsAuthenticated, searchController.searchSchool_post)
+
 router.get('/search/provider', checkIsAuthenticated, searchController.searchProvider_get)
 router.post('/search/provider', checkIsAuthenticated, searchController.searchProvider_post)
+
+router.get('/results', checkIsAuthenticated, searchController.results_get)
 
 /// ------------------------------------------------------------------------ ///
 /// SUPPORT - PLACEMENT SCHOOL ROUTES
@@ -135,9 +137,11 @@ router.get('/support/account', checkIsAuthenticated, supportAccountController.us
 /// AUTOCOMPLETE ROUTES
 /// ------------------------------------------------------------------------ ///
 
-router.get('/provider-suggestions', providerController.providerSuggestions_json)
+router.get('/location-suggestions', searchController.locationSuggestions_json)
 
-router.get('/location-suggestions', locationController.locationSuggestions_json)
+router.get('/provider-suggestions', searchController.providerSuggestions_json)
+
+router.get('/school-suggestions', searchController.schoolSuggestions_json)
 
 /// ------------------------------------------------------------------------ ///
 ///
