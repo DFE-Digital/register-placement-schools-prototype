@@ -113,15 +113,74 @@ const getPlacementSchoolDetails = async (schoolId) => {
 const getPlacementSchoolsForProvider = async (providerId, page = 1, limit = 25) => {
   const offset = (page - 1) * limit
 
+  // Step 1: Confirm provider exists
   const provider = await Provider.findByPk(providerId)
   if (!provider) return null
 
-  const placements = await PlacementSchool.findAll({
+  // Step 2: Get total number of placements (used for pagination)
+  const totalCount = await PlacementSchool.count({
+    where: { providerId }
+  })
+
+  if (totalCount === 0) {
+    return {
+      provider: {
+        id: provider.id,
+        operatingName: provider.operatingName,
+        legalName: provider.legalName,
+        ukprn: provider.ukprn,
+        urn: provider.urn
+      },
+      academicYears: [],
+      pagination: new Pagination([], 0, page, limit)
+    }
+  }
+
+  // Step 3: Get flattened list of placement rows (only schoolId + academicYear) for this page
+  const pagedPlacementRows = await PlacementSchool.findAll({
     where: { providerId },
     include: [
       {
+        model: AcademicYear,
+        as: 'academicYear',
+        attributes: ['id', 'name']
+      },
+      {
         model: School,
         as: 'school',
+        attributes: ['id', 'name'],
+        required: true
+      }
+    ],
+    attributes: ['schoolId', 'academicYearId'],
+    order: [
+      [{ model: AcademicYear, as: 'academicYear' }, 'name', 'DESC'],
+      [{ model: School, as: 'school' }, 'name', 'ASC']
+    ],
+    offset,
+    limit,
+    raw: true,
+    nest: true
+  })
+
+  const schoolIds = pagedPlacementRows.map(row => row.schoolId)
+
+  // Step 4: Fetch full school + academic year info for these schools
+  const fullPlacements = await PlacementSchool.findAll({
+    where: {
+      providerId,
+      schoolId: schoolIds
+    },
+    include: [
+      {
+        model: AcademicYear,
+        as: 'academicYear',
+        attributes: ['id', 'name']
+      },
+      {
+        model: School,
+        as: 'school',
+        attributes: ['id', 'name', 'ukprn', 'urn'],
         include: [
           { model: SchoolAddress, as: 'schoolAddress' },
           { model: SchoolType, as: 'schoolType' },
@@ -129,50 +188,36 @@ const getPlacementSchoolsForProvider = async (providerId, page = 1, limit = 25) 
           { model: SchoolStatus, as: 'schoolStatus' },
           { model: SchoolEducationPhase, as: 'schoolEducationPhase' }
         ]
-      },
-      { model: AcademicYear, as: 'academicYear' }
-    ],
-    order: [
-      [{ model: AcademicYear, as: 'academicYear' }, 'name', 'DESC'],
-      [{ model: School, as: 'school' }, 'name', 'ASC']
+      }
     ]
   })
 
-  // Step 1: Flatten to school-level items
-  const flattened = placements.map(row => {
-    const s = row.school
-    const year = row.academicYear
-
-    return {
-      academicYearId: year.id,
-      academicYearName: year.name,
-      school: {
-        id: s.id,
-        name: s.name,
-        ukprn: s.ukprn,
-        urn: s.urn,
-        type: s.schoolType?.name || null,
-        group: s.schoolGroup?.name || null,
-        status: s.schoolStatus?.name || null,
-        educationPhase: s.schoolEducationPhase?.name || null,
-        address: s.schoolAddress || null
-      }
+  // Step 5: Flatten for pagination and regroup by academic year
+  const pageItems = fullPlacements.map(row => ({
+    academicYearId: row.academicYear.id,
+    academicYearName: row.academicYear.name,
+    school: {
+      id: row.school.id,
+      name: row.school.name,
+      ukprn: row.school.ukprn,
+      urn: row.school.urn,
+      type: row.school.schoolType?.name || null,
+      group: row.school.schoolGroup?.name || null,
+      status: row.school.schoolStatus?.name || null,
+      educationPhase: row.school.schoolEducationPhase?.name || null,
+      address: row.school.schoolAddress || null
     }
-  })
+  }))
 
-  // Step 2: Sort flattened list by academic year name (DESC), then school name (ASC)
-  flattened.sort((a, b) => {
+  // Sort again (in case DB order isn't preserved exactly)
+  pageItems.sort((a, b) => {
     const yearCompare = b.academicYearName.localeCompare(a.academicYearName)
-    if (yearCompare !== 0) return yearCompare
-    return a.school.name.localeCompare(b.school.name)
+    return yearCompare !== 0 ? yearCompare : a.school.name.localeCompare(b.school.name)
   })
 
-  // Step 3: Paginate at the school level
-  const totalCount = flattened.length
-  const pageItems = flattened.slice(offset, offset + limit)
   const pagination = new Pagination(pageItems, totalCount, page, limit)
 
-  // Step 4: Regroup paginated items by academic year
+  // Step 6: Group paged items by academic year
   const grouped = {}
   for (const item of pageItems) {
     const yearId = item.academicYearId
@@ -198,7 +243,7 @@ const getPlacementSchoolsForProvider = async (providerId, page = 1, limit = 25) 
       ukprn: provider.ukprn,
       urn: provider.urn
     },
-    academicYears, // Grouped by year, paginated by school count
+    academicYears,
     pagination
   }
 }
