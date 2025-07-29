@@ -12,12 +12,88 @@
     {% include "_includes/page-heading.njk" %}
 
     <p class="govuk-body">
-      Provider search: {{data|dump|safe}}
-    </p>
-
-    <p class="govuk-body">
       <a class="govuk-link" href="{{ actions.search }}">Search again</a>
     </p>
+
+    {% for year in academicYears %}
+      <h2 class="govuk-heading-m">{{ year.name }}</h2>
+
+      {% for school in year.schools %}
+
+        {% set nameHtml %}
+          {# <a href="{{ actions.view }}/{{ school.id }}" class="govuk-link"> #}
+            {{ school.name }}
+          {# </a> #}
+        {% endset %}
+
+        {% set schoolTypeGroupHtml %}
+          <ul class="govuk-list">
+            <li>
+              {{ school.group }}
+            </li>
+            <li class="govuk-!-font-size-16">
+              {{ school.type }}
+            </li>
+          </ul>
+        {% endset %}
+
+        {{ govukSummaryList({
+        card: {
+          title: {
+            html: nameHtml
+          }
+        },
+        rows: [
+          {
+            key: {
+              text: "School status"
+            },
+            value: {
+              text: school.status if school.status.length else "Not known",
+              classes: "govuk-hint" if not school.status.length
+            }
+          },
+          {
+            key: {
+              text: "UK provider reference number (UKPRN)"
+            },
+            value: {
+              text: school.ukprn if school.ukprn.length else "Not known",
+              classes: "govuk-hint" if not school.ukprn.length
+            }
+          },
+          {
+            key: {
+              text: "Unique reference number (URN)"
+            },
+            value: {
+              text: school.urn if school.urn.length else "Not known",
+              classes: "govuk-hint" if not school.urn.length
+            }
+          },
+          {
+            key: {
+              text: "School type"
+            },
+            value: {
+              html: schoolTypeGroupHtml
+            }
+          },
+          {
+            key: {
+              text: "Education phase"
+            },
+            value: {
+              text: school.educationPhase if school.educationPhase.length else "Not known",
+              classes: "govuk-hint" if not school.educationPhase.length
+            }
+          }
+        ]
+      }) }}
+      {% endfor %}
+    {% endfor %}
+
+    {% include "_includes/pagination.njk" %}
 
   </div>
 </div>
