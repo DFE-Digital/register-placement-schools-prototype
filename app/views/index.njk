@@ -7,59 +7,18 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
 
-    <form action="{{ actions.continue }}" method="post" accept-charset="utf-8" novalidate>
+    <h1 class="govuk-heading-l">
+      {{ serviceName }}
+    </h1>
 
-      {% set locationHtml %}
-        Location HTML
-      {% endset %}
+    <p class="govuk-body">Use this service to find the details of all initial teacher training (ITT) placement schools.</p>
 
-      {% set providerHtml %}
-        Provider HTML
-      {% endset %}
-
-      {{ govukRadios({
-        name: "q",
-        fieldset: {
-          legend: {
-            text: title,
-            isPageHeading: true,
-            classes: "govuk-fieldset__legend--l"
-          }
-        },
-        errorMessage: errors | getErrorMessage("q"),
-        items: [
-          {
-            value: "location",
-            text: "By city, town or postcode",
-            checked: (data.q == "location"),
-            conditional: {
-              html: locationHtml
-            }
-          },
-          {
-            value: "england",
-            text: "Across England",
-            checked: (data.q == "england")
-          } if 1==0,
-          {
-            divider: "or"
-          } if 1==0,
-          {
-            value: "provider",
-            text: "By university or other training provider",
-            checked: (data.q == "provider"),
-            conditional: {
-              html: providerHtml
-            }
-          }
-        ]
-      }) }}
-
-      {{ govukButton({
-        text: "Continue"
-      }) }}
-
-    </form>
+    {{ govukButton({
+      classes: "govuk-!-margin-top-4",
+      text: "Start",
+      href: "/search",
+      isStartButton: true
+    }) }}
 
   </div>
 </div>
