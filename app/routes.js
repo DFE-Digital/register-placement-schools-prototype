@@ -29,6 +29,8 @@ const passport = {
 /// Controller modules
 /// ------------------------------------------------------------------------ ///
 const placementSchoolController = require('./controllers/placementSchool')
+const locationController = require('./controllers/location')
+const providerController = require('./controllers/provider')
 const supportAccountController = require('./controllers/support/account')
 const supportPlacementSchoolController = require('./controllers/support/placementSchool')
 const supportUserController = require('./controllers/support/user')
@@ -122,6 +124,14 @@ router.get('/support/users', checkIsAuthenticated, supportUserController.usersLi
 /// ------------------------------------------------------------------------ ///
 
 router.get('/support/account', checkIsAuthenticated, supportAccountController.userAccount)
+
+/// ------------------------------------------------------------------------ ///
+/// AUTOCOMPLETE ROUTES
+/// ------------------------------------------------------------------------ ///
+
+router.get('/provider-suggestions', providerController.providerSuggestions_json)
+
+router.get('/location-suggestions', locationController.locationSuggestions_json)
 
 /// ------------------------------------------------------------------------ ///
 ///
