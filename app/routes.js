@@ -29,6 +29,7 @@ const passport = {
 /// Controller modules
 /// ------------------------------------------------------------------------ ///
 const placementSchoolController = require('./controllers/placementSchool')
+const searchController = require('./controllers/search')
 const locationController = require('./controllers/location')
 const providerController = require('./controllers/provider')
 const supportAccountController = require('./controllers/support/account')
@@ -73,9 +74,14 @@ router.get('/support/sign-out', (req, res) => {
 /// PLACEMENT SCHOOL ROUTES
 /// ------------------------------------------------------------------------ ///
 
-router.get('/search', checkIsAuthenticated, placementSchoolController.search_get)
-router.post('/search', checkIsAuthenticated, placementSchoolController.search_post)
+router.get('/search', checkIsAuthenticated, searchController.search_get)
+router.post('/search', checkIsAuthenticated, searchController.search_post)
 
+router.get('/search/location', checkIsAuthenticated, searchController.searchLocation_get)
+router.post('/search/location', checkIsAuthenticated, searchController.searchLocation_post)
+
+router.get('/search/provider', checkIsAuthenticated, searchController.searchProvider_get)
+router.post('/search/provider', checkIsAuthenticated, searchController.searchProvider_post)
 
 /// ------------------------------------------------------------------------ ///
 /// SUPPORT - PLACEMENT SCHOOL ROUTES
