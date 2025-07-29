@@ -1,6 +1,6 @@
 {% extends "layouts/main.njk" %}
 
-{% set title = "Enter provider name, UKPRN or URN" %}
+{% set title = "Enter school name, UKPRN or URN" %}
 {% set caption = "Find placement schools" %}
 
 {% block pageTitle %}
@@ -25,32 +25,32 @@
       {% include "_includes/page-heading.njk" %}
     {% endset %}
 
-    <form id="provider-search" action="{{ actions.save }}" method="post" accept-charset="utf-8" novalidate>
-      {# Hidden field to store the provider ID #}
-      <input type="hidden" id="selected-provider-id" name="provider[id]" value="{{ data.provider.id | default('') }}">
+    <form id="school-search" action="{{ actions.save }}" method="post" accept-charset="utf-8" novalidate>
+      {# Hidden field to store the school ID #}
+      <input type="hidden" id="selected-school-id" name="school[id]" value="{{ data.school.id | default('') }}">
 
       <div class="govuk-form-group {{- ' govuk-form-group--error' if errors.length }}">
         {{ headingHtml | safe }}
 
         <div class="js-enabled-only" hidden>
-          <p id="selected-provider-id-error" class="govuk-error-message">
+          <p id="selected-school-id-error" class="govuk-error-message">
             <span class="govuk-visually-hidden">Error:</span> {{errors[0].text }}
           </p>
         </div>
 
         <div class="autocomplete__fallback">
           {{ govukInput({
-            id: "provider",
+            id: "school",
             name: "search",
             value: search,
             autocomplete: "off",
             formGroup: {
               classes: "govuk-!-margin-bottom-0"
             },
-            errorMessage: errors | getErrorMessage("provider")
+            errorMessage: errors | getErrorMessage("school")
           }) }}
         </div>
-        <div id="provider-autocomplete-container" class="govuk-body"></div>
+        <div id="school-autocomplete-container" class="govuk-body"></div>
       </div>
 
       {{ govukButton({
@@ -73,30 +73,30 @@
 document.documentElement.classList.add('js-enabled');
 
 document.addEventListener('DOMContentLoaded', function () {
-  const fallbackInput = document.getElementById('provider');
+  const fallbackInput = document.getElementById('school');
   if (fallbackInput) {
     fallbackInput.disabled = true;
   }
 
   const fallback = document.querySelector('.autocomplete__fallback');
-  const enhanced = document.querySelector('#provider-autocomplete-container');
+  const enhanced = document.querySelector('#school-autocomplete-container');
 
   if (fallback && enhanced) {
     fallback.style.display = 'none';
     enhanced.removeAttribute('hidden');
 
     // Disable the fallback input so it doesn't get submitted
-    const fallbackInput = document.getElementById('provider');
+    const fallbackInput = document.getElementById('school');
     if (fallbackInput) {
       fallbackInput.disabled = true;
     }
   }
 
-  let providerMap = []; // store providers for potential auto-match on submit
+  let schoolMap = []; // store schools for potential auto-match on submit
 
   accessibleAutocomplete({
-    element: document.querySelector('#provider-autocomplete-container'),
-    id: 'provider-autocomplete',
+    element: document.querySelector('#school-autocomplete-container'),
+    id: 'school-autocomplete',
     name: 'search', // <--- Use 'search' as the name of the generated input
     defaultValue: '{{ search | default("") }}', // re-populate typed text
     // add an aria-label for screen readers instead of a second visible label
@@ -109,25 +109,25 @@ document.addEventListener('DOMContentLoaded', function () {
       }
 
       // Call your endpoint with ?search=...
-      fetch('/provider-suggestions?search=' + encodeURIComponent(query))
+      fetch('/school-suggestions?search=' + encodeURIComponent(query))
         .then(response => response.json())
-        .then(providers => {
-          // providers: [ { id, operatingName, legalName, ukprn, urn }, ... ]
+        .then(schools => {
+          // schools: [ { id, name, ukprn, urn }, ... ]
 
-          // 1) Build a map that associates a display label with the provider object
-          providerMap = providers.map(provider => {
-            const namePart = provider.operatingName || provider.legalName || '(no name)';
-            const ukprnPart = provider.ukprn ? ` (UKPRN: ${provider.ukprn})` : '';
-            const displayLabel = `${namePart}${ukprnPart}`;
+          // 1) Build a map that associates a display label with the school object
+          schoolMap = schools.map(school => {
+            const namePart = school.name || '(no name)';
+            const urnPart = school.urn ? ` (URN: ${school.urn})` : '';
+            const displayLabel = `${namePart}${urnPart}`;
 
             return {
               label: displayLabel,
-              ...provider // keep the original fields, including provider.id
+              ...school // keep the original fields, including school.id
             };
           });
 
           // 2) Pass an array of just the labels to populateResults
-          const labelArray = providerMap.map(item => item.label);
+          const labelArray = schoolMap.map(item => item.label);
           populateResults(labelArray);
         })
         .catch(err => {
@@ -138,31 +138,31 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Fired when the user confirms a suggestion (click, Enter, or Tab)
     onConfirm: function (confirmedLabel) {
-      const selectedProvider = providerMap.find(p => p.label === confirmedLabel);
-      // If found, store the provider's ID in the hidden field
-      if (selectedProvider) {
-        document.getElementById('selected-provider-id').value = selectedProvider.id;
+      const selectedSchool = schoolMap.find(p => p.label === confirmedLabel);
+      // If found, store the school's ID in the hidden field
+      if (selectedSchool) {
+        document.getElementById('selected-school-id').value = selectedSchool.id;
       } else {
-        document.getElementById('selected-provider-id').value = '';
+        document.getElementById('selected-school-id').value = '';
       }
     }
   });
 
   // 3) Optional: auto-match on form submission if user typed something but never confirmed
-  const form = document.getElementById('provider-search');
+  const form = document.getElementById('school-search');
   form.addEventListener('submit', function (event) {
     // If the user has already picked a suggestion, the hidden input will have a value
-    const hiddenField = document.getElementById('selected-provider-id');
+    const hiddenField = document.getElementById('selected-school-id');
     if (hiddenField.value) {
       return; // we already have a confirmed selection, do nothing
     }
 
     // Otherwise, try to see if the typed text exactly matches one suggestion
-    const typedValue = document.getElementById('provider-autocomplete').value;
-    if (typedValue && providerMap.length > 0) {
-      const matchedProvider = providerMap.find(p => p.label === typedValue);
-      if (matchedProvider) {
-        hiddenField.value = matchedProvider.id;
+    const typedValue = document.getElementById('school-autocomplete').value;
+    if (typedValue && schoolMap.length > 0) {
+      const matchedSchool = schoolMap.find(p => p.label === typedValue);
+      if (matchedSchool) {
+        hiddenField.value = matchedSchool.id;
       }
       // If there's no exact match, hiddenField stays blank
     }

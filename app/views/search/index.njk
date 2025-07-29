@@ -18,27 +18,22 @@
             classes: "govuk-fieldset__legend--l"
           }
         },
-        errorMessage: errors | getErrorMessage("q"),
         items: [
           {
             value: "location",
-            text: "By city, town or postcode",
-            checked: (data.q == "location")
+            text: "By city, town or postcode"
           },
           {
-            value: "england",
-            text: "Across England",
-            checked: (data.q == "england")
-          } if 1==0,
-          {
-            divider: "or"
-          } if 1==0,
+            value: "school",
+            text: "By school"
+          },
           {
             value: "provider",
-            text: "By university or other training provider",
-            checked: (data.q == "provider")
+            text: "By university or other training provider"
           }
-        ]
+        ],
+        value: q,
+        errorMessage: errors | getErrorMessage("q")
       }) }}
 
       {{ govukButton({

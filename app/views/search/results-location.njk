@@ -1,0 +1,25 @@
+{% extends "layouts/main.njk" %}
+
+{% set title = pagination.totalCount | numeral("0,0") + " placement schools near ‘" + search + "’" %}
+
+{% block content %}
+
+{% include "_includes/notification-banner.njk" %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% include "_includes/page-heading.njk" %}
+
+    <p class="govuk-body">
+      Location search: {{data|dump|safe}}
+    </p>
+
+    <p class="govuk-body">
+      <a class="govuk-link" href="{{ actions.search }}">Search again</a>
+    </p>
+
+  </div>
+</div>
+
+{% endblock %}

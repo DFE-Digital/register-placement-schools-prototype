@@ -42,7 +42,7 @@
           {{ govukInput({
             id: "location",
             name: "search",
-            value: data.search,
+            value: search,
             autocomplete: "off",
             formGroup: {
               classes: "govuk-!-margin-bottom-0"
@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function () {
     element: document.querySelector('#location-autocomplete-container'),
     id: 'location-autocomplete',
     name: 'search', // <--- Use 'search' as the name of the generated input
-    defaultValue: '{{ data["search"] | default("") }}', // re-populate typed text
+    defaultValue: '{{ search | default("") }}', // re-populate typed text
     // add an aria-label for screen readers instead of a second visible label
     ariaLabel: '{{ title }}',
     source: function (query, populateResults) {
