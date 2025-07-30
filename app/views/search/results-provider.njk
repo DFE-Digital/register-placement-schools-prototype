@@ -40,58 +40,58 @@
             {% endset %}
 
             {{ govukSummaryList({
-            card: {
-              title: {
-                html: nameHtml
-              }
-            },
-            rows: [
-              {
-                key: {
-                  text: "School status"
-                },
-                value: {
-                  text: school.status if school.status.length else "Not known",
-                  classes: "govuk-hint" if not school.status.length
+              card: {
+                title: {
+                  html: nameHtml
                 }
               },
-              {
-                key: {
-                  text: "UK provider reference number (UKPRN)"
+              rows: [
+                {
+                  key: {
+                    text: "School status"
+                  },
+                  value: {
+                    text: school.status if school.status.length else "Not known",
+                    classes: "govuk-hint" if not school.status.length
+                  }
                 },
-                value: {
-                  text: school.ukprn if school.ukprn.length else "Not known",
-                  classes: "govuk-hint" if not school.ukprn.length
-                }
-              },
-              {
-                key: {
-                  text: "Unique reference number (URN)"
+                {
+                  key: {
+                    text: "UK provider reference number (UKPRN)"
+                  },
+                  value: {
+                    text: school.ukprn if school.ukprn.length else "Not known",
+                    classes: "govuk-hint" if not school.ukprn.length
+                  }
                 },
-                value: {
-                  text: school.urn if school.urn.length else "Not known",
-                  classes: "govuk-hint" if not school.urn.length
-                }
-              },
-              {
-                key: {
-                  text: "School type"
+                {
+                  key: {
+                    text: "Unique reference number (URN)"
+                  },
+                  value: {
+                    text: school.urn if school.urn.length else "Not known",
+                    classes: "govuk-hint" if not school.urn.length
+                  }
                 },
-                value: {
-                  html: schoolTypeGroupHtml
-                }
-              },
-              {
-                key: {
-                  text: "Education phase"
+                {
+                  key: {
+                    text: "School type"
+                  },
+                  value: {
+                    html: schoolTypeGroupHtml
+                  }
                 },
-                value: {
-                  text: school.educationPhase if school.educationPhase.length else "Not known",
-                  classes: "govuk-hint" if not school.educationPhase.length
+                {
+                  key: {
+                    text: "Education phase"
+                  },
+                  value: {
+                    text: school.educationPhase if school.educationPhase.length else "Not known",
+                    classes: "govuk-hint" if not school.educationPhase.length
+                  }
                 }
-              }
-            ]
-          }) }}
+              ]
+            }) }}
           {% endfor %}
         {% else %}
           <p class="govuk-body">{{ provider.operatingName if provider.operatingName.length else "The organisation" }} did not partner with any schools in {{ year.name }}.</p>

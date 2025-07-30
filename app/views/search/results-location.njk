@@ -1,6 +1,6 @@
 {% extends "layouts/main.njk" %}
 
-{% set title = pagination.totalCount | numeral("0,0") + " placement schools near ‘" + search + "’" %}
+{% set title = pagination.totalCount | numeral("0,0") + " placement schools near ‘" + location.name + "’" %}
 
 {% block content %}
 
@@ -12,12 +12,161 @@
     {% include "_includes/page-heading.njk" %}
 
     <p class="govuk-body">
-      Location search: {{data|dump|safe}}
+      Showing placement schools within {{ radius }} miles of ‘{{ location.name }}’.
     </p>
 
     <p class="govuk-body">
       <a class="govuk-link" href="{{ actions.search }}">Search again</a>
     </p>
+
+    {% if placements.length %}
+
+      {% for placement in placements %}
+        {% set nameHtml %}
+          {# <a href="{{ actions.view }}/{{ placement.school.id }}" class="govuk-link"> #}
+            {{ placement.school.name }}
+          {# </a> #}
+        {% endset %}
+
+        {% set urnHtml %}
+          <ul class="govuk-list">
+            <li>
+              {{ placement.school.urn }}
+            </li>
+            <li>
+              <a href="https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/{{placement.school.urn}}" target="_blank" rel="noreferrer nofollow" class="govuk-link">View school on Get information about schools (opens in new tab)</a>
+            </li>
+          </ul>
+        {% endset %}
+
+        {% set schoolTypeGroupHtml %}
+          <ul class="govuk-list">
+            <li>
+              {{ placement.school.group }}
+            </li>
+            <li class="govuk-!-font-size-16">
+              {{ placement.school.type }}
+            </li>
+          </ul>
+        {% endset %}
+
+        {% set addressHtml -%}
+          {% if placement.school.address.line1.length %}
+            {{ placement.school.address.line1 }}<br>
+          {% endif %}
+          {% if placement.school.address.line2.length %}
+            {{ placement.school.address.line2 }}<br>
+          {% endif %}
+          {% if placement.school.address.line3.length %}
+            {{ placement.school.address.line3 }}<br>
+          {% endif %}
+          {% if placement.school.address.town.length %}
+            {{ placement.school.address.town }}<br>
+          {% endif %}
+          {% if placement.school.address.county.length %}
+            {{ placement.school.address.county }}<br>
+          {% endif %}
+          {% if placement.school.address.postcode.length %}
+            {{ placement.school.address.postcode }}<br>
+          {% endif %}
+        {%- endset %}
+
+        {% set academicYearsHtml %}
+          {% if placement.academicYears.length %}
+            <ul class="govuk-list govuk-list--bullet">
+              {% for year in placement.academicYears %}
+                <li>{{ year }}</li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="govuk-body">The school has not hosted any trainees</p>
+          {% endif %}
+        {% endset %}
+
+        {{ govukSummaryList({
+          card: {
+            title: {
+              html: nameHtml
+            }
+          },
+          rows: [
+            {
+              key: {
+                text: "Distance"
+              },
+              value: {
+                text: (placement.distance | round(1) + " miles") if placement.distance else "Not known",
+                classes: "govuk-hint" if not placement.distance
+              }
+            },
+            {
+              key: {
+                text: "School status"
+              },
+              value: {
+                text: placement.school.status if placement.school.status.length else "Not known",
+                classes: "govuk-hint" if not placement.school.status.length
+              }
+            },
+            {
+              key: {
+                text: "UK provider reference number (UKPRN)"
+              },
+              value: {
+                text: placement.school.ukprn if placement.school.ukprn.length else "Not known",
+                classes: "govuk-hint" if not placement.school.ukprn.length
+              }
+            },
+            {
+              key: {
+                text: "Unique reference number (URN)"
+              },
+              value: {
+                html: urnHtml
+              }
+            },
+            {
+              key: {
+                text: "School type"
+              },
+              value: {
+                html: schoolTypeGroupHtml
+              }
+            },
+            {
+              key: {
+                text: "Education phase"
+              },
+              value: {
+                text: placement.school.educationPhase if placement.school.educationPhase.length else "Not known",
+                classes: "govuk-hint" if not placement.school.educationPhase.length
+              }
+            },
+            {
+              key: {
+                text: "Address"
+              },
+              value: {
+                html: addressHtml if (placement.school.address.line1.length and placement.school.address.town.length and placement.school.address.postcode.length) else "Not known",
+                classes: "govuk-hint" if not (placement.school.address.line1.length and placement.school.address.town.length and placement.school.address.postcode.length)
+              }
+            },
+            {
+              key: {
+                text: "Academic years"
+              },
+              value: {
+                html: academicYearsHtml
+              }
+            }
+          ]
+        }) }}
+
+      {% endfor %}
+      {% include "_includes/pagination.njk" %}
+    {% else %}
+      <p class="govuk-body">There are no placement schools within {{ radius }} miles of ‘{{ location.name }}’.</p>
+    {% endif %}
 
   </div>
 </div>
