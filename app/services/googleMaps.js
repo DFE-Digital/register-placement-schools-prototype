@@ -1,3 +1,20 @@
+const safeFetchJson = async (url) => {
+  try {
+    const response = await fetch(url)
+
+    if (!response.ok) {
+      console.error(`Fetch failed: ${response.status} ${response.statusText}`)
+      return null
+    }
+
+    const data = await response.json()
+    return data
+  } catch (err) {
+    console.error('Fetch threw an error:', err)
+    return null
+  }
+}
+
 /**
  * geocodeAddress
  *
@@ -57,6 +74,31 @@ const geocodeAddress = async (addressString) => {
   return { latitude: lat, longitude: lng, googlePlaceId }
 }
 
+const getPlaceSuggestions = async (input) => {
+  const url = new URL('https://maps.googleapis.com/maps/api/place/autocomplete/json')
+  url.searchParams.set('input', input)
+  url.searchParams.set('key', process.env.GOOGLE_MAPS_API_KEY)
+  url.searchParams.set('types', '(regions)')
+  url.searchParams.set('components', 'country:gb')
+
+  const data = await safeFetchJson(url)
+
+  return data?.predictions || []
+}
+
+const getPlaceDetails = async (placeId) => {
+  const url = new URL('https://maps.googleapis.com/maps/api/place/details/json')
+  url.searchParams.set('place_id', placeId)
+  url.searchParams.set('key', process.env.GOOGLE_MAPS_API_KEY)
+  url.searchParams.set('fields', 'geometry,name')
+
+  const data = await safeFetchJson(url)
+
+  return data?.result || null
+}
+
 module.exports = {
-  geocodeAddress
+  geocodeAddress,
+  getPlaceDetails,
+  getPlaceSuggestions
 }
