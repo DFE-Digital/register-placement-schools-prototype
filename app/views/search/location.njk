@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  let providerMap = []; // store providers for potential auto-match on submit
+  let locationMap = []; // store location for potential auto-match on submit
 
   accessibleAutocomplete({
     element: document.querySelector('#location-autocomplete-container'),
@@ -114,9 +114,7 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(locations => {
           // 1) Build a map that associates a display label with the location object
           locationMap = locations.map(location => {
-            const namePart = location.operatingName || location.legalName || '(no name)';
-            const ukprnPart = location.ukprn ? ` (UKPRN: ${location.ukprn})` : '';
-            const displayLabel = `${namePart}${ukprnPart}`;
+            const displayLabel = location.text || '(no name)';
 
             return {
               label: displayLabel,
@@ -139,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function () {
       const selectedLocation = locationMap.find(p => p.label === confirmedLabel);
       // If found, store the location's ID in the hidden field
       if (selectedLocation) {
-        document.getElementById('selected-location-id').value = selectedLocation.id;
+        document.getElementById('selected-location-id').value = selectedLocation.value;
       } else {
         document.getElementById('selected-location-id').value = '';
       }
@@ -160,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (typedValue && locationMap.length > 0) {
       const matchedLocation = locationMap.find(p => p.label === typedValue);
       if (matchedLocation) {
-        hiddenField.value = matchedLocation.id;
+        hiddenField.value = matchedLocation.value;
       }
       // If there's no exact match, hiddenField stays blank
     }
