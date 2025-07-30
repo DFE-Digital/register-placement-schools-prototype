@@ -18,6 +18,10 @@ const {
   SchoolType
 } = require('../models')
 
+const { getPlaceSuggestions, getPlaceDetails } = require('../services/googleMaps')
+const { getPlacementSchoolsByLocation } = require('../services/placementSchoolSearch')
+
+
 const Pagination = require('../helpers/pagination')
 
 const getPlacementSchoolDetails = async (schoolId) => {
@@ -435,9 +439,28 @@ exports.results_get = async (req, res) => {
   const limit = parseInt(req.query.limit, 10) || 25
 
   if (q === 'location') {
+    const placeId = req.session.data?.location?.id
+
+    if (!placeId) return res.redirect('/search/location')
+
+    const place = await getPlaceDetails(placeId)
+    if (!place || !place.geometry?.location) return res.redirect('/search/location')
+
+    const searchLat = place.geometry.location.lat
+    const searchLng = place.geometry.location.lng
+    const radiusMiles = 10
+
+    const { placements, pagination } = await getPlacementSchoolsByLocation(searchLat, searchLng, page, limit, radiusMiles)
+
     res.render('search/results-location', {
-      q,
-      search,
+      location: {
+        name: place.name,
+        lat: searchLat,
+        lng: searchLng
+      },
+      placements,
+      pagination,
+      radius: radiusMiles,
       actions: {
         search: '/search'
       }
@@ -483,9 +506,24 @@ exports.locationSuggestions_json = async (req, res) => {
 
   const query = req.query.search || ''
 
-  const locations = []
+  if (!query || query.length < 2) {
+    return res.json([])
+  }
 
-  res.json(locations)
+  try {
+    const results = await getPlaceSuggestions(query)
+
+    const suggestions = results.map((result) => ({
+      text: result.description,
+      value: result.place_id
+    }))
+
+    res.json(suggestions)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json([])
+  }
+
 }
 
 exports.providerSuggestions_json = async (req, res) => {
