@@ -95,8 +95,7 @@
                 text: "Distance"
               },
               value: {
-                text: (placement.distance | round(1) + " miles") if placement.distance else "Not known",
-                classes: "govuk-hint" if not placement.distance
+                text: placement.distance | round(1) + " miles"
               }
             },
             {
