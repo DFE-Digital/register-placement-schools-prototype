@@ -231,15 +231,16 @@ exports.results_get = async (req, res) => {
       }
     })
   } else if (q === 'provider') {
-    const { provider } = req.session.data
-    const results = await getPlacementSchoolsForProvider(provider.id, page, limit)
+    const providerId = req.session.data?.provider?.id
+
+    if (!providerId) return res.redirect('/search/provider')
+
+    const { provider, placements, pagination } = await getPlacementSchoolsForProvider(providerId, page, limit)
 
     res.render('search/results-provider', {
-      q,
-      search,
-      provider: results.provider,
-      academicYears: results.academicYears,
-      pagination: results.pagination,
+      provider,
+      placements,
+      pagination,
       actions: {
         search: '/search'
       }
