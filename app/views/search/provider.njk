@@ -1,0 +1,172 @@
+{% extends "layouts/main.njk" %}
+
+{% set title = "Enter provider name, UKPRN or URN" %}
+{% set caption = "Find placement schools" %}
+
+{% block pageTitle %}
+  {{ "Error: " if errors.length }}{{ title + " - " if title }}{{ caption + " - " if caption }}{{ serviceName }} - GOV.UK
+{% endblock %}
+
+{% block beforeContent %}
+{{ govukBackLink({
+  text: "Back",
+  href: actions.back
+}) }}
+{% endblock %}
+
+{% block content %}
+
+{% include "_includes/error-summary.njk" %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% set headingHtml %}
+      {% include "_includes/page-heading.njk" %}
+    {% endset %}
+
+    <form id="provider-search" action="{{ actions.save }}" method="post" accept-charset="utf-8" novalidate>
+      {# Hidden field to store the provider ID #}
+      <input type="hidden" id="selected-provider-id" name="provider[id]" value="{{ data.provider.id | default('') }}">
+
+      <div class="govuk-form-group {{- ' govuk-form-group--error' if errors.length }}">
+        {{ headingHtml | safe }}
+
+        <div class="js-enabled-only" hidden>
+          <p id="selected-provider-id-error" class="govuk-error-message">
+            <span class="govuk-visually-hidden">Error:</span> {{errors[0].text }}
+          </p>
+        </div>
+
+        <div class="autocomplete__fallback">
+          {{ govukInput({
+            id: "provider",
+            name: "search",
+            value: search,
+            autocomplete: "off",
+            formGroup: {
+              classes: "govuk-!-margin-bottom-0"
+            },
+            errorMessage: errors | getErrorMessage("provider")
+          }) }}
+        </div>
+        <div id="provider-autocomplete-container" class="govuk-body"></div>
+      </div>
+
+      {{ govukButton({
+        text: "Continue"
+      }) }}
+
+    </form>
+
+    <p class="govuk-body">
+      <a class="govuk-link" href="{{ actions.cancel }}">Cancel</a>
+    </p>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block pageScripts %}
+<script src="/public/javascripts/vendor/accessible-autocomplete.min.js"></script>
+<script>
+document.documentElement.classList.add('js-enabled');
+
+document.addEventListener('DOMContentLoaded', function () {
+  const fallbackInput = document.getElementById('provider');
+  if (fallbackInput) {
+    fallbackInput.disabled = true;
+  }
+
+  const fallback = document.querySelector('.autocomplete__fallback');
+  const enhanced = document.querySelector('#provider-autocomplete-container');
+
+  if (fallback && enhanced) {
+    fallback.style.display = 'none';
+    enhanced.removeAttribute('hidden');
+
+    // Disable the fallback input so it doesn't get submitted
+    const fallbackInput = document.getElementById('provider');
+    if (fallbackInput) {
+      fallbackInput.disabled = true;
+    }
+  }
+
+  let providerMap = []; // store providers for potential auto-match on submit
+
+  accessibleAutocomplete({
+    element: document.querySelector('#provider-autocomplete-container'),
+    id: 'provider-autocomplete',
+    name: 'search', // <--- Use 'search' as the name of the generated input
+    defaultValue: '{{ search | default("") }}', // re-populate typed text
+    // add an aria-label for screen readers instead of a second visible label
+    ariaLabel: '{{ title }}',
+    source: function (query, populateResults) {
+      // If user hasn't typed anything, return no suggestions
+      if (!query || query.length < 3) {
+        populateResults([]);
+        return;
+      }
+
+      // Call your endpoint with ?search=...
+      fetch('/provider-suggestions?search=' + encodeURIComponent(query))
+        .then(response => response.json())
+        .then(providers => {
+          // providers: [ { id, operatingName, legalName, ukprn, urn }, ... ]
+
+          // 1) Build a map that associates a display label with the provider object
+          providerMap = providers.map(provider => {
+            const namePart = provider.operatingName || provider.legalName || '(no name)';
+            const ukprnPart = provider.ukprn ? ` (UKPRN: ${provider.ukprn})` : '';
+            const displayLabel = `${namePart}${ukprnPart}`;
+
+            return {
+              label: displayLabel,
+              ...provider // keep the original fields, including provider.id
+            };
+          });
+
+          // 2) Pass an array of just the labels to populateResults
+          const labelArray = providerMap.map(item => item.label);
+          populateResults(labelArray);
+        })
+        .catch(err => {
+          console.error(err);
+          populateResults([]);
+        });
+    },
+
+    // Fired when the user confirms a suggestion (click, Enter, or Tab)
+    onConfirm: function (confirmedLabel) {
+      const selectedProvider = providerMap.find(p => p.label === confirmedLabel);
+      // If found, store the provider's ID in the hidden field
+      if (selectedProvider) {
+        document.getElementById('selected-provider-id').value = selectedProvider.id;
+      } else {
+        document.getElementById('selected-provider-id').value = '';
+      }
+    }
+  });
+
+  // 3) Optional: auto-match on form submission if user typed something but never confirmed
+  const form = document.getElementById('provider-search');
+  form.addEventListener('submit', function (event) {
+    // If the user has already picked a suggestion, the hidden input will have a value
+    const hiddenField = document.getElementById('selected-provider-id');
+    if (hiddenField.value) {
+      return; // we already have a confirmed selection, do nothing
+    }
+
+    // Otherwise, try to see if the typed text exactly matches one suggestion
+    const typedValue = document.getElementById('provider-autocomplete').value;
+    if (typedValue && providerMap.length > 0) {
+      const matchedProvider = providerMap.find(p => p.label === typedValue);
+      if (matchedProvider) {
+        hiddenField.value = matchedProvider.id;
+      }
+      // If there's no exact match, hiddenField stays blank
+    }
+  });
+});
+</script>
+{% endblock %}

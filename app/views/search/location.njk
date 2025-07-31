@@ -1,0 +1,168 @@
+{% extends "layouts/main.njk" %}
+
+{% set title = "Enter city, town or postcode" %}
+{% set caption = "Find placement schools" %}
+
+{% block pageTitle %}
+  {{ "Error: " if errors.length }}{{ title + " - " if title }}{{ caption + " - " if caption }}{{ serviceName }} - GOV.UK
+{% endblock %}
+
+{% block beforeContent %}
+{{ govukBackLink({
+  text: "Back",
+  href: actions.back
+}) }}
+{% endblock %}
+
+{% block content %}
+
+{% include "_includes/error-summary.njk" %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% set headingHtml %}
+      {% include "_includes/page-heading.njk" %}
+    {% endset %}
+
+    <form id="location-search" action="{{ actions.save }}" method="post" accept-charset="utf-8" novalidate>
+      {# Hidden field to store the location ID #}
+      <input type="hidden" id="selected-location-id" name="location[id]" value="{{ data.location.id | default('') }}">
+
+      <div class="govuk-form-group {{- ' govuk-form-group--error' if errors.length }}">
+        {{ headingHtml | safe }}
+
+        <div class="js-enabled-only" hidden>
+          <p id="selected-location-id-error" class="govuk-error-message">
+            <span class="govuk-visually-hidden">Error:</span> {{errors[0].text }}
+          </p>
+        </div>
+
+        <div class="autocomplete__fallback">
+          {{ govukInput({
+            id: "location",
+            name: "search",
+            value: search,
+            autocomplete: "off",
+            formGroup: {
+              classes: "govuk-!-margin-bottom-0"
+            },
+            errorMessage: errors | getErrorMessage("location")
+          }) }}
+        </div>
+        <div id="location-autocomplete-container" class="govuk-body"></div>
+      </div>
+
+      {{ govukButton({
+        text: "Continue"
+      }) }}
+
+    </form>
+
+    <p class="govuk-body">
+      <a class="govuk-link" href="{{ actions.cancel }}">Cancel</a>
+    </p>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block pageScripts %}
+<script src="/public/javascripts/vendor/accessible-autocomplete.min.js"></script>
+<script>
+document.documentElement.classList.add('js-enabled');
+
+document.addEventListener('DOMContentLoaded', function () {
+  const fallbackInput = document.getElementById('location');
+  if (fallbackInput) {
+    fallbackInput.disabled = true;
+  }
+
+  const fallback = document.querySelector('.autocomplete__fallback');
+  const enhanced = document.querySelector('#location-autocomplete-container');
+
+  if (fallback && enhanced) {
+    fallback.style.display = 'none';
+    enhanced.removeAttribute('hidden');
+
+    // Disable the fallback input so it doesn't get submitted
+    const fallbackInput = document.getElementById('location');
+    if (fallbackInput) {
+      fallbackInput.disabled = true;
+    }
+  }
+
+  let locationMap = []; // store location for potential auto-match on submit
+
+  accessibleAutocomplete({
+    element: document.querySelector('#location-autocomplete-container'),
+    id: 'location-autocomplete',
+    name: 'search', // <--- Use 'search' as the name of the generated input
+    defaultValue: '{{ search | default("") }}', // re-populate typed text
+    // add an aria-label for screen readers instead of a second visible label
+    ariaLabel: '{{ title }}',
+    source: function (query, populateResults) {
+      // If user hasn't typed anything, return no suggestions
+      if (!query || query.length < 3) {
+        populateResults([]);
+        return;
+      }
+
+      // Call your endpoint with ?search=...
+      fetch('/location-suggestions?search=' + encodeURIComponent(query))
+        .then(response => response.json())
+        .then(locations => {
+          // 1) Build a map that associates a display label with the location object
+          locationMap = locations.map(location => {
+            const displayLabel = location.text || '(no name)';
+
+            return {
+              label: displayLabel,
+              ...location // keep the original fields, including location.id
+            };
+          });
+
+          // 2) Pass an array of just the labels to populateResults
+          const labelArray = locationMap.map(item => item.label);
+          populateResults(labelArray);
+        })
+        .catch(err => {
+          console.error(err);
+          populateResults([]);
+        });
+    },
+
+    // Fired when the user confirms a suggestion (click, Enter, or Tab)
+    onConfirm: function (confirmedLabel) {
+      const selectedLocation = locationMap.find(p => p.label === confirmedLabel);
+      // If found, store the location's ID in the hidden field
+      if (selectedLocation) {
+        document.getElementById('selected-location-id').value = selectedLocation.value;
+      } else {
+        document.getElementById('selected-location-id').value = '';
+      }
+    }
+  });
+
+  // 3) Optional: auto-match on form submission if user typed something but never confirmed
+  const form = document.getElementById('location-search');
+  form.addEventListener('submit', function (event) {
+    // If the user has already picked a suggestion, the hidden input will have a value
+    const hiddenField = document.getElementById('selected-location-id');
+    if (hiddenField.value) {
+      return; // we already have a confirmed selection, do nothing
+    }
+
+    // Otherwise, try to see if the typed text exactly matches one suggestion
+    const typedValue = document.getElementById('location-autocomplete').value;
+    if (typedValue && locationMap.length > 0) {
+      const matchedLocation = locationMap.find(p => p.label === typedValue);
+      if (matchedLocation) {
+        hiddenField.value = matchedLocation.value;
+      }
+      // If there's no exact match, hiddenField stays blank
+    }
+  });
+});
+</script>
+{% endblock %}

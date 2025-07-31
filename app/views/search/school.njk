@@ -1,0 +1,172 @@
+{% extends "layouts/main.njk" %}
+
+{% set title = "Enter school name, UKPRN or URN" %}
+{% set caption = "Find placement schools" %}
+
+{% block pageTitle %}
+  {{ "Error: " if errors.length }}{{ title + " - " if title }}{{ caption + " - " if caption }}{{ serviceName }} - GOV.UK
+{% endblock %}
+
+{% block beforeContent %}
+{{ govukBackLink({
+  text: "Back",
+  href: actions.back
+}) }}
+{% endblock %}
+
+{% block content %}
+
+{% include "_includes/error-summary.njk" %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% set headingHtml %}
+      {% include "_includes/page-heading.njk" %}
+    {% endset %}
+
+    <form id="school-search" action="{{ actions.save }}" method="post" accept-charset="utf-8" novalidate>
+      {# Hidden field to store the school ID #}
+      <input type="hidden" id="selected-school-id" name="school[id]" value="{{ data.school.id | default('') }}">
+
+      <div class="govuk-form-group {{- ' govuk-form-group--error' if errors.length }}">
+        {{ headingHtml | safe }}
+
+        <div class="js-enabled-only" hidden>
+          <p id="selected-school-id-error" class="govuk-error-message">
+            <span class="govuk-visually-hidden">Error:</span> {{errors[0].text }}
+          </p>
+        </div>
+
+        <div class="autocomplete__fallback">
+          {{ govukInput({
+            id: "school",
+            name: "search",
+            value: search,
+            autocomplete: "off",
+            formGroup: {
+              classes: "govuk-!-margin-bottom-0"
+            },
+            errorMessage: errors | getErrorMessage("school")
+          }) }}
+        </div>
+        <div id="school-autocomplete-container" class="govuk-body"></div>
+      </div>
+
+      {{ govukButton({
+        text: "Continue"
+      }) }}
+
+    </form>
+
+    <p class="govuk-body">
+      <a class="govuk-link" href="{{ actions.cancel }}">Cancel</a>
+    </p>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block pageScripts %}
+<script src="/public/javascripts/vendor/accessible-autocomplete.min.js"></script>
+<script>
+document.documentElement.classList.add('js-enabled');
+
+document.addEventListener('DOMContentLoaded', function () {
+  const fallbackInput = document.getElementById('school');
+  if (fallbackInput) {
+    fallbackInput.disabled = true;
+  }
+
+  const fallback = document.querySelector('.autocomplete__fallback');
+  const enhanced = document.querySelector('#school-autocomplete-container');
+
+  if (fallback && enhanced) {
+    fallback.style.display = 'none';
+    enhanced.removeAttribute('hidden');
+
+    // Disable the fallback input so it doesn't get submitted
+    const fallbackInput = document.getElementById('school');
+    if (fallbackInput) {
+      fallbackInput.disabled = true;
+    }
+  }
+
+  let schoolMap = []; // store schools for potential auto-match on submit
+
+  accessibleAutocomplete({
+    element: document.querySelector('#school-autocomplete-container'),
+    id: 'school-autocomplete',
+    name: 'search', // <--- Use 'search' as the name of the generated input
+    defaultValue: '{{ search | default("") }}', // re-populate typed text
+    // add an aria-label for screen readers instead of a second visible label
+    ariaLabel: '{{ title }}',
+    source: function (query, populateResults) {
+      // If user hasn't typed anything, return no suggestions
+      if (!query || query.length < 3) {
+        populateResults([]);
+        return;
+      }
+
+      // Call your endpoint with ?search=...
+      fetch('/school-suggestions?search=' + encodeURIComponent(query))
+        .then(response => response.json())
+        .then(schools => {
+          // schools: [ { id, name, ukprn, urn }, ... ]
+
+          // 1) Build a map that associates a display label with the school object
+          schoolMap = schools.map(school => {
+            const namePart = school.name || '(no name)';
+            const urnPart = school.urn ? ` (URN: ${school.urn})` : '';
+            const displayLabel = `${namePart}${urnPart}`;
+
+            return {
+              label: displayLabel,
+              ...school // keep the original fields, including school.id
+            };
+          });
+
+          // 2) Pass an array of just the labels to populateResults
+          const labelArray = schoolMap.map(item => item.label);
+          populateResults(labelArray);
+        })
+        .catch(err => {
+          console.error(err);
+          populateResults([]);
+        });
+    },
+
+    // Fired when the user confirms a suggestion (click, Enter, or Tab)
+    onConfirm: function (confirmedLabel) {
+      const selectedSchool = schoolMap.find(p => p.label === confirmedLabel);
+      // If found, store the school's ID in the hidden field
+      if (selectedSchool) {
+        document.getElementById('selected-school-id').value = selectedSchool.id;
+      } else {
+        document.getElementById('selected-school-id').value = '';
+      }
+    }
+  });
+
+  // 3) Optional: auto-match on form submission if user typed something but never confirmed
+  const form = document.getElementById('school-search');
+  form.addEventListener('submit', function (event) {
+    // If the user has already picked a suggestion, the hidden input will have a value
+    const hiddenField = document.getElementById('selected-school-id');
+    if (hiddenField.value) {
+      return; // we already have a confirmed selection, do nothing
+    }
+
+    // Otherwise, try to see if the typed text exactly matches one suggestion
+    const typedValue = document.getElementById('school-autocomplete').value;
+    if (typedValue && schoolMap.length > 0) {
+      const matchedSchool = schoolMap.find(p => p.label === typedValue);
+      if (matchedSchool) {
+        hiddenField.value = matchedSchool.id;
+      }
+      // If there's no exact match, hiddenField stays blank
+    }
+  });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,154 @@
+{% extends "layouts/main.njk" %}
+
+{% set title = placementSchool.name %}
+
+{% block content %}
+
+{% include "_includes/notification-banner.njk" %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% include "_includes/page-heading.njk" %}
+
+    <p class="govuk-body">
+      <a class="govuk-link" href="{{ actions.search }}">Search again</a>
+    </p>
+
+    {# <p class="govuk-body">
+      School search: {{data|dump|safe}}
+    </p>
+
+    {{placementSchool|dump|safe}} #}
+
+    {% set urnHtml %}
+      <ul class="govuk-list">
+        <li>
+          {{ placementSchool.urn }}
+        </li>
+        <li>
+          <a href="https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/{{placementSchool.urn}}" target="_blank" rel="noreferrer nofollow" class="govuk-link">View school on Get information about schools (opens in new tab)</a>
+        </li>
+      </ul>
+    {% endset %}
+
+    {% set schoolTypeGroupHtml %}
+      <ul class="govuk-list">
+        <li>
+          {{ placementSchool.group }}
+        </li>
+        <li class="govuk-!-font-size-16">
+          {{ placementSchool.type }}
+        </li>
+      </ul>
+    {% endset %}
+
+    {% set addressHtml -%}
+      {% if placementSchool.address.line1.length %}
+        {{ placementSchool.address.line1 }}<br>
+      {% endif %}
+      {% if placementSchool.address.line2.length %}
+        {{ placementSchool.address.line2 }}<br>
+      {% endif %}
+      {% if placementSchool.address.line3.length %}
+        {{ placementSchool.address.line3 }}<br>
+      {% endif %}
+      {% if placementSchool.address.town.length %}
+        {{ placementSchool.address.town }}<br>
+      {% endif %}
+      {% if placementSchool.address.county.length %}
+        {{ placementSchool.address.county }}<br>
+      {% endif %}
+      {% if placementSchool.address.postcode.length %}
+        {{ placementSchool.address.postcode }}<br>
+      {% endif %}
+    {%- endset %}
+
+    {% set academicYearsHtml %}
+      {% if placementSchool.academicYears.length %}
+        <ul class="govuk-list govuk-list--spaced">
+          {% for year in placementSchool.academicYears %}
+            <li>
+              <strong>{{ year.name }}</strong>
+              <ul class="govuk-list govuk-list--bullet">
+                {% for provider in year.providers %}
+                  <li>{{ provider.name }}</li>
+                {% endfor %}
+              </ul>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="govuk-body">The school has not hosted any trainees</p>
+      {% endif %}
+    {% endset %}
+
+    {{ govukSummaryList({
+      rows: [
+        {
+          key: {
+            text: "School status"
+          },
+          value: {
+            text: placementSchool.status if placementSchool.status.length else "Not known",
+            classes: "govuk-hint" if not placementSchool.status.length
+          }
+        },
+        {
+          key: {
+            text: "UK provider reference number (UKPRN)"
+          },
+          value: {
+            text: placementSchool.ukprn if placementSchool.ukprn.length else "Not known",
+            classes: "govuk-hint" if not placementSchool.ukprn.length
+          }
+        },
+        {
+          key: {
+            text: "Unique reference number (URN)"
+          },
+          value: {
+            html: urnHtml
+          }
+        },
+        {
+          key: {
+            text: "School type"
+          },
+          value: {
+            html: schoolTypeGroupHtml
+          }
+        },
+        {
+          key: {
+            text: "Education phase"
+          },
+          value: {
+            text: placementSchool.educationPhase if placementSchool.educationPhase.length else "Not known",
+            classes: "govuk-hint" if not placementSchool.educationPhase.length
+          }
+        },
+        {
+          key: {
+            text: "Address"
+          },
+          value: {
+            html: addressHtml if (placementSchool.address.line1.length and placementSchool.address.town.length and placementSchool.address.postcode.length) else "Not known",
+            classes: "govuk-hint" if not (placementSchool.address.line1.length and placementSchool.address.town.length and placementSchool.address.postcode.length)
+          }
+        },
+        {
+          key: {
+            text: "Placements"
+          },
+          value: {
+            html: academicYearsHtml
+          }
+        }
+      ]
+    }) }}
+
+  </div>
+</div>
+
+{% endblock %}

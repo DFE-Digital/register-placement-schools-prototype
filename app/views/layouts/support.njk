@@ -1,0 +1,64 @@
+{% extends "govuk-prototype-kit/layouts/govuk-branded.njk" %}
+
+{% set govukRebrand = true %}
+
+{% from "_components/checkbox-filter/macro.njk" import appCheckboxFilter %}
+{% from "_components/search/macro.njk" import appSearch %}
+{% from "_components/secondary-navigation/macro.njk" import appSecondaryNavigation %}
+
+{% block pageTitle -%}
+  {{ subtitle + " - " if subtitle }}{{ title + " - " if title }}{{ caption + " - " if caption }}{{ serviceName }} - GOV.UK
+{%- endblock %}
+
+{% block head %}
+  {% include "_includes/head.njk" %}
+{% endblock %}
+
+{% block header %}
+  {{ govukHeader({
+    rebrand: true,
+    homepageUrl: "/",
+    containerClasses: "govuk-width-container"
+  }) }}
+
+  {% set navigationEndHtml %}
+    <li class="govuk-service-navigation__item {{- ' govuk-service-navigation__item--active' if primaryNavId == 'account' }} app-service-navigation__align-right">
+      <a class="govuk-service-navigation__link" href="/support/account" {{- ' aria-current="true"' if primaryNavId == "account" }}>Your account</a>
+    </li>
+    <li class="govuk-service-navigation__item">
+      <a class="govuk-service-navigation__link" href="/">Sign out</a>
+    </li>
+  {% endset %}
+
+  {{ govukServiceNavigation({
+    navigationId: "primaryNavigation",
+    serviceName: serviceName,
+    serviceUrl: "/",
+    navigation: [
+      {
+        text: "Placement schools",
+        href: "/support/placement-schools",
+        active: primaryNavId == "placementSchools"
+      },
+      {
+        text: "Support users",
+        href: "/support/users",
+        active: primaryNavId == "users"
+      },
+      {
+        text: "Activity log",
+        href: "/support/activity",
+        active: primaryNavId == "activity"
+      } if 1==0
+    ],
+    slots: {
+      navigationEnd: navigationEndHtml
+    }
+  }) }}
+
+  {% include "_includes/phase-banner.njk" %}
+{% endblock %}
+
+{% block footer %}
+  {% include "_includes/footer.njk" %}
+{% endblock %}
