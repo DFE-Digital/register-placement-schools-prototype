@@ -229,7 +229,8 @@ const getPlacementSchoolDetails = async (schoolId) => {
 }
 
 /**
- * Fetch all placement schools for a provider, grouped by academic year.
+ * Fetch all placement schools a provider has worked with, grouped by school.
+ * Each school includes the academic years during which it had placements.
  *
  * @param {string} providerId - UUID of the provider
  * @param {number} [page=1] - Page number
@@ -242,45 +243,10 @@ const getPlacementSchoolsForProvider = async (providerId, page = 1, limit = 25) 
     const provider = await Provider.findByPk(providerId)
     if (!provider) return null
 
-    const totalCount = await PlacementSchool.count({ where: { providerId } })
-
-    if (totalCount === 0) {
-      return {
-        provider: {
-          id: provider.id,
-          operatingName: provider.operatingName,
-          legalName: provider.legalName,
-          ukprn: provider.ukprn,
-          urn: provider.urn
-        },
-        academicYears: [],
-        pagination: new Pagination([], 0, page, limit)
-      }
-    }
-
-    const pagedPlacementRows = await PlacementSchool.findAll({
+    const allPlacements = await PlacementSchool.findAll({
       where: { providerId },
       include: [
-        { model: AcademicYear, as: 'academicYear', attributes: ['id', 'name'] },
-        { model: School, as: 'school', attributes: ['id', 'name'], required: true }
-      ],
-      attributes: ['schoolId', 'academicYearId'],
-      order: [
-        [{ model: AcademicYear, as: 'academicYear' }, 'name', 'DESC'],
-        [{ model: School, as: 'school' }, 'name', 'ASC']
-      ],
-      offset,
-      limit,
-      raw: true,
-      nest: true
-    })
-
-    const schoolIds = pagedPlacementRows.map(row => row.schoolId)
-
-    const fullPlacements = await PlacementSchool.findAll({
-      where: { providerId, schoolId: schoolIds },
-      include: [
-        { model: AcademicYear, as: 'academicYear', attributes: ['id', 'name'] },
+        { model: AcademicYear, as: 'academicYear', attributes: ['name'] },
         {
           model: School,
           as: 'school',
@@ -291,47 +257,45 @@ const getPlacementSchoolsForProvider = async (providerId, page = 1, limit = 25) 
             { model: SchoolGroup, as: 'schoolGroup' },
             { model: SchoolStatus, as: 'schoolStatus' },
             { model: SchoolEducationPhase, as: 'schoolEducationPhase' }
-          ]
+          ],
+          required: true
         }
       ]
     })
 
-    const pageItems = fullPlacements.map(row => ({
-      academicYearId: row.academicYear.id,
-      academicYearName: row.academicYear.name,
-      school: {
-        id: row.school.id,
-        name: row.school.name,
-        ukprn: row.school.ukprn,
-        urn: row.school.urn,
-        type: row.school.schoolType?.name || null,
-        group: row.school.schoolGroup?.name || null,
-        status: row.school.schoolStatus?.name || null,
-        educationPhase: row.school.schoolEducationPhase?.name || null,
-        address: row.school.schoolAddress || null
-      }
-    }))
+    const schoolMap = new Map()
 
-    pageItems.sort((a, b) => {
-      const yearCompare = b.academicYearName.localeCompare(a.academicYearName)
-      return yearCompare !== 0 ? yearCompare : a.school.name.localeCompare(b.school.name)
-    })
-
-    const pagination = new Pagination(pageItems, totalCount, page, limit)
-
-    const grouped = {}
-    for (const item of pageItems) {
-      if (!grouped[item.academicYearId]) {
-        grouped[item.academicYearId] = {
-          id: item.academicYearId,
-          name: item.academicYearName,
-          schools: []
+    for (const placement of allPlacements) {
+      const s = placement.school
+      if (!schoolMap.has(s.id)) {
+        schoolMap.set(s.id, {
+          school: {
+            id: s.id,
+            name: s.name,
+            ukprn: s.ukprn,
+            urn: s.urn,
+            address: s.schoolAddress || null,
+            type: s.schoolType?.name || null,
+            group: s.schoolGroup?.name || null,
+            status: s.schoolStatus?.name || null,
+            educationPhase: s.schoolEducationPhase?.name || null
+          },
+          academicYears: [placement.academicYear.name]
+        })
+      } else {
+        const existing = schoolMap.get(s.id)
+        if (!existing.academicYears.includes(placement.academicYear.name)) {
+          existing.academicYears.push(placement.academicYear.name)
         }
       }
-      grouped[item.academicYearId].schools.push(item.school)
     }
 
-    const academicYears = Object.values(grouped).sort((a, b) => b.name.localeCompare(a.name))
+    const allSchools = Array.from(schoolMap.values()).sort((a, b) =>
+      a.school.name.localeCompare(b.school.name)
+    )
+
+    const pagedSchools = allSchools.slice(offset, offset + limit)
+    const pagination = new Pagination(pagedSchools, allSchools.length, page, limit)
 
     return {
       provider: {
@@ -341,7 +305,7 @@ const getPlacementSchoolsForProvider = async (providerId, page = 1, limit = 25) 
         ukprn: provider.ukprn,
         urn: provider.urn
       },
-      academicYears,
+      placements: pagination.getData(),
       pagination
     }
   } catch (error) {
