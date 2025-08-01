@@ -47,7 +47,7 @@ module.exports = {
           gender_code: nullIfEmpty(school.gender_code),
           religious_character_code: nullIfEmpty(school.religious_character_code),
           admissions_policy_code: nullIfEmpty(school.admissions_policy_code),
-          special_classes_code: nullIfEmpty(school.special_classes_code),
+          special_class_code: nullIfEmpty(school.special_classes_code),
           school_capacity: nullIfEmpty(school.school_capacity),
           number_of_boys: nullIfEmpty(school.number_of_boys),
           number_of_girls: nullIfEmpty(school.number_of_girls),
