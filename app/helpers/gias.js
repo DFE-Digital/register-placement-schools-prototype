@@ -9,7 +9,12 @@ const {
 const getSchoolGroupOptions = async () => {
   const items = []
 
-  const schoolGroups = await SchoolGroup.findAll({})
+  const schoolGroups = await SchoolGroup.findAll({
+    order: [
+      ['rank', 'ASC'],
+      ['name', 'ASC']
+    ]
+  })
 
   schoolGroups.forEach((schoolGroup) => {
     const item = {}
@@ -41,7 +46,12 @@ const getSchoolGroupLabel = async (code) => {
 const getSchoolTypeOptions = async () => {
   const items = []
 
-  const schoolTypes = await SchoolType.findAll({})
+  const schoolTypes = await SchoolType.findAll({
+    order: [
+      ['rank', 'ASC'],
+      ['name', 'ASC']
+    ]
+  })
 
   schoolTypes.forEach((schoolType) => {
     const item = {}
@@ -73,7 +83,12 @@ const getSchoolTypeLabel = async (code) => {
 const getSchoolStatusOptions = async () => {
   const items = []
 
-  const schoolStatuses = await SchoolStatus.findAll({})
+  const schoolStatuses = await SchoolStatus.findAll({
+    order: [
+      ['rank', 'ASC'],
+      ['name', 'ASC']
+    ]
+  })
 
   schoolStatuses.forEach((schoolStatus) => {
     const item = {}
@@ -105,7 +120,12 @@ const getSchoolStatusLabel = async (code) => {
 const getSchoolEducationPhaseOptions = async () => {
   const items = []
 
-  const schoolEducationPhases = await SchoolEducationPhase.findAll({})
+  const schoolEducationPhases = await SchoolEducationPhase.findAll({
+    order: [
+      ['rank', 'ASC'],
+      ['name', 'ASC']
+    ]
+  })
 
   schoolEducationPhases.forEach((schoolEducationPhase) => {
     const item = {}
