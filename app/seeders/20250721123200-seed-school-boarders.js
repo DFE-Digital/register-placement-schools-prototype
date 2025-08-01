@@ -26,6 +26,7 @@ module.exports = {
           id: item.id,
           code: item.code,
           name: item.name,
+          rank: item.rank,
           created_by_id: systemUserId,
           created_at: createdAt,
           updated_by_id: systemUserId,
