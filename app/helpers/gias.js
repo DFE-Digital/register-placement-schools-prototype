@@ -27,8 +27,9 @@ const {
 /**
  * Generic function to retrieve ordered lookup options
  */
-const getOptions = async (model) => {
+const getOptions = async (model, where = {}) => {
   const rows = await model.findAll({
+    where,
     order: [['rank', 'ASC'], ['name', 'ASC']]
   })
   return rows.map(row => ({
@@ -43,7 +44,7 @@ const getOptions = async (model) => {
  */
 const getLabel = async (model, code) => {
   const row = await model.findOne({ where: { code } })
-  return row ? row.name : code
+  return row?.name || `Unknown (${code})`
 }
 
 module.exports = {
