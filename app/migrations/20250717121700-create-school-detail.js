@@ -45,7 +45,7 @@ module.exports = {
       admissions_policy_code: {
         type: Sequelize.STRING
       },
-      special_classes_code: {
+      special_class_code: {
         type: Sequelize.STRING
       },
       school_capacity: {
