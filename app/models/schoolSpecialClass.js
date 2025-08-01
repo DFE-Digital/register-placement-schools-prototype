@@ -1,27 +1,27 @@
 const { Model, DataTypes } = require('sequelize')
 
 module.exports = (sequelize) => {
-  class SchoolType extends Model {
+  class SchoolSpecialClass extends Model {
     static associate(models) {
-      SchoolType.hasMany(models.School, {
-        foreignKey: 'typeCode',
+      SchoolSpecialClass.hasMany(models.SchoolDetail, {
+        foreignKey: 'specialClassCode',
         sourceKey: 'code',
-        as: 'schools'
+        as: 'schoolDetails'
       })
 
-      SchoolType.belongsTo(models.User, {
+      SchoolSpecialClass.belongsTo(models.User, {
         foreignKey: 'createdById',
         as: 'createdByUser'
       })
 
-      SchoolType.belongsTo(models.User, {
+      SchoolSpecialClass.belongsTo(models.User, {
         foreignKey: 'updatedById',
         as: 'updatedByUser'
       })
     }
   }
 
-  SchoolType.init(
+  SchoolSpecialClass.init(
     {
       id: {
         type: DataTypes.UUID,
@@ -71,28 +71,28 @@ module.exports = (sequelize) => {
     },
     {
       sequelize,
-      modelName: 'SchoolType',
-      tableName: 'school_types',
+      modelName: 'SchoolSpecialClass',
+      tableName: 'school_special_classes',
       timestamps: true
     }
   )
 
   // const createRevisionHook = require('../hooks/revisionHook')
 
-  // SchoolType.addHook('afterCreate', (instance, options) =>
-  //   createRevisionHook({ revisionModelName: 'SchoolTypeRevision', modelKey: 'schoolType' })(instance, {
+  // SchoolSpecialClass.addHook('afterCreate', (instance, options) =>
+  //   createRevisionHook({ revisionModelName: 'SchoolSpecialClassRevision', modelKey: 'schoolSpecialClass' })(instance, {
   //     ...options,
   //     hookName: 'afterCreate'
   //   })
   // )
 
-  // SchoolType.addHook('afterUpdate', (instance, options) => {
+  // SchoolSpecialClass.addHook('afterUpdate', (instance, options) => {
   //   const hookName = instance.deletedById !== null ? 'afterDestroy' : 'afterUpdate'
-  //   createRevisionHook({ revisionModelName: 'SchoolTypeRevision', modelKey: 'schoolType' })(instance, {
+  //   createRevisionHook({ revisionModelName: 'SchoolSpecialClassRevision', modelKey: 'schoolSpecialClass' })(instance, {
   //     ...options,
   //     hookName
   //   })
   // })
 
-  return SchoolType
+  return SchoolSpecialClass
 }

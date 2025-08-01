@@ -1,146 +1,86 @@
+/**
+ * Metadata option and label helper functions for school-related lookup tables.
+ *
+ * These functions retrieve metadata records (such as school type, status, group, etc.)
+ * from the database and return structured arrays suitable for populating GOV.UK
+ * checkbox and select components. Each category also includes a label function to
+ * convert a code into a human-readable name.
+ *
+ * All records are sorted by `rank` (tinyint) and then `name` (varchar).
+ */
+
 const {
-  SchoolType,
+  SchoolAdmissionsPolicy,
+  SchoolBoarder,
+  SchoolEducationPhase,
+  SchoolGender,
   SchoolGroup,
+  SchoolNurseryProvision,
+  SchoolReligiousCharacter,
+  SchoolSixthForm,
+  SchoolSpecialClass,
   SchoolStatus,
-  SchoolEducationPhase
+  SchoolType,
+  SchoolUrbanRuralLocation
 } = require('../models')
 
-
-const getSchoolGroupOptions = async () => {
-  const items = []
-
-  const schoolGroups = await SchoolGroup.findAll({})
-
-  schoolGroups.forEach((schoolGroup) => {
-    const item = {}
-    item.text = schoolGroup.name
-    item.value = schoolGroup.code
-    item.id = schoolGroup.id
-    items.push(item)
+/**
+ * Generic function to retrieve ordered lookup options
+ */
+const getOptions = async (model, where = {}) => {
+  const rows = await model.findAll({
+    where,
+    order: [['rank', 'ASC'], ['name', 'ASC']]
   })
-
-  return items
+  return rows.map(row => ({
+    text: row.name,
+    value: row.code,
+    id: row.id
+  }))
 }
 
-const getSchoolGroupLabel = async (code) => {
-  let label
-
-  const schoolGroup = await SchoolGroup.findOne({ where: {
-    code: code
-  }})
-
-  if (schoolGroup) {
-    label = schoolGroup.name
-  } else {
-    label = code
-  }
-
-  return label
-}
-
-const getSchoolTypeOptions = async () => {
-  const items = []
-
-  const schoolTypes = await SchoolType.findAll({})
-
-  schoolTypes.forEach((schoolType) => {
-    const item = {}
-    item.text = schoolType.name
-    item.value = schoolType.code
-    item.id = schoolType.id
-    items.push(item)
-  })
-
-  return items
-}
-
-const getSchoolTypeLabel = async (code) => {
-  let label
-
-  const schoolType = await SchoolType.findOne({ where: {
-    code: code
-  }})
-
-  if (schoolType) {
-    label = schoolType.name
-  } else {
-    label = code
-  }
-
-  return label
-}
-
-const getSchoolStatusOptions = async () => {
-  const items = []
-
-  const schoolStatuses = await SchoolStatus.findAll({})
-
-  schoolStatuses.forEach((schoolStatus) => {
-    const item = {}
-    item.text = schoolStatus.name
-    item.value = schoolStatus.code
-    item.id = schoolStatus.id
-    items.push(item)
-  })
-
-  return items
-}
-
-const getSchoolStatusLabel = async (code) => {
-  let label
-
-  const schoolStatus = await SchoolStatus.findOne({ where: {
-    code: code
-  }})
-
-  if (schoolStatus) {
-    label = schoolStatus.name
-  } else {
-    label = code
-  }
-
-  return label
-}
-
-const getSchoolEducationPhaseOptions = async () => {
-  const items = []
-
-  const schoolEducationPhases = await SchoolEducationPhase.findAll({})
-
-  schoolEducationPhases.forEach((schoolEducationPhase) => {
-    const item = {}
-    item.text = schoolEducationPhase.name
-    item.value = schoolEducationPhase.code
-    item.id = schoolEducationPhase.id
-    items.push(item)
-  })
-
-  return items
-}
-
-const getSchoolEducationPhaseLabel = async (code) => {
-  let label
-
-  const schoolEducationPhase = await SchoolEducationPhase.findOne({ where: {
-    code: code
-  }})
-
-  if (schoolEducationPhase) {
-    label = schoolEducationPhase.name
-  } else {
-    label = code
-  }
-
-  return label
+/**
+ * Generic function to retrieve label for a given code
+ */
+const getLabel = async (model, code) => {
+  const row = await model.findOne({ where: { code } })
+  return row?.name || `Unknown (${code})`
 }
 
 module.exports = {
-  getSchoolTypeOptions,
-  getSchoolTypeLabel,
-  getSchoolGroupOptions,
-  getSchoolGroupLabel,
-  getSchoolStatusOptions,
-  getSchoolStatusLabel,
-  getSchoolEducationPhaseOptions,
-  getSchoolEducationPhaseLabel
+  getSchoolAdmissionsPolicyOptions: () => getOptions(SchoolAdmissionsPolicy),
+  getSchoolAdmissionsPolicyLabel: (code) => getLabel(SchoolAdmissionsPolicy, code),
+
+  getSchoolBoarderOptions: () => getOptions(SchoolBoarder),
+  getSchoolBoarderLabel: (code) => getLabel(SchoolBoarder, code),
+
+  getSchoolEducationPhaseOptions: () => getOptions(SchoolEducationPhase),
+  getSchoolEducationPhaseLabel: (code) => getLabel(SchoolEducationPhase, code),
+
+  getSchoolGenderOptions: () => getOptions(SchoolGender),
+  getSchoolGenderLabel: (code) => getLabel(SchoolGender, code),
+
+  getSchoolGroupOptions: () => getOptions(SchoolGroup),
+  getSchoolGroupLabel: (code) => getLabel(SchoolGroup, code),
+
+  getSchoolNurseryProvisionOptions: () => getOptions(SchoolNurseryProvision),
+  getSchoolNurseryProvisionLabel: (code) => getLabel(SchoolNurseryProvision, code),
+
+  getSchoolReligiousCharacterOptions: () => getOptions(SchoolReligiousCharacter),
+  getSchoolReligiousCharacterLabel: (code) => getLabel(SchoolReligiousCharacter, code),
+
+  getSchoolSixthFormOptions: () => getOptions(SchoolSixthForm),
+  getSchoolSixthFormLabel: (code) => getLabel(SchoolSixthForm, code),
+
+  getSchoolSpecialClassOptions: () => getOptions(SchoolSpecialClass),
+  getSchoolSpecialClassLabel: (code) => getLabel(SchoolSpecialClass, code),
+
+  getSchoolStatusOptions: () => getOptions(SchoolStatus),
+  getSchoolStatusLabel: (code) => getLabel(SchoolStatus, code),
+
+  getSchoolTypeOptions: () => getOptions(SchoolType),
+  getSchoolTypeLabel: (code) => getLabel(SchoolType, code),
+
+  getSchoolUrbanRuralLocationOptions: () => getOptions(SchoolUrbanRuralLocation),
+  getSchoolUrbanRuralLocationLabel: (code) => getLabel(SchoolUrbanRuralLocation, code)
 }

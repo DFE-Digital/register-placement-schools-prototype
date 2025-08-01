@@ -38,6 +38,24 @@ module.exports = (sequelize) => {
         as: 'religiousCharacter'
       })
 
+      SchoolDetail.belongsTo(models.SchoolSixthForm, {
+        foreignKey: 'officialSixthFormCode',
+        targetKey: 'code',
+        as: 'sixthForm'
+      })
+
+      SchoolDetail.belongsTo(models.SchoolSpecialClass, {
+        foreignKey: 'specialClassCode',
+        targetKey: 'code',
+        as: 'specialClass'
+      })
+
+      SchoolDetail.belongsTo(models.SchoolUrbanRuralLocation, {
+        foreignKey: 'urbanRuralCode',
+        targetKey: 'code',
+        as: 'urbanRuralLocation'
+      })
+
       SchoolDetail.belongsTo(models.User, {
         foreignKey: 'createdById',
         as: 'createdByUser'
@@ -103,9 +121,9 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
         field: 'admissions_policy_code'
       },
-      specialClassesCode:  {
+      specialClassCode:  {
         type: DataTypes.STRING,
-        field: 'special_classes_code'
+        field: 'special_class_code'
       },
       schoolCapacity:  {
         type: DataTypes.INTEGER,

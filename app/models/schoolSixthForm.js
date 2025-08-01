@@ -1,27 +1,27 @@
 const { Model, DataTypes } = require('sequelize')
 
 module.exports = (sequelize) => {
-  class SchoolType extends Model {
+  class SchoolSixthForm extends Model {
     static associate(models) {
-      SchoolType.hasMany(models.School, {
-        foreignKey: 'typeCode',
+      SchoolSixthForm.hasMany(models.SchoolDetail, {
+        foreignKey: 'officialSixthFormCode',
         sourceKey: 'code',
-        as: 'schools'
+        as: 'schoolDetails'
       })
 
-      SchoolType.belongsTo(models.User, {
+      SchoolSixthForm.belongsTo(models.User, {
         foreignKey: 'createdById',
         as: 'createdByUser'
       })
 
-      SchoolType.belongsTo(models.User, {
+      SchoolSixthForm.belongsTo(models.User, {
         foreignKey: 'updatedById',
         as: 'updatedByUser'
       })
     }
   }
 
-  SchoolType.init(
+  SchoolSixthForm.init(
     {
       id: {
         type: DataTypes.UUID,
@@ -71,28 +71,28 @@ module.exports = (sequelize) => {
     },
     {
       sequelize,
-      modelName: 'SchoolType',
-      tableName: 'school_types',
+      modelName: 'SchoolSixthForm',
+      tableName: 'school_sixth_forms',
       timestamps: true
     }
   )
 
   // const createRevisionHook = require('../hooks/revisionHook')
 
-  // SchoolType.addHook('afterCreate', (instance, options) =>
-  //   createRevisionHook({ revisionModelName: 'SchoolTypeRevision', modelKey: 'schoolType' })(instance, {
+  // SchoolSixthForm.addHook('afterCreate', (instance, options) =>
+  //   createRevisionHook({ revisionModelName: 'SchoolSixthFormRevision', modelKey: 'schoolSixthForm' })(instance, {
   //     ...options,
   //     hookName: 'afterCreate'
   //   })
   // )
 
-  // SchoolType.addHook('afterUpdate', (instance, options) => {
+  // SchoolSixthForm.addHook('afterUpdate', (instance, options) => {
   //   const hookName = instance.deletedById !== null ? 'afterDestroy' : 'afterUpdate'
-  //   createRevisionHook({ revisionModelName: 'SchoolTypeRevision', modelKey: 'schoolType' })(instance, {
+  //   createRevisionHook({ revisionModelName: 'SchoolSixthFormRevision', modelKey: 'schoolSixthForm' })(instance, {
   //     ...options,
   //     hookName
   //   })
   // })
 
-  return SchoolType
+  return SchoolSixthForm
 }

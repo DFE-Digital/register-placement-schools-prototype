@@ -30,10 +30,12 @@ module.exports = (sequelize) => {
         primaryKey: true
       },
       code:  {
-        type: DataTypes.STRING
+        type: DataTypes.STRING,
+        allowNull: false
       },
       name:  {
-        type: DataTypes.STRING
+        type: DataTypes.STRING,
+        allowNull: false
       },
       rank:  {
         type: DataTypes.TINYINT

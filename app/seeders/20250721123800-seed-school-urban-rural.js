@@ -9,10 +9,10 @@ module.exports = {
     const transaction = await queryInterface.sequelize.transaction()
 
     try {
-      await queryInterface.bulkDelete('school_urban_rural', null, { transaction })
-      // await queryInterface.bulkDelete('school_urban_rural_revisions', null, { transaction })
+      await queryInterface.bulkDelete('school_urban_rural_locations', null, { transaction })
+      // await queryInterface.bulkDelete('school_urban_rural_location_revisions', null, { transaction })
       // await queryInterface.bulkDelete('activity_logs', {
-      //   entity_type: 'school_urban_rural'
+      //   entity_type: 'school_urban_rural_location'
       // }, { transaction })
 
       const createdAt = new Date()
@@ -26,6 +26,7 @@ module.exports = {
           id: item.id,
           code: item.code,
           name: item.name,
+          rank: item.rank,
           created_by_id: systemUserId,
           created_at: createdAt,
           updated_by_id: systemUserId,
@@ -33,13 +34,13 @@ module.exports = {
         }
 
         // 1. Insert into users table
-        await queryInterface.bulkInsert('school_urban_rural', [baseFields], { transaction })
+        await queryInterface.bulkInsert('school_urban_rural_locations', [baseFields], { transaction })
 
         // 2. Create revision
         // const { id: _, ...revisionDataWithoutId } = baseFields
 
         // const revisionId = await createRevision({
-        //   revisionTable: 'school_urban_rural_revisions',
+        //   revisionTable: 'school_urban_rural_location_revisions',
         //   entityId: item.id,
         //   revisionData: revisionDataWithoutId,
         //   revisionNumber,
@@ -49,9 +50,9 @@ module.exports = {
 
         // 3. Create activity log
         // await createActivityLog({
-        //   revisionTable: 'school_urban_rural_revisions',
+        //   revisionTable: 'school_urban_rural_location_revisions',
         //   revisionId,
-        //   entityType: 'school_urban_rural',
+        //   entityType: 'school_urban_rural_location',
         //   entityId: item.id,
         //   revisionNumber,
         //   changedById: systemUserId,
@@ -70,9 +71,9 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     // await queryInterface.bulkDelete('activity_logs', {
-    //   entity_type: 'school_urban_rural'
+    //   entity_type: 'school_urban_rural_location'
     // })
-    // await queryInterface.bulkDelete('school_urban_rural_revisions', null, {})
-    await queryInterface.bulkDelete('school_urban_rural', null, {})
+    // await queryInterface.bulkDelete('school_urban_rural_location_revisions', null, {})
+    await queryInterface.bulkDelete('school_urban_rural_locations', null, {})
   }
 }

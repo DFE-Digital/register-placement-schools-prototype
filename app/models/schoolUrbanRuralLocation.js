@@ -1,27 +1,27 @@
 const { Model, DataTypes } = require('sequelize')
 
 module.exports = (sequelize) => {
-  class SchoolType extends Model {
+  class SchoolUrbanRuralLocation extends Model {
     static associate(models) {
-      SchoolType.hasMany(models.School, {
-        foreignKey: 'typeCode',
+      SchoolUrbanRuralLocation.hasMany(models.SchoolDetail, {
+        foreignKey: 'urbanRuralCode',
         sourceKey: 'code',
-        as: 'schools'
+        as: 'schoolDetails'
       })
 
-      SchoolType.belongsTo(models.User, {
+      SchoolUrbanRuralLocation.belongsTo(models.User, {
         foreignKey: 'createdById',
         as: 'createdByUser'
       })
 
-      SchoolType.belongsTo(models.User, {
+      SchoolUrbanRuralLocation.belongsTo(models.User, {
         foreignKey: 'updatedById',
         as: 'updatedByUser'
       })
     }
   }
 
-  SchoolType.init(
+  SchoolUrbanRuralLocation.init(
     {
       id: {
         type: DataTypes.UUID,
@@ -71,28 +71,28 @@ module.exports = (sequelize) => {
     },
     {
       sequelize,
-      modelName: 'SchoolType',
-      tableName: 'school_types',
+      modelName: 'SchoolUrbanRuralLocation',
+      tableName: 'school_urban_rural_locations',
       timestamps: true
     }
   )
 
   // const createRevisionHook = require('../hooks/revisionHook')
 
-  // SchoolType.addHook('afterCreate', (instance, options) =>
-  //   createRevisionHook({ revisionModelName: 'SchoolTypeRevision', modelKey: 'schoolType' })(instance, {
+  // SchoolUrbanRuralLocation.addHook('afterCreate', (instance, options) =>
+  //   createRevisionHook({ revisionModelName: 'SchoolUrbanRuralLocationRevision', modelKey: 'schoolUrbanRuralLocation' })(instance, {
   //     ...options,
   //     hookName: 'afterCreate'
   //   })
   // )
 
-  // SchoolType.addHook('afterUpdate', (instance, options) => {
+  // SchoolUrbanRuralLocation.addHook('afterUpdate', (instance, options) => {
   //   const hookName = instance.deletedById !== null ? 'afterDestroy' : 'afterUpdate'
-  //   createRevisionHook({ revisionModelName: 'SchoolTypeRevision', modelKey: 'schoolType' })(instance, {
+  //   createRevisionHook({ revisionModelName: 'SchoolUrbanRuralLocationRevision', modelKey: 'schoolUrbanRuralLocation' })(instance, {
   //     ...options,
   //     hookName
   //   })
   // })
 
-  return SchoolType
+  return SchoolUrbanRuralLocation
 }
