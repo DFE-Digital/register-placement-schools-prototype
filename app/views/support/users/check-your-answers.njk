@@ -13,6 +13,7 @@
 {% else %}
   {% set caption = "Add support user" %}
 {% endif %}
+{% set allowPersonalDetailChanges = (not currentUser) or (not (currentUser.lastSignedInAt)) %}
 
 {% block beforeContent %}
 {{ govukBackLink({
@@ -50,7 +51,7 @@
                   visuallyHiddenText: "first name"
                 }
               ]
-            }
+            } if allowPersonalDetailChanges
           },
           {
             key: {
@@ -67,7 +68,7 @@
                   visuallyHiddenText: "last name"
                 }
               ]
-            }
+            } if allowPersonalDetailChanges
           },
           {
             key: {
@@ -84,7 +85,7 @@
                   visuallyHiddenText: "email"
                 }
               ]
-            }
+            } if allowPersonalDetailChanges
           },
           {
             key: {
