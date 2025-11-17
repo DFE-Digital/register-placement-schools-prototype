@@ -119,7 +119,7 @@ exports.signInPassword_post = (req, res, next) => {
   }
 
   // Authenticate with Passport
-  passport.authenticate('local', (err, user, info) => {
+  passport.authenticate('local', async (err, user, info) => {
     if (err) {
       return next(err)
     }
@@ -140,6 +140,18 @@ exports.signInPassword_post = (req, res, next) => {
           back: '/auth/sign-in/email'
         }
       })
+    }
+
+    // Update last signed in timestamp before logging them in
+    try {
+      const lastSignedInAt = new Date()
+      await user.update({
+        lastSignedInAt,
+        updatedById: user.id
+      })
+      user.lastSignedInAt = lastSignedInAt
+    } catch (updateError) {
+      return next(updateError)
     }
 
     // Log the user in
@@ -216,6 +228,18 @@ exports.persona_post = async (req, res, next) => {
           cancel: '/'
         }
       })
+    }
+
+    // Update last signed in timestamp before logging them in
+    try {
+      const lastSignedInAt = new Date()
+      await user.update({
+        lastSignedInAt,
+        updatedById: user.id
+      })
+      user.lastSignedInAt = lastSignedInAt
+    } catch (updateError) {
+      return next(updateError)
     }
 
     // Log the user in directly

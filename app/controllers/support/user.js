@@ -53,8 +53,10 @@ exports.userDetails = async (req, res) => {
   delete req.session.data.user
 
   const user = await User.findOne({ where: { id: req.params.userId } })
-  const showDeleteLink = !(req.params.userId === req.user.id)
-  const showChangeLink = !(req.params.userId === req.user.id)
+  const isViewingSelf = req.params.userId === req.user.id
+  const hasNeverSignedIn = !user.lastSignedInAt
+  const showDeleteLink = !isViewingSelf
+  const showChangeLink = !isViewingSelf && hasNeverSignedIn
 
   res.render('support/users/show', {
     user,
