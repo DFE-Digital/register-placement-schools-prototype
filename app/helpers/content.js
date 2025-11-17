@@ -1,3 +1,5 @@
+const { govukDateTime } = require('../helpers/date')
+
 const getFeedbackRatingLabel = (code) => {
   if (!code) {
     return null
@@ -26,6 +28,19 @@ const getFeedbackRatingLabel = (code) => {
   return label
 }
 
+const formatLastUpdatedDisplay = (result) => {
+  if (!result || !result.changedAt) return null
+
+  const date = new Date(result.changedAt)
+  const dateStr = govukDateTime(date)
+
+  const name = result.changedByUser
+    ? [result.changedByUser.firstName, result.changedByUser.lastName].filter(Boolean).join(' ') || result.changedByUser.email || 'Unknown'
+    : 'Unknown'
+  return `Last updated by ${name} on ${dateStr}`
+}
+
 module.exports = {
-  getFeedbackRatingLabel
+  getFeedbackRatingLabel,
+  formatLastUpdatedDisplay
 }

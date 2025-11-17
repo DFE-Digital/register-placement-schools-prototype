@@ -17,7 +17,8 @@ const {
 } = require('./helpers/date')
 
 const {
-  getFeedbackRatingLabel
+  getFeedbackRatingLabel,
+  formatLastUpdatedDisplay
 } = require('./helpers/content')
 
 /* ------------------------------------------------------------------
@@ -136,3 +137,10 @@ addFilter('markdownToHtml', (markdown) => {
 
   return govukHtml
 })
+
+/* ------------------------------------------------------------------
+utility function to parse markdown as HTML
+example: {{ lastUpdated | formatLastUpdatedDisplay }}
+outputs: "Created 2 October 2025 at 3:20pm by Anne Wilson"
+------------------------------------------------------------------ */
+addFilter('formatLastUpdatedDisplay', formatLastUpdatedDisplay)

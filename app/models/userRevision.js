@@ -61,6 +61,11 @@ module.exports = (sequelize) => {
         allowNull: false,
         defaultValue: true
       },
+      lastSignedInAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
+        field: 'last_signed_in_at'
+      },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,
