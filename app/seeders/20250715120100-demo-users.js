@@ -49,6 +49,7 @@ module.exports = {
           email: user.email,
           password: hashedPassword, // Hashed password for prototype (password: 'bat')
           is_active: true,
+          last_signed_in_at: null,
           created_by_id: systemUserId,
           created_at: createdAt,
           updated_by_id: systemUserId,
