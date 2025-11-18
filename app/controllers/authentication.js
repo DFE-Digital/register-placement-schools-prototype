@@ -176,18 +176,44 @@ exports.signInPassword_post = (req, res, next) => {
   })(req, res, next)
 }
 
-exports.persona_get = (req, res) => {
+exports.persona_get = async (req, res, next) => {
   // If user is already authenticated, redirect to support page
   if (req.isAuthenticated()) {
     return res.redirect('/support/placement-schools')
   }
 
-  res.render('authentication/persona', {
-    actions: {
-      save: '/auth/persona',
-      cancel: '/'
-    }
-  })
+  try {
+    const personas = await User.findAll({
+      where: { deletedAt: null },
+      order: [
+        ['firstName', 'ASC'],
+        ['lastName', 'ASC']
+      ]
+    })
+
+    const personaItems = personas.map((persona) => {
+      const fullName = `${persona.firstName} ${persona.lastName}`
+      const suffix = persona.isActive ? '' : ' - not active'
+
+      return {
+        value: persona.id,
+        text: `${fullName}${suffix}`,
+        hint: {
+          text: persona.email
+        }
+      }
+    })
+
+    res.render('authentication/persona', {
+      personas: personaItems,
+      actions: {
+        save: '/auth/persona',
+        cancel: '/'
+      }
+    })
+  } catch (error) {
+    return next(error)
+  }
 }
 
 exports.persona_post = async (req, res, next) => {
