@@ -29,7 +29,7 @@ passport.use(
         // Check if user is active
         if (!user.isActive) {
           return done(null, false, {
-            message: 'Your account has been deactivated'
+            redirect: '/account-not-authorised'
           })
         }
 

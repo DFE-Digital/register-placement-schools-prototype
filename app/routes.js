@@ -56,6 +56,10 @@ const supportUserController = require('./controllers/support/user')
 /// ------------------------------------------------------------------------ ///
 const checkIsAuthenticated = (req, res, next) => {
   if (req.isAuthenticated()) {
+    if (!req.user.isActive) {
+      return res.redirect('/account-not-authorised')
+    }
+
     // Set base URLs for navigation
     res.locals.baseUrl = `/placement-schools/${req.params.schoolId}`
     res.locals.supportBaseUrl = `/support/placement-schools/${req.params.schoolId}`

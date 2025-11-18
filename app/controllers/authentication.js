@@ -126,6 +126,10 @@ exports.signInPassword_post = (req, res, next) => {
 
     // Authentication failed
     if (!user) {
+      if (info && info.redirect) {
+        return res.redirect(info.redirect)
+      }
+
       const error = {}
       error.fieldName = 'password'
       error.href = '#password'
@@ -215,19 +219,7 @@ exports.persona_post = async (req, res, next) => {
     const user = await User.findByPk(personaId)
 
     if (!user || !user.isActive) {
-      const error = {}
-      error.fieldName = 'persona'
-      error.href = '#persona'
-      error.text = 'Select a valid persona you want to sign in as'
-      errors.push(error)
-
-      return res.render('authentication/persona', {
-        errors,
-        actions: {
-          save: '/auth/persona',
-          cancel: '/'
-        }
-      })
+      return res.redirect('/account-not-authorised')
     }
 
     // Update last signed in timestamp before logging them in
