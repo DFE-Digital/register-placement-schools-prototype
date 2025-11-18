@@ -1,5 +1,28 @@
 const passport = require('passport')
 const { User } = require('../models')
+
+const getPersonaItems = async () => {
+  const personas = await User.findAll({
+    where: { deletedAt: null },
+    order: [
+      ['firstName', 'ASC'],
+      ['lastName', 'ASC']
+    ]
+  })
+
+  return personas.map((persona) => {
+    const fullName = `${persona.firstName} ${persona.lastName}`
+    const suffix = persona.isActive ? '' : ' - not active'
+
+    return {
+      value: persona.id,
+      text: `${fullName}${suffix}`,
+      hint: {
+        text: persona.email
+      }
+    }
+  })
+}
 const { isValidEmail } = require('../helpers/validation')
 
 exports.signIn_get = (req, res) => {
@@ -183,26 +206,7 @@ exports.persona_get = async (req, res, next) => {
   }
 
   try {
-    const personas = await User.findAll({
-      where: { deletedAt: null },
-      order: [
-        ['firstName', 'ASC'],
-        ['lastName', 'ASC']
-      ]
-    })
-
-    const personaItems = personas.map((persona) => {
-      const fullName = `${persona.firstName} ${persona.lastName}`
-      const suffix = persona.isActive ? '' : ' - not active'
-
-      return {
-        value: persona.id,
-        text: `${fullName}${suffix}`,
-        hint: {
-          text: persona.email
-        }
-      }
-    })
+    const personaItems = await getPersonaItems()
 
     res.render('authentication/persona', {
       personas: personaItems,
@@ -231,18 +235,30 @@ exports.persona_post = async (req, res, next) => {
 
   // If validation fails, re-render the form with errors
   if (errors.length) {
-    return res.render('authentication/persona', {
-      errors,
-      actions: {
-        save: '/auth/persona',
-        cancel: '/'
-      }
-    })
+    try {
+      const personaItems = await getPersonaItems()
+
+      return res.render('authentication/persona', {
+        personas: personaItems,
+        errors,
+        actions: {
+          save: '/auth/persona',
+          cancel: '/'
+        }
+      })
+    } catch (error) {
+      return next(error)
+    }
   }
 
   try {
     // Find the user by ID
-    const user = await User.findByPk(personaId)
+    const user = await User.findOne({
+      where: {
+        id: personaId,
+        deletedAt: null
+      }
+    })
 
     if (!user || !user.isActive) {
       return res.redirect('/account-not-authorised')
