@@ -30,29 +30,7 @@
           }
         },
         errorMessage: errors | getErrorMessage("persona"),
-        items: [
-          {
-            value: "3faa7586-951b-495c-9999-e5fc4367b507",
-            text: "Anne Wilson",
-            hint: {
-              text: "test1@education.gov.uk"
-            }
-          },
-          {
-            value: "99c07212-6395-40b5-9776-9210645a5028",
-            text: "Mary Lawson",
-            hint: {
-              text: "test2@education.gov.uk"
-            }
-          },
-          {
-            value: "354751f2-c5f7-483c-b9e4-b6103f50f970",
-            text: "Colin Chapman",
-            hint: {
-              text: "test3@education.gov.uk"
-            }
-          }
-        ]
+        items: personas
       }) }}
 
       {{ govukButton({
