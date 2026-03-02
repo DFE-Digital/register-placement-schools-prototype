@@ -44,10 +44,26 @@
 
       {% for placement in placements %}
 
+        {% if placement.school.status | lower == "open" %}
+          {% set tagClass = "govuk-tag--green" %}
+        {% elif placement.school.status | lower == "closed" %}
+          {% set tagClass = "govuk-tag--red" %}
+        {% elif placement.school.status | lower == "open, but proposed to close" %}
+          {% set tagClass = "govuk-tag--orange" %}
+        {% elif placement.school.status | lower == "proposed to open" %}
+          {% set tagClass = "govuk-tag--yellow" %}
+        {% else %}
+          {% set tagClass = "govuk-tag--grey" %}
+        {% endif %}
+
         {% set nameHtml %}
           {# <a href="{{ actions.view }}/{{ placement.school.id }}" class="govuk-link"> #}
             {{ placement.school.name }}
           {# </a> #}
+          {{ govukTag({
+            text: placement.school.status if placement.school.status.length else "Not known",
+            classes: tagClass + " govuk-tag--no-max-width govuk-!-margin-left-1"
+          }) }}
         {% endset %}
 
         {% set urnHtml %}
@@ -133,7 +149,7 @@
                 text: placement.school.status if placement.school.status.length else "Not known",
                 classes: "govuk-hint" if not placement.school.status.length
               }
-            },
+            } if 1==0,
             {
               key: {
                 text: "UK provider reference number (UKPRN)"
