@@ -80,6 +80,53 @@ document.addEventListener('DOMContentLoaded', function () {
 
   const fallback = document.querySelector('.autocomplete__fallback');
   const enhanced = document.querySelector('#school-autocomplete-container');
+  const escapeHtml = (value = '') => {
+    const div = document.createElement('div');
+    div.textContent = value;
+    return div.innerHTML;
+  };
+
+  const formatSchoolName = (school) => {
+    if (!school) return '';
+    if (typeof school === 'string') return school;
+    return school.name || '(no name)';
+  };
+
+  const formatTown = (school) => {
+    if (school && typeof school === 'object') {
+      const address = school.schoolAddress || {};
+      return address.town || school.town || '';
+    }
+    return '';
+  };
+
+  const formatPostcode = (school) => {
+    if (school && typeof school === 'object') {
+      const address = school.schoolAddress || {};
+      return address.postcode || school.postcode || '';
+    }
+    return '';
+  };
+
+  const formatTownPostcode = (school) => {
+    const parts = [formatTown(school), formatPostcode(school)].filter(Boolean);
+    return parts.join(', ');
+  };
+
+  const formatInputValue = (school) => formatSchoolName(school);
+
+  const suggestionTemplate = (school) => {
+    const name = escapeHtml(formatSchoolName(school));
+    const townPostcode = formatTownPostcode(school);
+    const locationHtml = townPostcode ? `<div class="govuk-hint govuk-!-margin-bottom-0">${escapeHtml(townPostcode)}</div>` : '';
+
+    return `
+      <div class="app-autocomplete__option">
+        <div class="govuk-!-font-weight-bold">${name}</div>
+        ${locationHtml}
+      </div>
+    `;
+  };
 
   if (fallback && enhanced) {
     fallback.style.display = 'none';
@@ -112,23 +159,9 @@ document.addEventListener('DOMContentLoaded', function () {
       fetch('/school-suggestions?search=' + encodeURIComponent(query))
         .then(response => response.json())
         .then(schools => {
-          // schools: [ { id, name, ukprn, urn }, ... ]
-
-          // 1) Build a map that associates a display label with the school object
-          schoolMap = schools.map(school => {
-            const namePart = school.name || '(no name)';
-            const urnPart = school.urn ? ` (URN: ${school.urn})` : '';
-            const displayLabel = `${namePart}${urnPart}`;
-
-            return {
-              label: displayLabel,
-              ...school // keep the original fields, including school.id
-            };
-          });
-
-          // 2) Pass an array of just the labels to populateResults
-          const labelArray = schoolMap.map(item => item.label);
-          populateResults(labelArray);
+          // schools: [ { id, name, ukprn, urn, schoolAddress }, ... ]
+          schoolMap = schools;
+          populateResults(schoolMap);
         })
         .catch(err => {
           console.error(err);
@@ -138,13 +171,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Fired when the user confirms a suggestion (click, Enter, or Tab)
     onConfirm: function (confirmedLabel) {
-      const selectedSchool = schoolMap.find(p => p.label === confirmedLabel);
+      const selectedSchool = typeof confirmedLabel === 'object'
+        ? confirmedLabel
+        : schoolMap.find(p => formatInputValue(p) === confirmedLabel || formatSchoolName(p) === confirmedLabel);
       // If found, store the school's ID in the hidden field
       if (selectedSchool) {
         document.getElementById('selected-school-id').value = selectedSchool.id;
       } else {
         document.getElementById('selected-school-id').value = '';
       }
+    },
+    templates: {
+      inputValue: formatInputValue,
+      suggestion: suggestionTemplate
     }
   });
 
@@ -160,7 +199,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Otherwise, try to see if the typed text exactly matches one suggestion
     const typedValue = document.getElementById('school-autocomplete').value;
     if (typedValue && schoolMap.length > 0) {
-      const matchedSchool = schoolMap.find(p => p.label === typedValue);
+      const matchedSchool = schoolMap.find(p => formatInputValue(p) === typedValue || formatSchoolName(p) === typedValue);
       if (matchedSchool) {
         hiddenField.value = matchedSchool.id;
       }
