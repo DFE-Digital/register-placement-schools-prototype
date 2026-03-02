@@ -540,7 +540,8 @@ exports.schoolSuggestions_json = async (req, res) => {
       [Op.or]: [
         { name: { [Op.like]: `%${query}%` } },
         { ukprn: { [Op.like]: `%${query}%` } },
-        { urn: { [Op.like]: `%${query}%` } }
+        { urn: { [Op.like]: `%${query}%` } },
+        { '$schoolAddress.postcode$': { [Op.like]: `%${query}%` } }
       ]
     },
     order: [['name', 'ASC']]
