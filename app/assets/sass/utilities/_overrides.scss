@@ -3,6 +3,10 @@
   top: -7px;
 }
 
+.govuk-tag--no-max-width {
+  max-width: none;
+}
+
 .govuk-service-navigation__wrapper {
   flex-grow: 1;
 }
