@@ -113,17 +113,39 @@ document.addEventListener('DOMContentLoaded', function () {
     return parts.join(', ');
   };
 
+  const formatUkprn = (school) => {
+    if (school && typeof school === 'object' && school.ukprn) {
+      return `UKPRN: ${school.ukprn}`;
+    }
+    return '';
+  };
+
+  const formatUrn = (school) => {
+    if (school && typeof school === 'object' && school.urn) {
+      return `URN: ${school.urn}`;
+    }
+    return '';
+  };
+
+  const formatReferences = (school) => {
+    const references = [formatUkprn(school), formatUrn(school)].filter(Boolean);
+    return references.join(', ');
+  };
+
   const formatInputValue = (school) => formatSchoolName(school);
 
   const suggestionTemplate = (school) => {
     const name = escapeHtml(formatSchoolName(school));
     const townPostcode = formatTownPostcode(school);
-    const locationHtml = townPostcode ? `<div class="govuk-hint govuk-!-margin-bottom-0">${escapeHtml(townPostcode)}</div>` : '';
+    const references = formatReferences(school);
+    const metaParts = [townPostcode, references].filter(Boolean);
+    const metaText = metaParts.join(' • ');
+    const metaHtml = metaText ? `<div class="govuk-hint govuk-!-margin-bottom-0">${escapeHtml(metaText)}</div>` : '';
 
     return `
       <div class="app-autocomplete__option">
         <div class="govuk-!-font-weight-bold">${name}</div>
-        ${locationHtml}
+        ${metaHtml}
       </div>
     `;
   };
