@@ -2,7 +2,8 @@ const { Op } = require('sequelize')
 
 const {
   Provider,
-  School
+  School,
+  SchoolAddress
 } = require('../models')
 
 const {
@@ -525,12 +526,22 @@ exports.schoolSuggestions_json = async (req, res) => {
       'ukprn',
       'urn'
     ],
+    include: [
+      {
+        model: SchoolAddress,
+        as: 'schoolAddress',
+        attributes: ['town', 'postcode'],
+        where: { deletedAt: null },
+        required: false
+      }
+    ],
     where: {
       deletedAt: null,
       [Op.or]: [
         { name: { [Op.like]: `%${query}%` } },
         { ukprn: { [Op.like]: `%${query}%` } },
-        { urn: { [Op.like]: `%${query}%` } }
+        { urn: { [Op.like]: `%${query}%` } },
+        { '$schoolAddress.postcode$': { [Op.like]: `%${query}%` } }
       ]
     },
     order: [['name', 'ASC']]
