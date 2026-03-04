@@ -171,6 +171,44 @@
   {% endif %}
 {% endif %}
 
+{% if filterAcademicYearItems.length %}
+  {% if filterAcademicYearItems.length > 5 %}
+    {{ appCheckboxFilter({
+      id: "filters-academic-year",
+      name: "filters[academicYear]",
+      fieldset: {
+        legend: {
+          html: 'Academic year<span class="govuk-visually-hidden"> filter</span>',
+          isPageHeading: false,
+          classes: "govuk-fieldset__legend--s"
+        }
+      },
+      values: selectedAcademicYear,
+      items: filterAcademicYearItems,
+      showSelectedTags: false,
+      classes: "govuk-!-margin-bottom-7"
+    }) }}
+  {% else %}
+    {{ govukCheckboxes({
+      id: "filters-academic-year",
+      name: "filters[academicYear]",
+      fieldset: {
+        legend: {
+          html: 'Academic year<span class="govuk-visually-hidden"> filter</span>',
+          isPageHeading: false,
+          classes: "govuk-fieldset__legend--s"
+        }
+      },
+      formGroup: {
+        classes: "app-filter__group"
+      },
+      classes: "govuk-checkboxes--small",
+      values: selectedAcademicYear,
+      items: filterAcademicYearItems
+    }) }}
+  {% endif %}
+{% endif %}
+
 {% if filterSchoolStatusItems.length %}
   {{ govukCheckboxes({
     id: "filters-school-status",
