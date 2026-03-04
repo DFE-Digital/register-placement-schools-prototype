@@ -11,6 +11,24 @@
 
 const { AcademicYear } = require('../models')
 
+const getCurrentAcademicYearCode = (date = new Date()) => {
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Europe/London',
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric'
+  }).formatToParts(date).reduce((acc, part) => {
+    acc[part.type] = part.value
+    return acc
+  }, {})
+
+  const year = Number(parts.year)
+  const month = Number(parts.month)
+
+  if (!Number.isFinite(year) || !Number.isFinite(month)) return NaN
+  return month >= 8 ? year : year - 1
+}
+
 /**
  * Generic function to retrieve ordered lookup options
  */
@@ -35,6 +53,13 @@ const getLabel = async (model, code) => {
 }
 
 module.exports = {
-  getAcademicYearOptions: () => getOptions(AcademicYear),
+  getCurrentAcademicYearCode,
+  getAcademicYearOptions: async ({ maxCode } = {}) => {
+    let options = await getOptions(AcademicYear)
+    if (Number.isFinite(maxCode)) {
+      options = options.filter(option => Number(option.value) <= maxCode)
+    }
+    return options.sort((a, b) => Number(b.value) - Number(a.value))
+  },
   getAcademicYearLabel: (code) => getLabel(AcademicYear, code),
 }

@@ -46,6 +46,7 @@ const getDistanceInMiles = (lat1, lng1, lat2, lng2) => {
  * @param {number} [selectedSchoolGroup=null] - School group code
  * @param {number} [selectedSchoolStatus=null] - School status code
  * @param {number} [selectedSchoolEducationPhase=null] - School education phase code
+ * @param {string[]|null} [selectedAcademicYear=null] - Academic year code(s)
  * @param {string} [keywords=null] - Keyword search
  * @returns {Promise<{ placements: any[], pagination: Pagination }>}
  */
@@ -59,6 +60,7 @@ const getPlacementSchoolsByLocation = async (
   selectedSchoolGroup = null,
   selectedSchoolStatus = null,
   selectedSchoolEducationPhase = null,
+  selectedAcademicYear = null,
   keywords=null
 ) => {
   try {
@@ -86,6 +88,32 @@ const getPlacementSchoolsByLocation = async (
     })
 
     const schoolIds = [...new Set(candidateRows.map(r => r.schoolId))]
+    if (!schoolIds.length) {
+      const pagination = new Pagination([], 0, page, limit)
+      return { placements: pagination.getData(), pagination }
+    }
+
+    let filteredSchoolIds = schoolIds
+
+    if (selectedAcademicYear?.length) {
+      const matchingRows = await PlacementSchool.findAll({
+        where: { schoolId: schoolIds },
+        include: [{
+          model: AcademicYear,
+          as: 'academicYear',
+          where: { code: { [Op.in]: selectedAcademicYear } },
+          required: true
+        }],
+        attributes: ['schoolId'],
+        raw: true
+      })
+
+      filteredSchoolIds = [...new Set(matchingRows.map(row => row.schoolId))]
+      if (!filteredSchoolIds.length) {
+        const pagination = new Pagination([], 0, page, limit)
+        return { placements: pagination.getData(), pagination }
+      }
+    }
 
     const whereSchool = {}
 
@@ -111,7 +139,7 @@ const getPlacementSchoolsByLocation = async (
     }
 
     const placementRows = await PlacementSchool.findAll({
-      where: { schoolId: schoolIds },
+      where: { schoolId: filteredSchoolIds },
       include: [
         {
           model: School,
@@ -286,6 +314,7 @@ const getPlacementSchoolDetails = async (schoolId) => {
  * @param {number} [selectedSchoolGroup=null] - School group code
  * @param {number} [selectedSchoolStatus=null] - School status code
  * @param {number} [selectedSchoolEducationPhase=null] - School education phase code
+ * @param {string[]|null} [selectedAcademicYear=null] - Academic year code(s)
  * @param {string} [keywords=null] - Keyword search
  * @returns {Promise<Object|null>}
  */
@@ -298,6 +327,7 @@ const getPlacementSchoolsForProvider = async (
   selectedSchoolGroup = null,
   selectedSchoolStatus = null,
   selectedSchoolEducationPhase = null,
+  selectedAcademicYear = null,
   keywords = null
 ) => {
   try {
@@ -334,8 +364,43 @@ const getPlacementSchoolsForProvider = async (
       whereSchoolDetail.regionCode = { [Op.in]: selectedRegion }
     }
 
+    let filteredSchoolIds = null
+
+    if (selectedAcademicYear?.length) {
+      const matchingRows = await PlacementSchool.findAll({
+        where: { providerId },
+        include: [{
+          model: AcademicYear,
+          as: 'academicYear',
+          where: { code: { [Op.in]: selectedAcademicYear } },
+          required: true
+        }],
+        attributes: ['schoolId'],
+        raw: true
+      })
+
+      filteredSchoolIds = [...new Set(matchingRows.map(row => row.schoolId))]
+      if (!filteredSchoolIds.length) {
+        const pagination = new Pagination([], 0, page, limit)
+        return {
+          provider: {
+            id: provider.id,
+            operatingName: provider.operatingName,
+            legalName: provider.legalName,
+            ukprn: provider.ukprn,
+            urn: provider.urn
+          },
+          placements: pagination.getData(),
+          pagination
+        }
+      }
+    }
+
     const placementRows = await PlacementSchool.findAll({
-      where: { providerId },
+      where: {
+        providerId,
+        ...(filteredSchoolIds ? { schoolId: { [Op.in]: filteredSchoolIds } } : {})
+      },
       include: [
         { model: AcademicYear, as: 'academicYear', attributes: ['name'] },
         {
