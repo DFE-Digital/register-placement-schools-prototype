@@ -9,7 +9,7 @@ const {
 const {
   getPlaceDetails,
   getPlaceSuggestions
-} = require('../services/googleMaps')
+} = require('../services/locationSearch')
 
 const {
   getPlacementSchoolDetails,
