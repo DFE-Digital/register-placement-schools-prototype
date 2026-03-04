@@ -20,6 +20,11 @@ const {
   getSchoolEducationPhaseOptions,
   getSchoolEducationPhaseLabel
 } = require('./gias')
+const {
+  getAcademicYearOptions,
+  getAcademicYearLabel,
+  getCurrentAcademicYearCode
+} = require('./academicYear')
 
 /**
  * @typedef {Object} OptionItem
@@ -73,6 +78,7 @@ const {
  * @property {string[]} schoolGroup
  * @property {string[]} schoolStatus
  * @property {string[]} schoolEducationPhase
+ * @property {string[]} academicYear
  * @property {string[]} region
  */
 
@@ -240,6 +246,7 @@ const parseFilters = (filters = {}) => ({
   schoolGroup: Array.isArray(filters.schoolGroup) ? filters.schoolGroup : (filters.schoolGroup ? [filters.schoolGroup] : []),
   schoolStatus: Array.isArray(filters.schoolStatus) ? filters.schoolStatus : (filters.schoolStatus ? [filters.schoolStatus] : []),
   schoolEducationPhase: Array.isArray(filters.schoolEducationPhase) ? filters.schoolEducationPhase : (filters.schoolEducationPhase ? [filters.schoolEducationPhase] : []),
+  academicYear: Array.isArray(filters.academicYear) ? filters.academicYear : (filters.academicYear ? [filters.academicYear] : []),
 
   // provider mode
   region: Array.isArray(filters.region) ? filters.region : (filters.region ? [filters.region] : [])
@@ -280,12 +287,14 @@ const fetchFilterOptions = async (mode) => {
     filterSchoolTypeItems,
     filterSchoolGroupItems,
     filterSchoolStatusItems,
-    filterSchoolEducationPhaseItems
+    filterSchoolEducationPhaseItems,
+    filterAcademicYearItems
   ] = await Promise.all([
     getSchoolTypeOptions(),
     getSchoolGroupOptions(),
     getSchoolStatusOptions(),
-    getSchoolEducationPhaseOptions()
+    getSchoolEducationPhaseOptions(),
+    getAcademicYearOptions({ maxCode: getCurrentAcademicYearCode() })
   ])
 
   if (mode === 'location') {
@@ -295,7 +304,8 @@ const fetchFilterOptions = async (mode) => {
       filterSchoolTypeItems,
       filterSchoolGroupItems,
       filterSchoolStatusItems,
-      filterSchoolEducationPhaseItems
+      filterSchoolEducationPhaseItems,
+      filterAcademicYearItems
     }
   }
 
@@ -306,7 +316,8 @@ const fetchFilterOptions = async (mode) => {
       filterSchoolTypeItems,
       filterSchoolGroupItems,
       filterSchoolStatusItems,
-      filterSchoolEducationPhaseItems
+      filterSchoolEducationPhaseItems,
+      filterAcademicYearItems
     }
   }
 
@@ -347,7 +358,7 @@ const locationSelectedFilterConfig = (sel) => ([
   },
   {
     key: 'schoolEducationPhase',
-    heading: 'School education phase',
+    heading: 'Education phase',
     selected: sel.schoolEducationPhase,
     labelGetter: getSchoolEducationPhaseLabel,
     removeHref: (code) => `/results/remove-school-education-phase-filter/${code}`
@@ -358,6 +369,13 @@ const locationSelectedFilterConfig = (sel) => ([
     selected: sel.schoolStatus,
     labelGetter: getSchoolStatusLabel,
     removeHref: (code) => `/results/remove-school-status-filter/${code}`
+  },
+  {
+    key: 'academicYear',
+    heading: 'Academic year',
+    selected: sel.academicYear,
+    labelGetter: getAcademicYearLabel,
+    removeHref: (code) => `/results/remove-academic-year-filter/${code}`
   }
 ])
 
@@ -391,7 +409,7 @@ const providerSelectedFilterConfig = (sel) => ([
   },
   {
     key: 'schoolEducationPhase',
-    heading: 'School education phase',
+    heading: 'Education phase',
     selected: sel.schoolEducationPhase,
     labelGetter: getSchoolEducationPhaseLabel,
     removeHref: (code) => `/results/remove-school-education-phase-filter/${code}`
@@ -402,6 +420,13 @@ const providerSelectedFilterConfig = (sel) => ([
     selected: sel.schoolStatus,
     labelGetter: getSchoolStatusLabel,
     removeHref: (code) => `/results/remove-school-status-filter/${code}`
+  },
+  {
+    key: 'academicYear',
+    heading: 'Academic year',
+    selected: sel.academicYear,
+    labelGetter: getAcademicYearLabel,
+    removeHref: (code) => `/results/remove-academic-year-filter/${code}`
   }
 ])
 

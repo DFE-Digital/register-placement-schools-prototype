@@ -68,4 +68,13 @@ window.GOVUKPrototypeKit.documentReady(() => {
     })
     checkboxFilterRegion.init()
   }
+
+  const academicYearContainer = document.querySelector('#filters-academic-year')
+  if (academicYearContainer) {
+    const checkboxFilterAcademicYear = new CheckboxFilter({
+      container: academicYearContainer,
+      textBox: { label: 'Search for academic year' }
+    })
+    checkboxFilterAcademicYear.init()
+  }
 })

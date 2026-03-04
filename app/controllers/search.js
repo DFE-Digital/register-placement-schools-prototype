@@ -238,13 +238,15 @@ exports.results_get = async (req, res, next) => {
       const selectedSchoolGroup = filters.schoolGroup
       const selectedSchoolStatus = filters.schoolStatus
       const selectedSchoolEducationPhase = filters.schoolEducationPhase
+      const selectedAcademicYear = filters.academicYear
 
       const hasFilters = hasAnyFilters(filters, [
         // 'radius', // re-enable when radius chips are back
         'schoolType',
         'schoolGroup',
         'schoolStatus',
-        'schoolEducationPhase'
+        'schoolEducationPhase',
+        'academicYear'
       ])
 
       const selectedFilters = await buildSelectedFilters(
@@ -256,7 +258,8 @@ exports.results_get = async (req, res, next) => {
         filterSchoolTypeItems,
         filterSchoolGroupItems,
         filterSchoolStatusItems,
-        filterSchoolEducationPhaseItems
+        filterSchoolEducationPhaseItems,
+        filterAcademicYearItems
       } = await fetchFilterOptions('location')
 
       const placeId = session.location?.id
@@ -279,6 +282,7 @@ exports.results_get = async (req, res, next) => {
         selectedSchoolGroup,
         selectedSchoolStatus,
         selectedSchoolEducationPhase,
+        selectedAcademicYear,
         keywords
       )
 
@@ -295,11 +299,13 @@ exports.results_get = async (req, res, next) => {
         filterSchoolGroupItems,
         filterSchoolStatusItems,
         filterSchoolEducationPhaseItems,
+        filterAcademicYearItems,
         selectedRadius,
         selectedSchoolType,
         selectedSchoolGroup,
         selectedSchoolStatus,
         selectedSchoolEducationPhase,
+        selectedAcademicYear,
         actions: {
           newSearch: '/search',
           view: '/results',
@@ -317,13 +323,15 @@ exports.results_get = async (req, res, next) => {
       const selectedSchoolGroup = filters.schoolGroup
       const selectedSchoolStatus = filters.schoolStatus
       const selectedSchoolEducationPhase = filters.schoolEducationPhase
+      const selectedAcademicYear = filters.academicYear
 
       const hasFilters = hasAnyFilters(filters, [
         'region',
         'schoolType',
         'schoolGroup',
         'schoolStatus',
-        'schoolEducationPhase'
+        'schoolEducationPhase',
+        'academicYear'
       ])
 
       const selectedFilters = await buildSelectedFilters(
@@ -335,7 +343,8 @@ exports.results_get = async (req, res, next) => {
         filterSchoolTypeItems,
         filterSchoolGroupItems,
         filterSchoolStatusItems,
-        filterSchoolEducationPhaseItems
+        filterSchoolEducationPhaseItems,
+        filterAcademicYearItems
       } = await fetchFilterOptions('provider')
 
       const providerId = session.provider?.id
@@ -350,6 +359,7 @@ exports.results_get = async (req, res, next) => {
         selectedSchoolGroup,
         selectedSchoolStatus,
         selectedSchoolEducationPhase,
+        selectedAcademicYear,
         keywords
       )
 
@@ -366,11 +376,13 @@ exports.results_get = async (req, res, next) => {
         filterSchoolGroupItems,
         filterSchoolStatusItems,
         filterSchoolEducationPhaseItems,
+        filterAcademicYearItems,
         selectedRegion,
         selectedSchoolType,
         selectedSchoolGroup,
         selectedSchoolStatus,
         selectedSchoolEducationPhase,
+        selectedAcademicYear,
         actions: {
           newSearch: '/search',
           view: '/results',
@@ -443,6 +455,15 @@ exports.removeSchoolEducationPhaseFilter = (req, res) => {
   filters.schoolEducationPhase = removeFilter(
     req.params.schoolEducationPhase,
     filters.schoolEducationPhase
+  )
+  res.redirect('/results')
+}
+
+exports.removeAcademicYearFilter = (req, res) => {
+  const { filters } = req.session.data
+  filters.academicYear = removeFilter(
+    req.params.academicYear,
+    filters.academicYear
   )
   res.redirect('/results')
 }
@@ -568,6 +589,7 @@ exports.locationDownload_csv = async (req, res, next) => {
     const selectedSchoolGroup = filters.schoolGroup
     const selectedSchoolStatus = filters.schoolStatus
     const selectedSchoolEducationPhase = filters.schoolEducationPhase
+    const selectedAcademicYear = filters.academicYear
     const keywords = (session.keywords ?? '').toString().trim()
 
     const placeId = session.location?.id
@@ -676,6 +698,7 @@ exports.locationDownload_csv = async (req, res, next) => {
       selectedSchoolGroup,
       selectedSchoolStatus,
       selectedSchoolEducationPhase,
+      selectedAcademicYear,
       keywords
     )
 
@@ -694,6 +717,7 @@ exports.locationDownload_csv = async (req, res, next) => {
         selectedSchoolGroup,
         selectedSchoolStatus,
         selectedSchoolEducationPhase,
+        selectedAcademicYear,
         keywords
       )
     }
@@ -722,6 +746,7 @@ exports.providerDownload_csv = async (req, res, next) => {
     const selectedSchoolGroup = filters.schoolGroup
     const selectedSchoolStatus = filters.schoolStatus
     const selectedSchoolEducationPhase = filters.schoolEducationPhase
+    const selectedAcademicYear = filters.academicYear
 
     const keywords = (session.keywords ?? '').toString().trim()
     const providerId = session.provider?.id
@@ -738,6 +763,7 @@ exports.providerDownload_csv = async (req, res, next) => {
       selectedSchoolGroup,
       selectedSchoolStatus,
       selectedSchoolEducationPhase,
+      selectedAcademicYear,
       keywords
     )
     const { provider } = first
@@ -851,6 +877,7 @@ exports.providerDownload_csv = async (req, res, next) => {
         selectedSchoolGroup,
         selectedSchoolStatus,
         selectedSchoolEducationPhase,
+        selectedAcademicYear,
         keywords
       )
       maybeMore = await streamPage(result)

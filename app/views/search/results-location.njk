@@ -135,7 +135,7 @@
         {% set academicYearsHtml %}
           {% if placement.academicYears.length %}
             <ul class="govuk-list govuk-list--bullet">
-              {% for year in placement.academicYears %}
+              {% for year in placement.academicYears | reverse %}
                 <li>{{ year }}</li>
               {% endfor %}
             </ul>
@@ -157,6 +157,15 @@
               },
               value: {
                 text: placement.distance | round(1) + " miles"
+              }
+            },
+            {
+              key: {
+                text: "Address"
+              },
+              value: {
+                html: addressHtml if (placement.school.address.line1.length and placement.school.address.town.length and placement.school.address.postcode.length) else "Not known",
+                classes: "govuk-hint" if not (placement.school.address.line1.length and placement.school.address.town.length and placement.school.address.postcode.length)
               }
             },
             {
@@ -199,15 +208,6 @@
               },
               value: {
                 html: educationPhaseHtml
-              }
-            },
-            {
-              key: {
-                text: "Address"
-              },
-              value: {
-                html: addressHtml if (placement.school.address.line1.length and placement.school.address.town.length and placement.school.address.postcode.length) else "Not known",
-                classes: "govuk-hint" if not (placement.school.address.line1.length and placement.school.address.town.length and placement.school.address.postcode.length)
               }
             },
             {
