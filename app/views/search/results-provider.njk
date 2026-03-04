@@ -131,7 +131,7 @@
         {% set academicYearsHtml %}
           {% if placement.academicYears.length %}
             <ul class="govuk-list govuk-list--bullet">
-              {% for year in placement.academicYears %}
+              {% for year in placement.academicYears | reverse %}
                 <li>{{ year }}</li>
               {% endfor %}
             </ul>
@@ -175,22 +175,6 @@
             } if 1==0,
             {
               key: {
-                text: "School type"
-              },
-              value: {
-                html: schoolTypeGroupHtml
-              }
-            },
-            {
-              key: {
-                text: "Education phase"
-              },
-              value: {
-                html: educationPhaseHtml
-              }
-            },
-            {
-              key: {
                 text: "Address"
               },
               value: {
@@ -205,6 +189,22 @@
               value: {
                 text: placement.school.region if placement.school.region.length else "Not known",
                 classes: "govuk-hint" if not placement.school.region.length
+              }
+            },
+            {
+              key: {
+                text: "School type"
+              },
+              value: {
+                html: schoolTypeGroupHtml
+              }
+            },
+            {
+              key: {
+                text: "Education phase"
+              },
+              value: {
+                html: educationPhaseHtml
               }
             },
             {
