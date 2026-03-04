@@ -18,6 +18,16 @@ module.exports = (sequelize) => {
         as: 'placements'
       })
 
+      School.hasMany(models.SchoolRelationship, {
+        foreignKey: 'schoolId',
+        as: 'outgoingSchoolRelationships'
+      })
+
+      School.hasMany(models.SchoolRelationship, {
+        foreignKey: 'relatedSchoolId',
+        as: 'incomingSchoolRelationships'
+      })
+
       School.belongsTo(models.SchoolType, {
         foreignKey: 'typeCode',
         targetKey: 'code',
