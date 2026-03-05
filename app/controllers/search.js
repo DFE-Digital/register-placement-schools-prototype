@@ -394,9 +394,14 @@ exports.results_get = async (req, res, next) => {
     }
 
     if (q === 'school') {
+      if (req.query.schoolId) {
+        req.session.data.school = { id: req.query.schoolId }
+      }
+
       const { search, school } = req.session.data ?? {}
       if (!school?.id) return res.redirect('/search/school')
       const placementSchool = await getPlacementSchoolDetails(school.id)
+      if (!placementSchool) return res.redirect('/search/school')
 
       return res.render('search/results-school', {
         q,

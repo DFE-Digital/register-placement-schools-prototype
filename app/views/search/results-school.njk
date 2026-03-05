@@ -173,6 +173,21 @@
       ]
     }) }}
 
+    {% if placementSchool.relatedSchools and placementSchool.relatedSchools.length %}
+      <h2 class="govuk-heading-m">Related school {{- "s" if placementSchool.relatedSchools.length > 1 }}</h2>
+
+      <ul class="govuk-list govuk-list--spaced">
+        {% for relatedSchool in placementSchool.relatedSchools %}
+          <li>
+            <a class="govuk-link" href="/results?q=school&schoolId={{ relatedSchool.id }}">{{ relatedSchool.name }}</a>
+            {# {% if relatedSchool.relationshipLabel %}
+              <span class="govuk-hint govuk-!-margin-left-1">({{ relatedSchool.relationshipLabel }})</span>
+            {% endif %} #}
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
   </div>
 </div>
 
