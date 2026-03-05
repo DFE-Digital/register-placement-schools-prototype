@@ -1,4 +1,4 @@
-id,urn,related_school_id,related_school_urn,relationship_type_id,relationship_type,related_at
+school_id,school_urn,related_school_id,related_school_urn,relationship_type_id,relationship_type_name,related_at
 7fd4221c-fff6-4c34-aa41-b03821ee7e3a,100006,e67d61f9-e7ad-480f-817d-98ed475ca26d,134643,4bcdc59b-8b59-4c62-b29b-1f055aad8d32,Predecessor - merged,01/01/2022
 0a08dddc-888f-4bd8-9e1b-889c2fae5bfb,100012,77a2158f-0756-48aa-912e-e0450540580e,100021,bdc293b9-3c7d-4433-9e39-fdaf96e02d8c,Successor - merged,31/08/2021
 f4a04593-5cde-42fa-bd4a-88664e98cc59,100016,b335c200-7261-4b32-afc5-2a4930606792,132245,01cb1950-2995-489d-84a2-c0ebae4e6a6a,Successor,
