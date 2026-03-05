@@ -6,6 +6,11 @@
   {% set title = "No placement schools near ‘" + location.name + "’" %}
 {% endif %}
 
+{% block head %}
+  {{ super() }}
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+{% endblock %}
+
 {% block content %}
 
 {% include "_includes/notification-banner.njk" %}
@@ -43,6 +48,11 @@
     </div>
 
     {% include "../_search-panel.njk" %}
+
+    {% if osMapsApiKey and osMapPoints.length %}
+      <div class="app-results-map" id="results-map" data-os-api-key="{{ osMapsApiKey }}"></div>
+      <script type="application/json" id="os-map-points">{{ osMapPoints | dump | safe }}</script>
+    {% endif %}
 
     {% if placements.length %}
 
@@ -230,4 +240,11 @@
   </div>
 </div>
 
+{% endblock %}
+
+{% block pageScripts %}
+  {% if osMapsApiKey and osMapPoints.length %}
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="/public/javascripts/os-results-map.js"></script>
+  {% endif %}
 {% endblock %}

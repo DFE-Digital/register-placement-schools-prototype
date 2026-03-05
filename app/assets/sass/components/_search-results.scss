@@ -66,3 +66,10 @@
     }
   }
 }
+
+.app-results-map {
+  border: 1px solid $govuk-border-colour;
+  height: 360px;
+  margin-bottom: govuk-spacing(5);
+  width: 99.5%;
+}

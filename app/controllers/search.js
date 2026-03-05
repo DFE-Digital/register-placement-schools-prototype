@@ -32,6 +32,17 @@ const {
   normaliseAcademicYears
 } = require('../helpers/search')
 
+const buildOsMapPoints = (placements) => (
+  (placements || [])
+    .map((placement) => ({
+      lat: placement?.school?.address?.latitude,
+      lon: placement?.school?.address?.longitude,
+      name: placement?.school?.name || null,
+      status: placement?.school?.status || null
+    }))
+    .filter((point) => typeof point.lat === 'number' && typeof point.lon === 'number')
+)
+
 exports.search_get = async (req, res) => {
   delete req.session.data.search
   delete req.session.data.filters
@@ -286,10 +297,14 @@ exports.results_get = async (req, res, next) => {
         keywords
       )
 
+      const osMapPoints = buildOsMapPoints(placements)
+
       return res.render('search/location/results', {
         location: { name: place.name, lat, lng },
         placements,
         pagination,
+        osMapPoints,
+        osMapsApiKey: process.env.ORDNANCE_SURVEY_API_KEY,
         keywords,
         hasSearch,
         hasFilters,
@@ -363,10 +378,14 @@ exports.results_get = async (req, res, next) => {
         keywords
       )
 
+      const osMapPoints = buildOsMapPoints(placements)
+
       return res.render('search/provider/results', {
         provider,
         placements,
         pagination,
+        osMapPoints,
+        osMapsApiKey: process.env.ORDNANCE_SURVEY_API_KEY,
         keywords,
         hasSearch,
         hasFilters,
