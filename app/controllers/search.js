@@ -90,7 +90,7 @@ exports.searchLocation_get = async (req, res) => {
 
   const { search } = req.session.data
 
-  res.render('search/location', {
+  res.render('search/location/index', {
     search,
     actions: {
       back: '/search',
@@ -113,7 +113,7 @@ exports.searchLocation_post = async (req, res) => {
   }
 
   if (errors.length) {
-    res.render('search/location', {
+    res.render('search/location/index', {
       search,
       errors,
       actions: {
@@ -133,7 +133,7 @@ exports.searchSchool_get = async (req, res) => {
 
   const { search } = req.session.data
 
-  res.render('search/school', {
+  res.render('search/school/index', {
     search,
     actions: {
       back: '/search',
@@ -156,7 +156,7 @@ exports.searchSchool_post = async (req, res) => {
   }
 
   if (errors.length) {
-    res.render('search/school', {
+    res.render('search/school/index', {
       search,
       errors,
       actions: {
@@ -176,7 +176,7 @@ exports.searchProvider_get = async (req, res) => {
 
   const { search } = req.session.data
 
-  res.render('search/provider', {
+  res.render('search/provider/index', {
     search,
     actions: {
       back: '/search',
@@ -199,7 +199,7 @@ exports.searchProvider_post = async (req, res) => {
   }
 
   if (errors.length) {
-    res.render('search/provider', {
+    res.render('search/provider/index', {
       search,
       errors,
       actions: {
@@ -286,7 +286,7 @@ exports.results_get = async (req, res, next) => {
         keywords
       )
 
-      return res.render('search/results-location', {
+      return res.render('search/location/results', {
         location: { name: place.name, lat, lng },
         placements,
         pagination,
@@ -363,7 +363,7 @@ exports.results_get = async (req, res, next) => {
         keywords
       )
 
-      return res.render('search/results-provider', {
+      return res.render('search/provider/results', {
         provider,
         placements,
         pagination,
@@ -403,7 +403,7 @@ exports.results_get = async (req, res, next) => {
       const placementSchool = await getPlacementSchoolDetails(school.id)
       if (!placementSchool) return res.redirect('/search/school')
 
-      return res.render('search/results-school', {
+      return res.render('search/school/result', {
         q,
         search,
         placementSchool,

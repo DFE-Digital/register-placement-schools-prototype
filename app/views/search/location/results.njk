@@ -1,9 +1,9 @@
 {% extends "layouts/main.njk" %}
 
 {% if pagination.totalCount %}
-  {% set title = pagination.totalCount | numeral("0,0") + " placement school" + ("s" if pagination.totalCount > 1) + " for ‘" + provider.operatingName + "’" %}
+  {% set title = pagination.totalCount | numeral("0,0") + " placement school" + ("s" if pagination.totalCount > 1) + " near ‘" + location.name + "’" %}
 {% else %}
-  {% set title = "No placement schools for ‘" + provider.operatingName + "’" %}
+  {% set title = "No placement schools near ‘" + location.name + "’" %}
 {% endif %}
 
 {% block content %}
@@ -14,6 +14,10 @@
   <div class="govuk-grid-column-two-thirds">
 
     {% include "_includes/page-heading.njk" %}
+
+    <p class="govuk-body">
+      Showing placement schools within {{ selectedRadius }} miles of ‘{{ location.name }}’.
+    </p>
 
     <div class="govuk-button-group">
       {{ govukButton({
@@ -29,7 +33,7 @@
 
 <div class="app-filter-layout">
   <div class="app-filter-layout__filter">
-    {% include "./_filter-panel.njk" %}
+    {% include "../_filter-panel.njk" %}
   </div>
 
   <div class="app-filter-layout__content">
@@ -38,7 +42,7 @@
       <div class="app-action-bar__filter"></div>
     </div>
 
-    {% include "./_search-panel.njk" %}
+    {% include "../_search-panel.njk" %}
 
     {% if placements.length %}
 
@@ -78,7 +82,7 @@
               {{ placement.school.urn }}
             </li>
             <li>
-              <a href="https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/{{placement.school.urn}}" target="_blank" rel="noreferrer nofollow" class="govuk-link">View school on Get information about schools (opens in new tab)</a>
+              <a href="https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/{{ placement.school.urn }}" target="_blank" rel="noreferrer nofollow" class="govuk-link">View school on Get information about schools (opens in new tab)</a>
             </li>
           </ul>
         {% endset %}
@@ -149,6 +153,23 @@
           rows: [
             {
               key: {
+                text: "Distance"
+              },
+              value: {
+                text: placement.distance | round(1) + " miles"
+              }
+            },
+            {
+              key: {
+                text: "Address"
+              },
+              value: {
+                html: addressHtml if (placement.school.address.line1.length and placement.school.address.town.length and placement.school.address.postcode.length) else "Not known",
+                classes: "govuk-hint" if not (placement.school.address.line1.length and placement.school.address.town.length and placement.school.address.postcode.length)
+              }
+            },
+            {
+              key: {
                 text: "School status"
               },
               value: {
@@ -173,24 +194,6 @@
                 html: urnHtml
               }
             } if 1==0,
-            {
-              key: {
-                text: "Address"
-              },
-              value: {
-                html: addressHtml if (placement.school.address.line1.length and placement.school.address.town.length and placement.school.address.postcode.length) else "Not known",
-                classes: "govuk-hint" if not (placement.school.address.line1.length and placement.school.address.town.length and placement.school.address.postcode.length)
-              }
-            },
-            {
-              key: {
-                text: "Region"
-              },
-              value: {
-                text: placement.school.region if placement.school.region.length else "Not known",
-                classes: "govuk-hint" if not placement.school.region.length
-              }
-            },
             {
               key: {
                 text: "School type"
@@ -221,7 +224,7 @@
       {% endfor %}
       {% include "_includes/pagination.njk" %}
     {% else %}
-      <p class="govuk-body">{{ provider.operatingName if provider.operatingName.length else "The organisation" }} has not partnerned with any schools matching your criteria.</p>
+      <p class="govuk-body">There are no placement schools within {{ selectedRadius }} miles of ‘{{ location.name }}’ matching your criteria.</p>
     {% endif %}
 
   </div>
