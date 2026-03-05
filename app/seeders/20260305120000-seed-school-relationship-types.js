@@ -32,13 +32,17 @@ module.exports = {
       for (const relationshipType of relationshipTypes) {
         const relationshipTypeId = nullIfEmpty(relationshipType.id)
         const name = nullIfEmpty(relationshipType.name)
+        const relationshipTypeGroupId = nullIfEmpty(
+          relationshipType.relationship_type_group_id || relationshipType.school_relationship_type_group_id
+        )
 
-        if (!relationshipTypeId || !name) continue
+        if (!relationshipTypeId || !name || !relationshipTypeGroupId) continue
 
         const baseFields = {
           id: relationshipTypeId,
           name,
           description: nullIfEmpty(relationshipType.description),
+          relationship_type_group_id: relationshipTypeGroupId,
           created_at: createdAt,
           created_by_id: userId,
           updated_at: createdAt,
