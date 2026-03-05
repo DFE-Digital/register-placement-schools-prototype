@@ -433,6 +433,7 @@ exports.results_get = async (req, res, next) => {
         q,
         search,
         placementSchool,
+        osMapsApiKey: process.env.ORDNANCE_SURVEY_API_KEY,
         backLink,
         showSearchAgain: !backLink,
         actions: { newSearch: '/search' }

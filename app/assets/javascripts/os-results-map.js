@@ -86,7 +86,9 @@
     bounds.extend([point.lat, point.lon])
   })
 
-  if (bounds.isValid()) {
+  if (points.length === 1) {
+    map.setView([points[0].lat, points[0].lon], 13)
+  } else if (bounds.isValid()) {
     map.fitBounds(bounds, { padding: [20, 20] })
   } else {
     map.setView([points[0].lat, points[0].lon], 12)
