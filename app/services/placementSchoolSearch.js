@@ -15,7 +15,9 @@ const {
   SchoolNurseryProvision,
   SchoolReligiousCharacter,
   SchoolStatus,
-  SchoolType
+  SchoolType,
+  SchoolRelationship,
+  SchoolRelationshipType
 } = require('../models')
 
 const Pagination = require('../helpers/pagination')
@@ -274,6 +276,44 @@ const getPlacementSchoolDetails = async (schoolId) => {
 
     const academicYears = Object.values(groupedByYear).sort((a, b) => b.name.localeCompare(a.name))
 
+    const schoolRelationships = await SchoolRelationship.findAll({
+      where: {
+        [Op.or]: [
+          { schoolId: school.id },
+          { relatedSchoolId: school.id }
+        ]
+      },
+      include: [
+        { model: School, as: 'school', attributes: ['id', 'name'] },
+        { model: School, as: 'relatedSchool', attributes: ['id', 'name'] },
+        { model: SchoolRelationshipType, as: 'relationshipType', attributes: ['id', 'name', 'description'] }
+      ]
+    })
+
+    const relatedSchoolsMap = new Map()
+
+    schoolRelationships.forEach((relationship) => {
+      const relatedSchool = relationship.schoolId === school.id
+        ? relationship.relatedSchool
+        : relationship.relatedSchoolId === school.id
+          ? relationship.school
+          : null
+
+      if (relatedSchool?.id && relatedSchool.id !== school.id) {
+        const relationshipType = relationship.relationshipType
+        const relationshipLabel = relationshipType?.description || relationshipType?.name || null
+
+        relatedSchoolsMap.set(relatedSchool.id, {
+          id: relatedSchool.id,
+          name: relatedSchool.name,
+          relationshipLabel
+        })
+      }
+    })
+
+    const relatedSchools = Array.from(relatedSchoolsMap.values())
+      .sort((a, b) => a.name.localeCompare(b.name))
+
     return {
       id: school.id,
       name: school.name,
@@ -294,7 +334,8 @@ const getPlacementSchoolDetails = async (schoolId) => {
         statutoryLowAge: school.schoolDetail?.statutoryLowAge || null,
         statutoryHighAge: school.schoolDetail?.statutoryHighAge || null
       },
-      academicYears
+      academicYears,
+      relatedSchools
     }
   } catch (error) {
     console.error('Error in getPlacementSchoolDetails:', error)

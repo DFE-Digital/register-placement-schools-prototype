@@ -2,6 +2,15 @@
 
 {% set title = placementSchool.name %}
 
+{% block beforeContent %}
+  {% if backLink %}
+    {{ govukBackLink({
+      text: "Back to search results",
+      href: backLink
+    }) }}
+  {% endif %}
+{% endblock %}
+
 {% block content %}
 
 {% include "_includes/notification-banner.njk" %}
@@ -30,9 +39,11 @@
 
     {% include "_includes/page-heading.njk" %}
 
-    <p class="govuk-body">
-      <a class="govuk-link" href="{{ actions.newSearch }}">Search again</a>
-    </p>
+    {% if showSearchAgain %}
+      <p class="govuk-body">
+        <a class="govuk-link" href="{{ actions.newSearch }}">Search again</a>
+      </p>
+    {% endif %}
 
     {% set urnHtml %}
       <ul class="govuk-list">
@@ -172,6 +183,21 @@
         }
       ]
     }) }}
+
+    {% if placementSchool.relatedSchools and placementSchool.relatedSchools.length %}
+      <h2 class="govuk-heading-m">Related school {{- "s" if placementSchool.relatedSchools.length > 1 }}</h2>
+
+      <ul class="govuk-list govuk-list--spaced">
+        {% for relatedSchool in placementSchool.relatedSchools %}
+          <li>
+            <a class="govuk-link" href="/results?q=school&schoolId={{ relatedSchool.id }}{{ '&from=' + query.from if query.from }}">{{ relatedSchool.name }}</a>
+            {# {% if relatedSchool.relationshipLabel %}
+              <span class="govuk-hint govuk-!-margin-left-1">({{ relatedSchool.relationshipLabel }})</span>
+            {% endif %} #}
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
 
   </div>
 </div>
