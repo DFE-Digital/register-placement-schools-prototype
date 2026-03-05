@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block content %}
-{{placementSchool|dump|safe}}
+
 {% include "_includes/notification-banner.njk" %}
 
 <div class="govuk-grid-row">
@@ -107,6 +107,16 @@
       {% endif %}
       {% if placementSchool.address.postcode.length %}
         {{ placementSchool.address.postcode }}
+      {% endif %}
+      {% if placementSchool.address.latitude and placementSchool.address.longitude %}
+        <p class="govuk-body govuk-!-margin-top-3">
+          <a href="https://www.openstreetmap.org/?mlat={{ placementSchool.address.latitude }}&mlon={{ placementSchool.address.longitude }}&zoom=17"
+            target="_blank"
+            rel="noreferrer"
+            class="govuk-link">
+            View school on map (opens in new tab)
+          </a>
+        </p>
       {% endif %}
     {%- endset %}
 
