@@ -17,7 +17,8 @@ const {
   SchoolStatus,
   SchoolType,
   SchoolRelationship,
-  SchoolRelationshipType
+  SchoolRelationshipType,
+  SchoolRelationshipTypeGroup
 } = require('../models')
 
 const Pagination = require('../helpers/pagination')
@@ -286,11 +287,34 @@ const getPlacementSchoolDetails = async (schoolId) => {
       include: [
         { model: School, as: 'school', attributes: ['id', 'name'] },
         { model: School, as: 'relatedSchool', attributes: ['id', 'name'] },
-        { model: SchoolRelationshipType, as: 'relationshipType', attributes: ['id', 'name', 'description'] }
+        {
+          model: SchoolRelationshipType,
+          as: 'relationshipType',
+          attributes: ['id', 'name', 'description'],
+          include: [
+            {
+              model: SchoolRelationshipTypeGroup,
+              as: 'relationshipTypeGroup',
+              attributes: ['id', 'name']
+            }
+          ]
+        }
       ]
     })
 
-    const relatedSchoolsMap = new Map()
+    const relationshipGroupLabels = {
+      Successor: 'is the successor to',
+      Predecessor: 'is the predecessor to',
+      Other: 'is related to'
+    }
+    const orderedGroupNames = ['Successor', 'Predecessor', 'Other']
+    const relatedSchoolGroupsMap = new Map()
+
+    const invertGroupName = (groupName) => {
+      if (groupName === 'Successor') return 'Predecessor'
+      if (groupName === 'Predecessor') return 'Successor'
+      return groupName
+    }
 
     schoolRelationships.forEach((relationship) => {
       const relatedSchool = relationship.schoolId === school.id
@@ -301,18 +325,46 @@ const getPlacementSchoolDetails = async (schoolId) => {
 
       if (relatedSchool?.id && relatedSchool.id !== school.id) {
         const relationshipType = relationship.relationshipType
-        const relationshipLabel = relationshipType?.description || relationshipType?.name || null
+        const baseGroupName = relationshipType?.relationshipTypeGroup?.name || 'Other'
+        const relationshipTypeGroupName = relationship.schoolId === school.id
+          ? invertGroupName(baseGroupName)
+          : baseGroupName
 
-        relatedSchoolsMap.set(relatedSchool.id, {
-          id: relatedSchool.id,
-          name: relatedSchool.name,
-          relationshipLabel
-        })
+        if (!relatedSchoolGroupsMap.has(relationshipTypeGroupName)) {
+          relatedSchoolGroupsMap.set(relationshipTypeGroupName, {
+            name: relationshipTypeGroupName,
+            label: relationshipGroupLabels[relationshipTypeGroupName] || 'is related to',
+            schools: new Map()
+          })
+        }
+
+        relatedSchoolGroupsMap
+          .get(relationshipTypeGroupName)
+          .schools
+          .set(relatedSchool.id, {
+            id: relatedSchool.id,
+            name: relatedSchool.name
+          })
       }
     })
 
-    const relatedSchools = Array.from(relatedSchoolsMap.values())
+    const orderedGroups = []
+    orderedGroupNames.forEach((groupName) => {
+      const group = relatedSchoolGroupsMap.get(groupName)
+      if (group) orderedGroups.push(group)
+    })
+
+    const remainingGroups = Array.from(relatedSchoolGroupsMap.values())
+      .filter((group) => !orderedGroupNames.includes(group.name))
       .sort((a, b) => a.name.localeCompare(b.name))
+
+    const relatedSchoolGroups = [...orderedGroups, ...remainingGroups]
+      .map((group) => ({
+        name: group.name,
+        label: group.label,
+        schools: Array.from(group.schools.values())
+          .sort((a, b) => a.name.localeCompare(b.name))
+      }))
 
     return {
       id: school.id,
@@ -335,7 +387,7 @@ const getPlacementSchoolDetails = async (schoolId) => {
         statutoryHighAge: school.schoolDetail?.statutoryHighAge || null
       },
       academicYears,
-      relatedSchools
+      relatedSchoolGroups
     }
   } catch (error) {
     console.error('Error in getPlacementSchoolDetails:', error)
