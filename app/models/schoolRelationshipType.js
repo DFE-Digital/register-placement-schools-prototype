@@ -8,6 +8,11 @@ module.exports = (sequelize) => {
         as: 'relationships'
       })
 
+      SchoolRelationshipType.belongsTo(models.SchoolRelationshipTypeGroup, {
+        foreignKey: 'relationshipTypeGroupId',
+        as: 'relationshipTypeGroup'
+      })
+
       SchoolRelationshipType.belongsTo(models.User, {
         foreignKey: 'createdById',
         as: 'createdByUser'
@@ -34,6 +39,11 @@ module.exports = (sequelize) => {
       },
       description: {
         type: DataTypes.STRING
+      },
+      relationshipTypeGroupId: {
+        type: DataTypes.UUID,
+        allowNull: false,
+        field: 'relationship_type_group_id'
       },
       createdAt: {
         type: DataTypes.DATE,
