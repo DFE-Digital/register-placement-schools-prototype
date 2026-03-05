@@ -1,6 +1,6 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('school_relationship_types', {
+    await queryInterface.createTable('school_relationship_type_groups', {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
@@ -13,14 +13,6 @@ module.exports = {
       },
       description: {
         type: Sequelize.STRING
-      },
-      relationship_type_group_id: {
-        type: Sequelize.UUID,
-        allowNull: false,
-        references: {
-          model: 'school_relationship_type_groups',
-          key: 'id'
-        }
       },
       created_at: {
         type: Sequelize.DATE,
@@ -52,6 +44,6 @@ module.exports = {
     })
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('school_relationship_types')
+    await queryInterface.dropTable('school_relationship_type_groups')
   }
 }

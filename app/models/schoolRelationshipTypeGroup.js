@@ -1,31 +1,26 @@
 const { Model, DataTypes } = require('sequelize')
 
 module.exports = (sequelize) => {
-  class SchoolRelationshipType extends Model {
+  class SchoolRelationshipTypeGroup extends Model {
     static associate(models) {
-      SchoolRelationshipType.hasMany(models.SchoolRelationship, {
-        foreignKey: 'relationshipTypeId',
-        as: 'relationships'
-      })
-
-      SchoolRelationshipType.belongsTo(models.SchoolRelationshipTypeGroup, {
+      SchoolRelationshipTypeGroup.hasMany(models.SchoolRelationshipType, {
         foreignKey: 'relationshipTypeGroupId',
-        as: 'relationshipTypeGroup'
+        as: 'relationshipTypes'
       })
 
-      SchoolRelationshipType.belongsTo(models.User, {
+      SchoolRelationshipTypeGroup.belongsTo(models.User, {
         foreignKey: 'createdById',
         as: 'createdByUser'
       })
 
-      SchoolRelationshipType.belongsTo(models.User, {
+      SchoolRelationshipTypeGroup.belongsTo(models.User, {
         foreignKey: 'updatedById',
         as: 'updatedByUser'
       })
     }
   }
 
-  SchoolRelationshipType.init(
+  SchoolRelationshipTypeGroup.init(
     {
       id: {
         type: DataTypes.UUID,
@@ -39,11 +34,6 @@ module.exports = (sequelize) => {
       },
       description: {
         type: DataTypes.STRING
-      },
-      relationshipTypeGroupId: {
-        type: DataTypes.UUID,
-        allowNull: false,
-        field: 'relationship_type_group_id'
       },
       createdAt: {
         type: DataTypes.DATE,
@@ -76,11 +66,11 @@ module.exports = (sequelize) => {
     },
     {
       sequelize,
-      modelName: 'SchoolRelationshipType',
-      tableName: 'school_relationship_types',
+      modelName: 'SchoolRelationshipTypeGroup',
+      tableName: 'school_relationship_type_groups',
       timestamps: true
     }
   )
 
-  return SchoolRelationshipType
+  return SchoolRelationshipTypeGroup
 }

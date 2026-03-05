@@ -1,18 +1,18 @@
-id,name,description
-58908425-a91c-47df-9efc-6ef98ee71c22,Closure,Closure
-11293967-946f-4752-9498-c0225f36c39a,Expansion,Expansion
-bf540baf-a9fd-430a-b6c2-c89d204c1a06,Merged - change in age range,Merged
-ad202a11-8763-4c4a-a75b-266c47e06544,Merged - expansion in school capacity and changer in age range,Merged
-57d619ab-802b-4131-a1b7-85e0158c3a57,Merged - expansion of school capacity,Merged
-56429a60-8353-4f3f-8f7e-be47811f90f2,Other,Other
-ee24fe0e-5a95-4a72-a075-b0a019076d85,Predecessor,Predecessor
-dd91eabf-26c5-46a8-b92c-3e5705643eea,Predecessor - amalgamated,Predecessor
-4bcdc59b-8b59-4c62-b29b-1f055aad8d32,Predecessor - merged,Predecessor
-10f23464-af67-471b-9bfd-80de1452c9dd,Predecessor - Split School,Predecessor
-08513c6f-a29d-447a-ab7f-37d01ec72248,Result of Amalgamation,
-69598c93-f9fa-4ae4-9fe6-8a019e5b872e,Sixth Form Centre Link,
-c1fcbdb5-df58-4bf6-a2c7-1ec5f9bf9d29,Sixth Form Centre School,
-01cb1950-2995-489d-84a2-c0ebae4e6a6a,Successor,Successor
-fdcb89af-de8f-4611-bb16-3b8f81e8ad33,Successor - amalgamated,Successor
-bdc293b9-3c7d-4433-9e39-fdaf96e02d8c,Successor - merged,Successor
-8d279cf4-bcfd-4f7d-aaca-b4c6548872ee,Successor - Split School,Successor
+id,name,description,school_relationship_type_group_id
+58908425-a91c-47df-9efc-6ef98ee71c22,Closure,,1b7819a9-ad66-4347-9773-962df6e2abd7
+11293967-946f-4752-9498-c0225f36c39a,Expansion,,1b7819a9-ad66-4347-9773-962df6e2abd7
+bf540baf-a9fd-430a-b6c2-c89d204c1a06,Merged - change in age range,,1b7819a9-ad66-4347-9773-962df6e2abd7
+ad202a11-8763-4c4a-a75b-266c47e06544,Merged - expansion in school capacity and changer in age range,,1b7819a9-ad66-4347-9773-962df6e2abd7
+57d619ab-802b-4131-a1b7-85e0158c3a57,Merged - expansion of school capacity,,1b7819a9-ad66-4347-9773-962df6e2abd7
+56429a60-8353-4f3f-8f7e-be47811f90f2,Other,,1b7819a9-ad66-4347-9773-962df6e2abd7
+ee24fe0e-5a95-4a72-a075-b0a019076d85,Predecessor,,8398db09-b7ed-455d-a3f5-be4b679894bc
+dd91eabf-26c5-46a8-b92c-3e5705643eea,Predecessor - amalgamated,,8398db09-b7ed-455d-a3f5-be4b679894bc
+4bcdc59b-8b59-4c62-b29b-1f055aad8d32,Predecessor - merged,,8398db09-b7ed-455d-a3f5-be4b679894bc
+10f23464-af67-471b-9bfd-80de1452c9dd,Predecessor - Split School,,8398db09-b7ed-455d-a3f5-be4b679894bc
+08513c6f-a29d-447a-ab7f-37d01ec72248,Result of Amalgamation,,1b7819a9-ad66-4347-9773-962df6e2abd7
+69598c93-f9fa-4ae4-9fe6-8a019e5b872e,Sixth Form Centre Link,,1b7819a9-ad66-4347-9773-962df6e2abd7
+c1fcbdb5-df58-4bf6-a2c7-1ec5f9bf9d29,Sixth Form Centre School,,1b7819a9-ad66-4347-9773-962df6e2abd7
+01cb1950-2995-489d-84a2-c0ebae4e6a6a,Successor,,156e4099-9891-4394-8d19-f7c313c5124f
+fdcb89af-de8f-4611-bb16-3b8f81e8ad33,Successor - amalgamated,,156e4099-9891-4394-8d19-f7c313c5124f
+bdc293b9-3c7d-4433-9e39-fdaf96e02d8c,Successor - merged,,156e4099-9891-4394-8d19-f7c313c5124f
+8d279cf4-bcfd-4f7d-aaca-b4c6548872ee,Successor - Split School,,156e4099-9891-4394-8d19-f7c313c5124f
