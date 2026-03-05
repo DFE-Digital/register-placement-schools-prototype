@@ -112,7 +112,7 @@
         <p class="govuk-body govuk-!-margin-top-3">
           <a href="https://www.openstreetmap.org/?mlat={{ placementSchool.address.latitude }}&mlon={{ placementSchool.address.longitude }}&zoom=17"
             target="_blank"
-            rel="noreferrer"
+            rel="noreferrer nofollow"
             class="govuk-link">
             View school on map (opens in new tab)
           </a>
@@ -204,7 +204,12 @@
     }) }}
 
     <p class="govuk-body">
-      <a href="https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/{{placementSchool.urn}}" target="_blank" rel="noreferrer nofollow" class="govuk-link">View school on Get information about schools (opens in new tab)</a>
+      <a href="https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/{{placementSchool.urn}}"
+        target="_blank"
+        rel="noreferrer nofollow"
+        class="govuk-link">
+        View school on Get information about schools (opens in new tab)
+      </a>
     </p>
 
     {% if placementSchool.relatedSchoolGroups and placementSchool.relatedSchoolGroups.length %}
