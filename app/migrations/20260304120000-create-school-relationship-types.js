@@ -14,6 +14,14 @@ module.exports = {
       description: {
         type: Sequelize.STRING
       },
+      relationship_type_group_id: {
+        type: Sequelize.UUID,
+        allowNull: false,
+        references: {
+          model: 'school_relationship_type_groups',
+          key: 'id'
+        }
+      },
       created_at: {
         type: Sequelize.DATE,
         allowNull: false,
