@@ -109,22 +109,22 @@
 
         {% set addressHtml -%}
           {% if placement.school.address.line1.length %}
-            {{ placement.school.address.line1 }}<br>
+            {{ placement.school.address.line1 }}<br aria-hidden="true">
           {% endif %}
           {% if placement.school.address.line2.length %}
-            {{ placement.school.address.line2 }}<br>
+            {{ placement.school.address.line2 }}<br aria-hidden="true">
           {% endif %}
           {% if placement.school.address.line3.length %}
-            {{ placement.school.address.line3 }}<br>
+            {{ placement.school.address.line3 }}<br aria-hidden="true">
           {% endif %}
           {% if placement.school.address.town.length %}
-            {{ placement.school.address.town }}<br>
+            {{ placement.school.address.town }}<br aria-hidden="true">
           {% endif %}
           {% if placement.school.address.county.length %}
-            {{ placement.school.address.county }}<br>
+            {{ placement.school.address.county }}<br aria-hidden="true">
           {% endif %}
           {% if placement.school.address.postcode.length %}
-            {{ placement.school.address.postcode }}<br>
+            {{ placement.school.address.postcode }}
           {% endif %}
         {%- endset %}
 

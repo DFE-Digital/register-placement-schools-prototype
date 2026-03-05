@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block content %}
-
+{{placementSchool|dump|safe}}
 {% include "_includes/notification-banner.njk" %}
 
 <div class="govuk-grid-row">
@@ -91,22 +91,22 @@
 
     {% set addressHtml -%}
       {% if placementSchool.address.line1.length %}
-        {{ placementSchool.address.line1 }}<br>
+        {{ placementSchool.address.line1 }}<br aria-hidden="true">
       {% endif %}
       {% if placementSchool.address.line2.length %}
-        {{ placementSchool.address.line2 }}<br>
+        {{ placementSchool.address.line2 }}<br aria-hidden="true">
       {% endif %}
       {% if placementSchool.address.line3.length %}
-        {{ placementSchool.address.line3 }}<br>
+        {{ placementSchool.address.line3 }}<br aria-hidden="true">
       {% endif %}
       {% if placementSchool.address.town.length %}
-        {{ placementSchool.address.town }}<br>
+        {{ placementSchool.address.town }}<br aria-hidden="true">
       {% endif %}
       {% if placementSchool.address.county.length %}
-        {{ placementSchool.address.county }}<br>
+        {{ placementSchool.address.county }}<br aria-hidden="true">
       {% endif %}
       {% if placementSchool.address.postcode.length %}
-        {{ placementSchool.address.postcode }}<br>
+        {{ placementSchool.address.postcode }}
       {% endif %}
     {%- endset %}
 
