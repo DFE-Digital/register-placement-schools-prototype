@@ -61,9 +61,9 @@
         {% endif %}
 
         {% set nameHtml %}
-          {# <a href="{{ actions.view }}/{{ placement.school.id }}" class="govuk-link"> #}
+          <a href="/results?q=school&schoolId={{ placement.school.id }}&from=location" class="govuk-link">
             {{ placement.school.name }}
-          {# </a> #}
+          </a>
           {{ govukTag({
             text: placement.school.status if placement.school.status.length else "Not known",
             classes: tagClass + " govuk-tag--no-max-width govuk-!-margin-left-1"

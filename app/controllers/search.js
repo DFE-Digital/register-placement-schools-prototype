@@ -398,6 +398,13 @@ exports.results_get = async (req, res, next) => {
         req.session.data.school = { id: req.query.schoolId }
       }
 
+      const from = (req.query.from ?? '').toString()
+      const backLink = from === 'location'
+        ? '/results?q=location'
+        : from === 'provider'
+          ? '/results?q=provider'
+          : null
+
       const { search, school } = req.session.data ?? {}
       if (!school?.id) return res.redirect('/search/school')
       const placementSchool = await getPlacementSchoolDetails(school.id)
@@ -407,6 +414,8 @@ exports.results_get = async (req, res, next) => {
         q,
         search,
         placementSchool,
+        backLink,
+        showSearchAgain: !backLink,
         actions: { newSearch: '/search' }
       })
     }
