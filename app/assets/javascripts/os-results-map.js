@@ -64,7 +64,7 @@
   })
 
   window.L.tileLayer(
-    `https://api.os.uk/maps/raster/v1/zxy/Light_3857/{z}/{x}/{y}.png?key=${apiKey}`,
+    `https://api.os.uk/maps/raster/v1/zxy/Outdoor_3857/{z}/{x}/{y}.png?key=${apiKey}`,
     {
       maxZoom: 20,
       attribution:
