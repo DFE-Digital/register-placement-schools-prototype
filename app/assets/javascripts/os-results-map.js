@@ -63,6 +63,10 @@
     scrollWheelZoom: false
   })
 
+  if (map.attributionControl) {
+    map.attributionControl.setPrefix('')
+  }
+
   window.L.tileLayer(
     `https://api.os.uk/maps/raster/v1/zxy/Outdoor_3857/{z}/{x}/{y}.png?key=${apiKey}`,
     {
