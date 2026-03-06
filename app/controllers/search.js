@@ -141,6 +141,10 @@ exports.searchLocation_post = async (req, res) => {
 exports.searchSchool_get = async (req, res) => {
   delete req.session.data.location
   delete req.session.data.provider
+  if (req.query.clear) {
+    delete req.session.data.search
+    delete req.session.data.school
+  }
 
   const { search } = req.session.data
 

@@ -13,6 +13,11 @@
       text: "Back to search results",
       href: backLink
     }) }}
+  {% else %}
+    {{ govukBackLink({
+      text: "Back to school search",
+      href: "/search/school?clear=true"
+    }) }}
   {% endif %}
 {% endblock %}
 
@@ -50,12 +55,6 @@
       <p class="govuk-hint">
         {% if placementSchool.ukprn.length %}<b><abbr title="UK provider reference number">UKPRN</abbr>:</b> {{ placementSchool.ukprn }}{% endif %}
         {% if placementSchool.urn.length %}<b><abbr title="unique reference number">URN</abbr>:</b> {{ placementSchool.urn }}{% endif %}
-      </p>
-    {% endif %}
-
-    {% if showSearchAgain %}
-      <p class="govuk-body govuk-!-margin-top-5">
-        <a class="govuk-link" href="{{ actions.newSearch }}">Search again</a>
       </p>
     {% endif %}
 
