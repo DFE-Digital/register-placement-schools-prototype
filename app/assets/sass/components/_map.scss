@@ -1,0 +1,33 @@
+.app-results-map {
+  border: 1px solid $govuk-border-colour;
+  height: 360px;
+  margin-bottom: govuk-spacing(5);
+  width: 99.5%;
+}
+
+.app-map-key {
+  display: flex;
+  flex-direction: column;
+  gap: govuk-spacing(2);
+  margin: 0 0 govuk-spacing(6);
+  padding: 0;
+  list-style: none;
+}
+
+.app-map-key__item {
+  display: flex;
+  align-items: bottom;
+  gap: govuk-spacing(2);
+}
+
+.app-map-key__pin {
+  display: inline-flex;
+  width: 20px;
+  height: 28px;
+}
+
+.app-map-key__label {
+  display: inline-flex;
+  align-items: bottom;
+  min-height: 28px;
+}
