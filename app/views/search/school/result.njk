@@ -154,6 +154,7 @@
           status: placementSchool.status
         }] | dump | safe
       }}</script>
+      {% include "_includes/map-key.njk" %}
     {% endif %}
 
     {{ govukSummaryList({

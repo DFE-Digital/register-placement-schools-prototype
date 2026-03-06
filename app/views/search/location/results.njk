@@ -52,6 +52,7 @@
     {% if osMapsApiKey and osMapPoints.length %}
       <div class="app-results-map" id="results-map" data-os-api-key="{{ osMapsApiKey }}"></div>
       <script type="application/json" id="os-map-points">{{ osMapPoints | dump | safe }}</script>
+      {% include "_includes/map-key.njk" %}
     {% endif %}
 
     {% if placements.length %}
