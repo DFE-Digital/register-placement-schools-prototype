@@ -59,42 +59,99 @@
     return iconCache.get(cacheKey)
   }
 
-  const map = window.L.map(mapElement, {
-    scrollWheelZoom: false
-  })
+  const buildMap = (element, { scrollWheelZoom }) => {
+    if (!element) return null
 
-  if (map.attributionControl) {
-    map.attributionControl.setPrefix('')
+    const map = window.L.map(element, {
+      scrollWheelZoom
+    })
+
+    if (map.attributionControl) {
+      map.attributionControl.setPrefix('')
+    }
+
+    window.L.tileLayer(
+      `https://api.os.uk/maps/raster/v1/zxy/Outdoor_3857/{z}/{x}/{y}.png?key=${apiKey}`,
+      {
+        maxZoom: 20,
+        attribution:
+          '&copy; Crown copyright and database rights 2026 Ordnance Survey'
+      }
+    ).addTo(map)
+
+    const bounds = window.L.latLngBounds()
+
+    points.forEach((point) => {
+      if (typeof point.lat !== 'number' || typeof point.lon !== 'number') return
+
+      const marker = window.L.marker([point.lat, point.lon], {
+        icon: getStatusIcon(point.status)
+      }).addTo(map)
+      if (point.name) {
+        marker.bindPopup(point.name)
+      }
+      bounds.extend([point.lat, point.lon])
+    })
+
+    if (points.length === 1) {
+      map.setView([points[0].lat, points[0].lon], 13)
+    } else if (bounds.isValid()) {
+      map.fitBounds(bounds, { padding: [20, 20] })
+    } else {
+      map.setView([points[0].lat, points[0].lon], 12)
+    }
+
+    return map
   }
 
-  window.L.tileLayer(
-    `https://api.os.uk/maps/raster/v1/zxy/Outdoor_3857/{z}/{x}/{y}.png?key=${apiKey}`,
-    {
-      maxZoom: 20,
-      attribution:
-        '&copy; Crown copyright and database rights 2026 Ordnance Survey'
+  const mainMap = buildMap(mapElement, { scrollWheelZoom: false })
+
+  const modalElement = document.getElementById('map-modal')
+  const modalMapElement = document.getElementById('results-map-modal')
+  const openButton = document.querySelector('[data-map-modal-open]')
+  const closeButtons = modalElement
+    ? modalElement.querySelectorAll('[data-map-modal-close]')
+    : []
+
+  if (!modalElement || !openButton || !modalMapElement) return
+
+  let modalMap = null
+  let lastFocusedElement = null
+
+  const openModal = () => {
+    lastFocusedElement = document.activeElement
+    modalElement.hidden = false
+    document.body.classList.add('app-map-modal-open')
+
+    if (!modalMap) {
+      modalMap = buildMap(modalMapElement, { scrollWheelZoom: true })
+    } else {
+      modalMap.invalidateSize()
     }
-  ).addTo(map)
 
-  const bounds = window.L.latLngBounds()
-
-  points.forEach((point) => {
-    if (typeof point.lat !== 'number' || typeof point.lon !== 'number') return
-
-    const marker = window.L.marker([point.lat, point.lon], {
-      icon: getStatusIcon(point.status)
-    }).addTo(map)
-    if (point.name) {
-      marker.bindPopup(point.name)
+    const closeButton = modalElement.querySelector('[data-map-modal-close]')
+    if (closeButton) {
+      closeButton.focus()
     }
-    bounds.extend([point.lat, point.lon])
+  }
+
+  const closeModal = () => {
+    modalElement.hidden = true
+    document.body.classList.remove('app-map-modal-open')
+    if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
+      lastFocusedElement.focus()
+    }
+  }
+
+  openButton.addEventListener('click', openModal)
+  closeButtons.forEach((button) => {
+    button.addEventListener('click', closeModal)
   })
 
-  if (points.length === 1) {
-    map.setView([points[0].lat, points[0].lon], 13)
-  } else if (bounds.isValid()) {
-    map.fitBounds(bounds, { padding: [20, 20] })
-  } else {
-    map.setView([points[0].lat, points[0].lon], 12)
-  }
+  modalElement.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      event.preventDefault()
+      closeModal()
+    }
+  })
 })()

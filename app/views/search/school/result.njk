@@ -145,6 +145,15 @@
     {% endset %}
 
     {% if osMapsApiKey and placementSchool.address.latitude and placementSchool.address.longitude %}
+      {# <div class="app-map-actions">
+        <button
+          type="button"
+          class="govuk-button govuk-button--secondary app-map-actions__button"
+          data-map-modal-open
+          aria-controls="map-modal">
+          Open full-screen map
+        </button>
+      </div> #}
       <div class="app-results-map" id="results-map" data-os-api-key="{{ osMapsApiKey }}"></div>
       <script type="application/json" id="os-map-points">{{
         [{
@@ -155,6 +164,28 @@
         }] | dump | safe
       }}</script>
       {% include "_includes/map-key.njk" %}
+      {# <div class="app-map-modal" id="map-modal" hidden>
+        <div class="app-map-modal__overlay" data-map-modal-close></div>
+        <div
+          class="app-map-modal__dialog"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="map-modal-title">
+          <div class="app-map-modal__header">
+            <h2 class="govuk-heading-m" id="map-modal-title">Map</h2>
+            <button
+              type="button"
+              class="govuk-button govuk-button--secondary app-map-modal__close"
+              data-map-modal-close>
+              Close map
+            </button>
+          </div>
+          <div class="app-map-modal__body">
+            <div class="app-results-map app-results-map--modal" id="results-map-modal" data-os-api-key="{{ osMapsApiKey }}"></div>
+            {% include "_includes/map-key.njk" %}
+          </div>
+        </div>
+      </div> #}
     {% endif %}
 
     {{ govukSummaryList({
