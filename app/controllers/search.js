@@ -603,7 +603,7 @@ exports.schoolSuggestions_json = async (req, res) => {
         { '$schoolAddress.postcode$': { [Op.like]: `%${query}%` } }
       ]
     },
-    order: [['name', 'ASC']]
+    order: [['name', 'ASC'],['urn', 'DESC']]
   })
 
   res.json(schools)
