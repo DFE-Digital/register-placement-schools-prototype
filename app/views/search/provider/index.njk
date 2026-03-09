@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   const formatReferences = (provider) => {
     const references = [formatUkprn(provider), formatUrn(provider)].filter(Boolean);
-    return references.join(', ');
+    return references.join(' • ');
   };
 
   const formatInputValue = (provider) => formatOperatingName(provider);
