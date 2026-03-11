@@ -62,22 +62,22 @@
 
     {% set addressHtml %}
       {% if placementSchool.schoolAddress.line1.length %}
-        {{ placementSchool.schoolAddress.line1 }}<br>
+        {{ placementSchool.schoolAddress.line1 }}<br aria-hidden="true">
       {% endif %}
       {% if placementSchool.schoolAddress.line2.length %}
-        {{ placementSchool.schoolAddress.line2 }}<br>
+        {{ placementSchool.schoolAddress.line2 }}<br aria-hidden="true">
       {% endif %}
       {% if placementSchool.schoolAddress.line3.length %}
-        {{ placementSchool.schoolAddress.line3 }}<br>
+        {{ placementSchool.schoolAddress.line3 }}<br aria-hidden="true">
       {% endif %}
       {% if placementSchool.schoolAddress.town.length %}
-        {{ placementSchool.schoolAddress.town }}<br>
+        {{ placementSchool.schoolAddress.town }}<br aria-hidden="true">
       {% endif %}
       {% if placementSchool.schoolAddress.county.length %}
-        {{ placementSchool.schoolAddress.county }}<br>
+        {{ placementSchool.schoolAddress.county }}<br aria-hidden="true">
       {% endif %}
       {% if placementSchool.schoolAddress.postcode.length %}
-        {{ placementSchool.schoolAddress.postcode }}<br>
+        {{ placementSchool.schoolAddress.postcode }}
       {% endif %}
     {% endset %}
 

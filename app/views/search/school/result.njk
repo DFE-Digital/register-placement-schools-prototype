@@ -2,11 +2,21 @@
 
 {% set title = placementSchool.name %}
 
+{% block head %}
+  {{ super() }}
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+{% endblock %}
+
 {% block beforeContent %}
   {% if backLink %}
     {{ govukBackLink({
       text: "Back to search results",
       href: backLink
+    }) }}
+  {% else %}
+    {{ govukBackLink({
+      text: "Back to school search",
+      href: "/search/school?clear=true"
     }) }}
   {% endif %}
 {% endblock %}
@@ -48,12 +58,6 @@
       </p>
     {% endif %}
 
-    {% if showSearchAgain %}
-      <p class="govuk-body govuk-!-margin-top-5">
-        <a class="govuk-link" href="{{ actions.newSearch }}">Search again</a>
-      </p>
-    {% endif %}
-
     {% set urnHtml %}
       <ul class="govuk-list">
         <li>
@@ -91,23 +95,33 @@
 
     {% set addressHtml -%}
       {% if placementSchool.address.line1.length %}
-        {{ placementSchool.address.line1 }}<br>
+        {{ placementSchool.address.line1 }}<br aria-hidden="true">
       {% endif %}
       {% if placementSchool.address.line2.length %}
-        {{ placementSchool.address.line2 }}<br>
+        {{ placementSchool.address.line2 }}<br aria-hidden="true">
       {% endif %}
       {% if placementSchool.address.line3.length %}
-        {{ placementSchool.address.line3 }}<br>
+        {{ placementSchool.address.line3 }}<br aria-hidden="true">
       {% endif %}
       {% if placementSchool.address.town.length %}
-        {{ placementSchool.address.town }}<br>
+        {{ placementSchool.address.town }}<br aria-hidden="true">
       {% endif %}
       {% if placementSchool.address.county.length %}
-        {{ placementSchool.address.county }}<br>
+        {{ placementSchool.address.county }}<br aria-hidden="true">
       {% endif %}
       {% if placementSchool.address.postcode.length %}
-        {{ placementSchool.address.postcode }}<br>
+        {{ placementSchool.address.postcode }}
       {% endif %}
+      {# {% if placementSchool.address.latitude and placementSchool.address.longitude %}
+        <p class="govuk-body govuk-!-margin-top-3">
+          <a href="https://www.openstreetmap.org/?mlat={{ placementSchool.address.latitude }}&mlon={{ placementSchool.address.longitude }}&zoom=17"
+            target="_blank"
+            rel="noreferrer nofollow"
+            class="govuk-link">
+            View school on map (opens in new tab)
+          </a>
+        </p>
+      {% endif %} #}
     {%- endset %}
 
     {% set academicYearsHtml %}
@@ -128,6 +142,50 @@
         <p class="govuk-body">The school has not hosted any trainees</p>
       {% endif %}
     {% endset %}
+
+    {% if osMapsApiKey and placementSchool.address.latitude and placementSchool.address.longitude %}
+      {# <div class="app-map-actions">
+        <button
+          type="button"
+          class="govuk-button govuk-button--secondary app-map-actions__button"
+          data-map-modal-open
+          aria-controls="map-modal">
+          Open full-screen map
+        </button>
+      </div> #}
+      <div class="app-results-map" id="results-map" data-os-api-key="{{ osMapsApiKey }}"></div>
+      <script type="application/json" id="os-map-points">{{
+        [{
+          lat: placementSchool.address.latitude,
+          lon: placementSchool.address.longitude,
+          name: placementSchool.name,
+          status: placementSchool.status
+        }] | dump | safe
+      }}</script>
+      {% include "_includes/map-key.njk" %}
+      {# <div class="app-map-modal" id="map-modal" hidden>
+        <div class="app-map-modal__overlay" data-map-modal-close></div>
+        <div
+          class="app-map-modal__dialog"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="map-modal-title">
+          <div class="app-map-modal__header">
+            <h2 class="govuk-heading-m" id="map-modal-title">Map</h2>
+            <button
+              type="button"
+              class="govuk-button govuk-button--secondary app-map-modal__close"
+              data-map-modal-close>
+              Close map
+            </button>
+          </div>
+          <div class="app-map-modal__body">
+            <div class="app-results-map app-results-map--modal" id="results-map-modal" data-os-api-key="{{ osMapsApiKey }}"></div>
+            {% include "_includes/map-key.njk" %}
+          </div>
+        </div>
+      </div> #}
+    {% endif %}
 
     {{ govukSummaryList({
       rows: [
@@ -194,7 +252,12 @@
     }) }}
 
     <p class="govuk-body">
-      <a href="https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/{{placementSchool.urn}}" target="_blank" rel="noreferrer nofollow" class="govuk-link">View school on Get information about schools (opens in new tab)</a>
+      <a href="https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/{{placementSchool.urn}}"
+        target="_blank"
+        rel="noreferrer nofollow"
+        class="govuk-link">
+        View school on Get information about schools (opens in new tab)
+      </a>
     </p>
 
     {% if placementSchool.relatedSchoolGroups and placementSchool.relatedSchoolGroups.length %}
@@ -215,4 +278,11 @@
   </div>
 </div>
 
+{% endblock %}
+
+{% block pageScripts %}
+  {% if osMapsApiKey and placementSchool.address.latitude and placementSchool.address.longitude %}
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="/public/javascripts/os-results-map.js"></script>
+  {% endif %}
 {% endblock %}

@@ -32,6 +32,17 @@ const {
   normaliseAcademicYears
 } = require('../helpers/search')
 
+const buildOsMapPoints = (placements) => (
+  (placements || [])
+    .map((placement) => ({
+      lat: placement?.school?.address?.latitude,
+      lon: placement?.school?.address?.longitude,
+      name: placement?.school?.name || null,
+      status: placement?.school?.status || null
+    }))
+    .filter((point) => typeof point.lat === 'number' && typeof point.lon === 'number')
+)
+
 exports.search_get = async (req, res) => {
   delete req.session.data.search
   delete req.session.data.filters
@@ -130,6 +141,10 @@ exports.searchLocation_post = async (req, res) => {
 exports.searchSchool_get = async (req, res) => {
   delete req.session.data.location
   delete req.session.data.provider
+  if (req.query.clear) {
+    delete req.session.data.search
+    delete req.session.data.school
+  }
 
   const { search } = req.session.data
 
@@ -286,10 +301,14 @@ exports.results_get = async (req, res, next) => {
         keywords
       )
 
+      const osMapPoints = buildOsMapPoints(placements)
+
       return res.render('search/location/results', {
         location: { name: place.name, lat, lng },
         placements,
         pagination,
+        osMapPoints,
+        osMapsApiKey: process.env.ORDNANCE_SURVEY_API_KEY,
         keywords,
         hasSearch,
         hasFilters,
@@ -363,10 +382,14 @@ exports.results_get = async (req, res, next) => {
         keywords
       )
 
+      const osMapPoints = buildOsMapPoints(placements)
+
       return res.render('search/provider/results', {
         provider,
         placements,
         pagination,
+        osMapPoints,
+        osMapsApiKey: process.env.ORDNANCE_SURVEY_API_KEY,
         keywords,
         hasSearch,
         hasFilters,
@@ -414,6 +437,7 @@ exports.results_get = async (req, res, next) => {
         q,
         search,
         placementSchool,
+        osMapsApiKey: process.env.ORDNANCE_SURVEY_API_KEY,
         backLink,
         showSearchAgain: !backLink,
         actions: { newSearch: '/search' }
@@ -579,7 +603,7 @@ exports.schoolSuggestions_json = async (req, res) => {
         { '$schoolAddress.postcode$': { [Op.like]: `%${query}%` } }
       ]
     },
-    order: [['name', 'ASC']]
+    order: [['name', 'ASC'],['urn', 'DESC']]
   })
 
   res.json(schools)
