@@ -651,23 +651,23 @@ exports.locationDownload_csv = async (req, res, next) => {
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`)
 
     const header = [
-      'school name',
+      'school_name',
       'ukprn',
       'urn',
-      'school status',
-      'school group',
-      'school type',
-      'education phase',
-      'age range',
-      'address line 1',
-      'address line 2',
-      'address line 3',
+      'school_status',
+      'school_group',
+      'school_type',
+      'education_phase',
+      'age_range',
+      'address_line_1',
+      'address_line_2',
+      'address_line_3',
       'town',
       'county',
       'postcode',
-      'distance (miles)',
-      'academic years',
-      'GIAS URL'
+      'distance_miles',
+      'academic_years',
+      'GIAS_URL'
     ]
     res.write('\uFEFF')
     res.write(header.map(csvEscape).join(',') + '\r\n')
@@ -823,23 +823,23 @@ exports.providerDownload_csv = async (req, res, next) => {
 
     // BOM + header row
     const header = [
-      'provider name',
-      'school name',
+      'provider_name',
+      'school_name',
       'ukprn',
       'urn',
-      'school status',
-      'school group',
-      'school type',
-      'education phase',
-      'age range',
-      'address line 1',
-      'address line 2',
-      'address line 3',
+      'school_status',
+      'school_group',
+      'school_type',
+      'education_phase',
+      'age_range',
+      'address_line_1',
+      'address_line_2',
+      'address_line_3',
       'town',
       'county',
       'postcode',
-      'academic years',
-      'GIAS URL'
+      'academic_years',
+      'GIAS_URL'
     ]
     res.write('\uFEFF') // UTF-8 BOM for Excel
     res.write(header.map(csvEscape).join(',') + '\r\n')
