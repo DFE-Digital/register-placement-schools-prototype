@@ -171,6 +171,44 @@
   {% endif %}
 {% endif %}
 
+{% if filterPlacementSubjectItems.length %}
+  {% if filterPlacementSubjectItems.length > 5 %}
+    {{ appCheckboxFilter({
+      id: "filters-placement-subject",
+      name: "filters[placementSubject]",
+      fieldset: {
+        legend: {
+          html: 'Placement subject<span class="govuk-visually-hidden"> filter</span>',
+          isPageHeading: false,
+          classes: "govuk-fieldset__legend--s"
+        }
+      },
+      values: selectedPlacementSubject,
+      items: filterPlacementSubjectItems,
+      showSelectedTags: false,
+      classes: "govuk-!-margin-bottom-7"
+    }) }}
+  {% else %}
+    {{ govukCheckboxes({
+      id: "filters-placement-subject",
+      name: "filters[placementSubject]",
+      fieldset: {
+        legend: {
+          html: 'Placement subject<span class="govuk-visually-hidden"> filter</span>',
+          isPageHeading: false,
+          classes: "govuk-fieldset__legend--s"
+        }
+      },
+      formGroup: {
+        classes: "app-filter__group"
+      },
+      classes: "govuk-checkboxes--small",
+      values: selectedPlacementSubject,
+      items: filterPlacementSubjectItems
+    }) }}
+  {% endif %}
+{% endif %}
+
 {% if filterAcademicYearItems.length %}
   {% if filterAcademicYearItems.length > 5 %}
     {{ appCheckboxFilter({

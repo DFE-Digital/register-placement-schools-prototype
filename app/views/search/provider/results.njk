@@ -151,6 +151,18 @@
           {% endif %}
         {% endset %}
 
+        {% set placementSubjectsHtml %}
+          {% if placement.placementSubjects.length %}
+            <ul class="govuk-list govuk-list--bullet">
+              {% for subject in placement.placementSubjects %}
+                <li>{{ subject }}</li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="govuk-body">Not known</p>
+          {% endif %}
+        {% endset %}
+
         {{ govukSummaryList({
           card: {
             title: {
@@ -216,6 +228,14 @@
               },
               value: {
                 html: educationPhaseHtml
+              }
+            },
+            {
+              key: {
+                text: "Placement subjects"
+              },
+              value: {
+                html: placementSubjectsHtml
               }
             },
             {
