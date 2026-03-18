@@ -73,7 +73,7 @@ window.GOVUKPrototypeKit.documentReady(() => {
   if (placementSubjectContainer) {
     const checkboxFilterPlacementSubject = new CheckboxFilter({
       container: placementSubjectContainer,
-      textBox: { label: 'Search for placement subject' }
+      textBox: { label: 'Search for subject' }
     })
     checkboxFilterPlacementSubject.init()
   }

@@ -440,7 +440,7 @@ const providerSelectedFilterConfig = (sel) => ([
   },
   {
     key: 'placementSubject',
-    heading: 'Placement subject',
+    heading: 'Subject',
     selected: sel.placementSubject,
     labelGetter: getSubjectLabel,
     removeHref: (code) => `/results/remove-placement-subject-filter/${code}`
