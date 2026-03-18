@@ -263,19 +263,29 @@ const getPlacementSchoolDetails = async (schoolId) => {
         groupedByYear[academicYear.id] = {
           id: academicYear.id,
           name: academicYear.name,
-          providers: []
+          providers: [],
+          providerIds: new Set()
         }
       }
-      groupedByYear[academicYear.id].providers.push({
-        id: provider.id,
-        name: provider.operatingName,
-        ukprn: provider.ukprn,
-        urn: provider.urn,
-        type: provider.type
-      })
+      const yearGroup = groupedByYear[academicYear.id]
+      if (!yearGroup.providerIds.has(provider.id)) {
+        yearGroup.providerIds.add(provider.id)
+        yearGroup.providers.push({
+          id: provider.id,
+          name: provider.operatingName,
+          ukprn: provider.ukprn,
+          urn: provider.urn,
+          type: provider.type
+        })
+      }
     })
 
-    const academicYears = Object.values(groupedByYear).sort((a, b) => b.name.localeCompare(a.name))
+    const academicYears = Object.values(groupedByYear)
+      .map((year) => {
+        delete year.providerIds
+        return year
+      })
+      .sort((a, b) => b.name.localeCompare(a.name))
 
     const schoolRelationships = await SchoolRelationship.findAll({
       where: {

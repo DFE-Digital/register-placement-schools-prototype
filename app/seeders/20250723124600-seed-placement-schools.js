@@ -33,7 +33,13 @@ module.exports = {
         const placementSchoolId = uuidv4()
         const providerId = placementSchool.partnerId ? placementSchool.partnerId : placementSchool.providerId
 
-        if (!providerId || !placementSchool.schoolId || !placementSchool.academicYearId) continue
+        if (
+          !providerId ||
+          !placementSchool.schoolId ||
+          !placementSchool.academicYearId ||
+          !placementSchool.subjectId
+        )
+          continue
 
         // const revisionNumber = 1
 
@@ -43,6 +49,7 @@ module.exports = {
           school_id: placementSchool.schoolId,
           provider_id: providerId,
           academic_year_id: placementSchool.academicYearId,
+          subject_id: placementSchool.subjectId,
           created_at: createdAt,
           created_by_id: userId,
           updated_at: createdAt,
