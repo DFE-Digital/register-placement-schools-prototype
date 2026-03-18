@@ -16,6 +16,7 @@ const {
   SchoolReligiousCharacter,
   SchoolStatus,
   SchoolType,
+  Subject,
   SchoolRelationship,
   SchoolRelationshipType,
   SchoolRelationshipTypeGroup
@@ -50,6 +51,7 @@ const getDistanceInMiles = (lat1, lng1, lat2, lng2) => {
  * @param {number} [selectedSchoolStatus=null] - School status code
  * @param {number} [selectedSchoolEducationPhase=null] - School education phase code
  * @param {string[]|null} [selectedAcademicYear=null] - Academic year code(s)
+ * @param {string[]|null} [selectedPlacementSubject=null] - Placement subject code(s)
  * @param {string} [keywords=null] - Keyword search
  * @returns {Promise<{ placements: any[], pagination: Pagination }>}
  */
@@ -64,6 +66,7 @@ const getPlacementSchoolsByLocation = async (
   selectedSchoolStatus = null,
   selectedSchoolEducationPhase = null,
   selectedAcademicYear = null,
+  selectedPlacementSubject = null,
   keywords=null
 ) => {
   try {
@@ -118,6 +121,26 @@ const getPlacementSchoolsByLocation = async (
       }
     }
 
+    if (selectedPlacementSubject?.length) {
+      const matchingRows = await PlacementSchool.findAll({
+        where: { schoolId: filteredSchoolIds },
+        include: [{
+          model: Subject,
+          as: 'subject',
+          where: { code: { [Op.in]: selectedPlacementSubject } },
+          required: true
+        }],
+        attributes: ['schoolId'],
+        raw: true
+      })
+
+      filteredSchoolIds = [...new Set(matchingRows.map(row => row.schoolId))]
+      if (!filteredSchoolIds.length) {
+        const pagination = new Pagination([], 0, page, limit)
+        return { placements: pagination.getData(), pagination }
+      }
+    }
+
     const whereSchool = {}
 
     if (selectedSchoolType?.length) {
@@ -158,7 +181,8 @@ const getPlacementSchoolsByLocation = async (
             { model: SchoolDetail, as: 'schoolDetail' }
           ]
         },
-        { model: AcademicYear, as: 'academicYear' }
+        { model: AcademicYear, as: 'academicYear' },
+        { model: Subject, as: 'subject' }
       ]
     })
 
@@ -189,17 +213,26 @@ const getPlacementSchoolsByLocation = async (
             statutoryHighAge: s.schoolDetail ? s.schoolDetail.statutoryHighAge : null
           },
           distance,
-          academicYears: [p.academicYear.name]
+          academicYears: [p.academicYear.name],
+          placementSubjects: [p.subject?.name].filter(Boolean)
         })
       } else {
         const existing = schoolMap.get(key)
         if (!existing.academicYears.includes(p.academicYear.name)) {
           existing.academicYears.push(p.academicYear.name)
         }
+        if (p.subject?.name && !existing.placementSubjects.includes(p.subject.name)) {
+          existing.placementSubjects.push(p.subject.name)
+        }
       }
     }
 
-    const results = Array.from(schoolMap.values()).sort((a, b) => a.distance - b.distance)
+    const results = Array.from(schoolMap.values())
+      .map((row) => ({
+        ...row,
+        placementSubjects: (row.placementSubjects || []).sort((a, b) => a.localeCompare(b))
+      }))
+      .sort((a, b) => a.distance - b.distance)
     const pagedResults = results.slice(offset, offset + limit)
     const pagination = new Pagination(pagedResults, results.length, page, limit)
 
@@ -248,6 +281,7 @@ const getPlacementSchoolDetails = async (schoolId) => {
       where: { schoolId: school.id },
       include: [
         { model: AcademicYear, as: 'academicYear' },
+        { model: Subject, as: 'subject' },
         { model: Provider, as: 'provider' }
       ],
       order: [
@@ -286,6 +320,14 @@ const getPlacementSchoolDetails = async (schoolId) => {
         return year
       })
       .sort((a, b) => b.name.localeCompare(a.name))
+
+    const placementSubjects = Array.from(
+      new Set(
+        placementRelationships
+          .map(({ subject }) => subject?.name)
+          .filter(Boolean)
+      )
+    ).sort((a, b) => a.localeCompare(b))
 
     const schoolRelationships = await SchoolRelationship.findAll({
       where: {
@@ -397,6 +439,7 @@ const getPlacementSchoolDetails = async (schoolId) => {
         statutoryHighAge: school.schoolDetail?.statutoryHighAge || null
       },
       academicYears,
+      placementSubjects,
       relatedSchoolGroups
     }
   } catch (error) {
@@ -418,6 +461,7 @@ const getPlacementSchoolDetails = async (schoolId) => {
  * @param {number} [selectedSchoolStatus=null] - School status code
  * @param {number} [selectedSchoolEducationPhase=null] - School education phase code
  * @param {string[]|null} [selectedAcademicYear=null] - Academic year code(s)
+ * @param {string[]|null} [selectedPlacementSubject=null] - Placement subject code(s)
  * @param {string} [keywords=null] - Keyword search
  * @returns {Promise<Object|null>}
  */
@@ -431,6 +475,7 @@ const getPlacementSchoolsForProvider = async (
   selectedSchoolStatus = null,
   selectedSchoolEducationPhase = null,
   selectedAcademicYear = null,
+  selectedPlacementSubject = null,
   keywords = null
 ) => {
   try {
@@ -499,6 +544,40 @@ const getPlacementSchoolsForProvider = async (
       }
     }
 
+    if (selectedPlacementSubject?.length) {
+      const matchingRows = await PlacementSchool.findAll({
+        where: { providerId },
+        include: [{
+          model: Subject,
+          as: 'subject',
+          where: { code: { [Op.in]: selectedPlacementSubject } },
+          required: true
+        }],
+        attributes: ['schoolId'],
+        raw: true
+      })
+
+      const subjectSchoolIds = [...new Set(matchingRows.map(row => row.schoolId))]
+      filteredSchoolIds = filteredSchoolIds
+        ? filteredSchoolIds.filter((id) => subjectSchoolIds.includes(id))
+        : subjectSchoolIds
+
+      if (!filteredSchoolIds.length) {
+        const pagination = new Pagination([], 0, page, limit)
+        return {
+          provider: {
+            id: provider.id,
+            operatingName: provider.operatingName,
+            legalName: provider.legalName,
+            ukprn: provider.ukprn,
+            urn: provider.urn
+          },
+          placements: pagination.getData(),
+          pagination
+        }
+      }
+    }
+
     const placementRows = await PlacementSchool.findAll({
       where: {
         providerId,
@@ -506,6 +585,7 @@ const getPlacementSchoolsForProvider = async (
       },
       include: [
         { model: AcademicYear, as: 'academicYear', attributes: ['name'] },
+        { model: Subject, as: 'subject', attributes: ['name', 'code'] },
         {
           model: School,
           as: 'school',
@@ -552,19 +632,26 @@ const getPlacementSchoolsForProvider = async (
             statutoryHighAge: s.schoolDetail.statutoryHighAge || null,
             region: s.schoolDetail?.region?.name || null
           },
-          academicYears: [placement.academicYear.name]
+          academicYears: [placement.academicYear.name],
+          placementSubjects: [placement.subject?.name].filter(Boolean)
         })
       } else {
         const existing = schoolMap.get(s.id)
         if (!existing.academicYears.includes(placement.academicYear.name)) {
           existing.academicYears.push(placement.academicYear.name)
         }
+        if (placement.subject?.name && !existing.placementSubjects.includes(placement.subject.name)) {
+          existing.placementSubjects.push(placement.subject.name)
+        }
       }
     }
 
-    const allSchools = Array.from(schoolMap.values()).sort((a, b) =>
-      a.school.name.localeCompare(b.school.name)
-    )
+    const allSchools = Array.from(schoolMap.values())
+      .map((row) => ({
+        ...row,
+        placementSubjects: (row.placementSubjects || []).sort((a, b) => a.localeCompare(b))
+      }))
+      .sort((a, b) => a.school.name.localeCompare(b.school.name))
 
     const pagedSchools = allSchools.slice(offset, offset + limit)
     const pagination = new Pagination(pagedSchools, allSchools.length, page, limit)
