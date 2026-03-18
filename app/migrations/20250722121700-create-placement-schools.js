@@ -31,6 +31,14 @@ module.exports = {
           key: 'id'
         }
       },
+      subject_id: {
+        type: Sequelize.UUID,
+        allowNull: false,
+        references: {
+          model: 'subjects',
+          key: 'id'
+        }
+      },
       created_at: {
         type: Sequelize.DATE,
         allowNull: false,
@@ -72,6 +80,10 @@ module.exports = {
     await queryInterface.addIndex('placement_schools', {
       fields: ['academic_year_id'],
       name: 'idx_placement_schools_academic_year_id'
+    })
+    await queryInterface.addIndex('placement_schools', {
+      fields: ['subject_id'],
+      name: 'idx_placement_schools_subject_id'
     })
   },
   async down(queryInterface, Sequelize) {
