@@ -18,6 +18,11 @@ module.exports = (sequelize) => {
         as: 'academicYear'
       })
 
+      PlacementSchool.belongsTo(models.Subject, {
+        foreignKey: 'subjectId',
+        as: 'subject'
+      })
+
       PlacementSchool.belongsTo(models.User, {
         foreignKey: 'createdById',
         as: 'createdByUser'
@@ -52,6 +57,11 @@ module.exports = (sequelize) => {
         type: DataTypes.UUID,
         allowNull: false,
         field: 'academic_year_id'
+      },
+      subjectId:  {
+        type: DataTypes.UUID,
+        allowNull: false,
+        field: 'subject_id'
       },
       createdAt: {
         type: DataTypes.DATE,
