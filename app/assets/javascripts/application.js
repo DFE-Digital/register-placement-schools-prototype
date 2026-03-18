@@ -69,6 +69,15 @@ window.GOVUKPrototypeKit.documentReady(() => {
     checkboxFilterRegion.init()
   }
 
+  const placementSubjectContainer = document.querySelector('#filters-placement-subject')
+  if (placementSubjectContainer) {
+    const checkboxFilterPlacementSubject = new CheckboxFilter({
+      container: placementSubjectContainer,
+      textBox: { label: 'Search for placement subject' }
+    })
+    checkboxFilterPlacementSubject.init()
+  }
+
   const academicYearContainer = document.querySelector('#filters-academic-year')
   if (academicYearContainer) {
     const checkboxFilterAcademicYear = new CheckboxFilter({
