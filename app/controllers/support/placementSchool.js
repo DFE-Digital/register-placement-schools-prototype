@@ -743,7 +743,7 @@ exports.placementSchoolPlacements = async (req, res) => {
     where: { schoolId }
   })
 
-  const partnerships = await PlacementSchool.findAll({
+  const placements = await PlacementSchool.findAll({
     where: { schoolId },
     include: [
       { model: Provider, as: 'provider', attributes: ['id', 'operatingName'] },
@@ -759,7 +759,7 @@ exports.placementSchoolPlacements = async (req, res) => {
     offset
   })
 
-  const pagination = new Pagination(partnerships, totalCount, page, limit)
+  const pagination = new Pagination(placements, totalCount, page, limit)
 
   res.render('support/placement-schools/placements', {
     placementSchool,
