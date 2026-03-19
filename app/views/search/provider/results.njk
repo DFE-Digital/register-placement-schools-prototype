@@ -141,7 +141,36 @@
 
         {% set academicYearsHtml %}
           {% if placement.academicYears.length %}
-            {% if placement.academicYears.length > 3 %}
+            {% if selectedAcademicYearNames.length %}
+              <ul class="govuk-list govuk-list--bullet">
+                {% for year in placement.academicYears | reverse %}
+                  {% if year in selectedAcademicYearNames %}
+                    <li>{{ year }}</li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+              {% set hasUnmatchedYears = false %}
+              {% for year in placement.academicYears | reverse %}
+                {% if year not in selectedAcademicYearNames %}
+                  {% set hasUnmatchedYears = true %}
+                {% endif %}
+              {% endfor %}
+              {% if hasUnmatchedYears %}
+                {% set moreAcademicYearsHtml %}
+                  <ul class="govuk-list govuk-list--bullet">
+                    {% for year in placement.academicYears | reverse %}
+                      {% if year not in selectedAcademicYearNames %}
+                        <li>{{ year }}</li>
+                      {% endif %}
+                    {% endfor %}
+                  </ul>
+                {% endset %}
+                {{ govukDetails({
+                  summaryText: "More academic years",
+                  html: moreAcademicYearsHtml
+                }) }}
+              {% endif %}
+            {% elseif placement.academicYears.length > 3 %}
               <ul class="govuk-list govuk-list--bullet">
                 {% for year in placement.academicYears | reverse %}
                   {% if loop.index <= 3 %}

@@ -279,6 +279,11 @@ exports.results_get = async (req, res, next) => {
         filterAcademicYearItems,
         filterPlacementSubjectItems
       } = await fetchFilterOptions('location')
+      const selectedAcademicYearNames = (selectedAcademicYear || []).length
+        ? filterAcademicYearItems
+          .filter((item) => selectedAcademicYear.includes(item.value))
+          .map((item) => item.text)
+        : []
       const selectedPlacementSubjectNames = (selectedPlacementSubject || []).length
         ? filterPlacementSubjectItems
           .filter((item) => selectedPlacementSubject.includes(item.value))
@@ -329,6 +334,7 @@ exports.results_get = async (req, res, next) => {
         filterSchoolEducationPhaseItems,
         filterAcademicYearItems,
         filterPlacementSubjectItems,
+        selectedAcademicYearNames,
         selectedPlacementSubjectNames,
         selectedRadius,
         selectedSchoolType,
@@ -380,6 +386,11 @@ exports.results_get = async (req, res, next) => {
         filterAcademicYearItems,
         filterPlacementSubjectItems
       } = await fetchFilterOptions('provider')
+      const selectedAcademicYearNames = (selectedAcademicYear || []).length
+        ? filterAcademicYearItems
+          .filter((item) => selectedAcademicYear.includes(item.value))
+          .map((item) => item.text)
+        : []
       const selectedPlacementSubjectNames = (selectedPlacementSubject || []).length
         ? filterPlacementSubjectItems
           .filter((item) => selectedPlacementSubject.includes(item.value))
@@ -422,6 +433,7 @@ exports.results_get = async (req, res, next) => {
         filterSchoolEducationPhaseItems,
         filterAcademicYearItems,
         filterPlacementSubjectItems,
+        selectedAcademicYearNames,
         selectedPlacementSubjectNames,
         selectedRegion,
         selectedSchoolType,
