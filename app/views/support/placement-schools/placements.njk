@@ -34,9 +34,9 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
 
-    <h2 class="govuk-heading-m">Placements</h2>
+    <h2 class="govuk-heading-m">Placements ({{ pagination.totalCount | numeral("0,0") }})</h2>
 
-    {% if partnerships.length %}
+    {% if placements.length %}
       <table class="govuk-table">
         <thead class="govuk-table__head">
           <tr class="govuk-table__row">
@@ -46,24 +46,27 @@
           </tr>
         </thead>
         <tbody class="govuk-table__body">
-          {% for partnership in partnerships %}
+          {% for placement in placements %}
             <tr class="govuk-table__row">
               <td class="govuk-table__cell">
-                {{ partnership.academicYear.name if partnership.academicYear and partnership.academicYear.name else "Not known" }}
+                {{ placement.academicYear.name if placement.academicYear and placement.academicYear.name else "Not known" }}
               </td>
               <td class="govuk-table__cell">
-                {{ partnership.provider.operatingName if partnership.provider and partnership.provider.operatingName else "Not known" }}
+                {{ placement.provider.operatingName if placement.provider and placement.provider.operatingName else "Not known" }}
               </td>
               <td class="govuk-table__cell">
-                {{ partnership.subject.name if partnership.subject and partnership.subject.name else "Not known" }}
+                {{ placement.subject.name if placement.subject and placement.subject.name else "Not known" }}
               </td>
             </tr>
           {% endfor %}
         </tbody>
       </table>
+      {% if pagination and pagination.totalCount > 25 %}
+        {% include "_includes/pagination.njk" %}
+      {% endif %}
 
     {% else %}
-      <p class="govuk-body">There are no partnerships for {{ placementSchool.name if placementSchool.name else "this school" }}.</p>
+      <p class="govuk-body">There are no placements for {{ placementSchool.name if placementSchool.name else "this school" }}.</p>
     {% endif %}
 
   </div>

@@ -696,6 +696,9 @@ exports.placementSchoolLocation = async (req, res) => {
   delete req.session.data.find
 
   const { schoolId } = req.params
+  const page = parseInt(req.query.page, 10) || 1
+  const limit = parseInt(req.query.limit, 10) || 25
+  const offset = (page - 1) * limit
 
   const placementSchool = await School.findOne({
     where: { id: schoolId },
@@ -718,19 +721,26 @@ exports.placementSchoolLocation = async (req, res) => {
   })
 }
 
-exports.placementSchoolPartnerships = async (req, res) => {
+exports.placementSchoolPlacements = async (req, res) => {
   // Clear session provider data
   delete req.session.data.keywords
   delete req.session.data.filters
   delete req.session.data.find
 
   const { schoolId } = req.params
+  const page = parseInt(req.query.page, 10) || 1
+  const limit = parseInt(req.query.limit, 10) || 25
+  const offset = (page - 1) * limit
 
   const placementSchool = await School.findOne({
     where: { id: schoolId },
     include: [
       { model: SchoolStatus, as: 'schoolStatus' }
     ]
+  })
+
+  const totalCount = await PlacementSchool.count({
+    where: { schoolId }
   })
 
   const partnerships = await PlacementSchool.findAll({
@@ -744,12 +754,17 @@ exports.placementSchoolPartnerships = async (req, res) => {
       [{ model: AcademicYear, as: 'academicYear' }, 'name', 'DESC'],
       [{ model: Provider, as: 'provider' }, 'operatingName', 'ASC'],
       [{ model: Subject, as: 'subject' }, 'name', 'ASC']
-    ]
+    ],
+    limit,
+    offset
   })
+
+  const pagination = new Pagination(partnerships, totalCount, page, limit)
 
   res.render('support/placement-schools/placements', {
     placementSchool,
-    partnerships,
+    placements: pagination.getData(),
+    pagination,
     actions: {
       back: '/support/placement-schools'
     }

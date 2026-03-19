@@ -169,7 +169,7 @@ router.get('/support/placement-schools/remove-all-filters', checkIsAuthenticated
 router.get('/support/placement-schools/remove-keyword-search', checkIsAuthenticated, supportPlacementSchoolController.removeKeywordSearch)
 
 router.get('/support/placement-schools/:schoolId/location', checkIsAuthenticated, supportPlacementSchoolController.placementSchoolLocation)
-router.get('/support/placement-schools/:schoolId/partnerships', checkIsAuthenticated, supportPlacementSchoolController.placementSchoolPartnerships)
+router.get('/support/placement-schools/:schoolId/placements', checkIsAuthenticated, supportPlacementSchoolController.placementSchoolPlacements)
 
 router.get('/support/placement-schools/:schoolId', checkIsAuthenticated, supportPlacementSchoolController.placementSchoolDetails)
 
