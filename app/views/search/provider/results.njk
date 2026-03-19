@@ -141,11 +141,34 @@
 
         {% set academicYearsHtml %}
           {% if placement.academicYears.length %}
-            <ul class="govuk-list govuk-list--bullet">
-              {% for year in placement.academicYears | reverse %}
-                <li>{{ year }}</li>
-              {% endfor %}
-            </ul>
+            {% if placement.academicYears.length > 3 %}
+              <ul class="govuk-list govuk-list--bullet">
+                {% for year in placement.academicYears | reverse %}
+                  {% if loop.index <= 3 %}
+                    <li>{{ year }}</li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+              {% set moreAcademicYearsHtml %}
+                <ul class="govuk-list govuk-list--bullet">
+                  {% for year in placement.academicYears | reverse %}
+                    {% if loop.index > 3 %}
+                      <li>{{ year }}</li>
+                    {% endif %}
+                  {% endfor %}
+                </ul>
+              {% endset %}
+              {{ govukDetails({
+                summaryText: "More academic years",
+                html: moreAcademicYearsHtml
+              }) }}
+            {% else %}
+              <ul class="govuk-list govuk-list--bullet">
+                {% for year in placement.academicYears | reverse %}
+                  <li>{{ year }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
           {% else %}
             <p class="govuk-body">The school has not hosted any trainees</p>
           {% endif %}
