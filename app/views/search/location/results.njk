@@ -26,7 +26,7 @@
 
     <div class="govuk-button-group">
       {{ govukButton({
-        text: "Search again",
+        text: "Start new search",
         href: actions.newSearch
       }) }}
 
@@ -145,13 +145,129 @@
 
         {% set academicYearsHtml %}
           {% if placement.academicYears.length %}
-            <ul class="govuk-list govuk-list--bullet">
+            {% if selectedAcademicYearNames.length %}
+              <ul class="govuk-list govuk-list--bullet">
+                {% for year in placement.academicYears | reverse %}
+                  {% if year in selectedAcademicYearNames %}
+                    <li>{{ year }}</li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+              {% set hasUnmatchedYears = false %}
               {% for year in placement.academicYears | reverse %}
-                <li>{{ year }}</li>
+                {% if year not in selectedAcademicYearNames %}
+                  {% set hasUnmatchedYears = true %}
+                {% endif %}
               {% endfor %}
-            </ul>
+              {% if hasUnmatchedYears %}
+                {% set moreAcademicYearsHtml %}
+                  <ul class="govuk-list govuk-list--bullet">
+                    {% for year in placement.academicYears | reverse %}
+                      {% if year not in selectedAcademicYearNames %}
+                        <li>{{ year }}</li>
+                      {% endif %}
+                    {% endfor %}
+                  </ul>
+                {% endset %}
+                {{ govukDetails({
+                  summaryText: "More academic years",
+                  html: moreAcademicYearsHtml
+                }) }}
+              {% endif %}
+            {% elseif placement.academicYears.length > 3 %}
+              <ul class="govuk-list govuk-list--bullet">
+                {% for year in placement.academicYears | reverse %}
+                  {% if loop.index <= 3 %}
+                    <li>{{ year }}</li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+              {% set moreAcademicYearsHtml %}
+                <ul class="govuk-list govuk-list--bullet">
+                  {% for year in placement.academicYears | reverse %}
+                    {% if loop.index > 3 %}
+                      <li>{{ year }}</li>
+                    {% endif %}
+                  {% endfor %}
+                </ul>
+              {% endset %}
+              {{ govukDetails({
+                summaryText: "More academic years",
+                html: moreAcademicYearsHtml
+              }) }}
+            {% else %}
+              <ul class="govuk-list govuk-list--bullet">
+                {% for year in placement.academicYears | reverse %}
+                  <li>{{ year }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
           {% else %}
             <p class="govuk-body">The school has not hosted any trainees</p>
+          {% endif %}
+        {% endset %}
+
+        {% set placementSubjectsHtml %}
+          {% if placement.placementSubjects.length %}
+            {% if selectedPlacementSubjectNames.length %}
+              <ul class="govuk-list govuk-list--bullet">
+                {% for subject in placement.placementSubjects %}
+                  {% if subject in selectedPlacementSubjectNames %}
+                    <li>{{ subject }}</li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+              {% set hasUnmatchedSubjects = false %}
+              {% for subject in placement.placementSubjects %}
+                {% if subject not in selectedPlacementSubjectNames %}
+                  {% set hasUnmatchedSubjects = true %}
+                {% endif %}
+              {% endfor %}
+              {% if hasUnmatchedSubjects %}
+                {% set moreSubjectsHtml %}
+                  <ul class="govuk-list govuk-list--bullet">
+                    {% for subject in placement.placementSubjects %}
+                      {% if subject not in selectedPlacementSubjectNames %}
+                        <li>{{ subject }}</li>
+                      {% endif %}
+                    {% endfor %}
+                  </ul>
+                {% endset %}
+                {{ govukDetails({
+                  summaryText: "More subjects",
+                  html: moreSubjectsHtml
+                }) }}
+              {% endif %}
+            {% elseif placement.placementSubjects.length > 3 %}
+              <ul class="govuk-list govuk-list--bullet">
+                {% for subject in placement.placementSubjects %}
+                  {% if loop.index <= 3 %}
+                    <li>{{ subject }}</li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+              {% set moreSubjectsHtml %}
+                <ul class="govuk-list govuk-list--bullet">
+                  {% for subject in placement.placementSubjects %}
+                    {% if loop.index > 3 %}
+                      <li>{{ subject }}</li>
+                    {% endif %}
+                  {% endfor %}
+                </ul>
+              {% endset %}
+              {{ govukDetails({
+                summaryText: "More subjects",
+                html: moreSubjectsHtml
+              }) }}
+            {% else %}
+              <ul class="govuk-list govuk-list--bullet">
+                {% for subject in placement.placementSubjects %}
+                  <li>{{ subject }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          {% else %}
+            <p class="govuk-body">Not known</p>
           {% endif %}
         {% endset %}
 
@@ -219,6 +335,14 @@
               },
               value: {
                 html: educationPhaseHtml
+              }
+            },
+            {
+              key: {
+                text: "Subjects"
+              },
+              value: {
+                html: placementSubjectsHtml
               }
             },
             {

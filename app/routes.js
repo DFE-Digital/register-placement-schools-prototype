@@ -136,6 +136,7 @@ router.get('/results/remove-school-group-filter/:schoolGroup', searchController.
 router.get('/results/remove-school-status-filter/:schoolStatus', searchController.removeSchoolStatusFilter)
 router.get('/results/remove-school-education-phase-filter/:schoolEducationPhase', searchController.removeSchoolEducationPhaseFilter)
 router.get('/results/remove-academic-year-filter/:academicYear', searchController.removeAcademicYearFilter)
+router.get('/results/remove-placement-subject-filter/:placementSubject', searchController.removePlacementSubjectFilter)
 
 router.get('/results/remove-all-filters', searchController.removeAllFilters)
 

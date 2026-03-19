@@ -143,6 +143,18 @@
       {% endif %}
     {% endset %}
 
+    {% set placementSubjectsHtml %}
+      {% if placementSchool.placementSubjects.length %}
+        <ul class="govuk-list govuk-list--bullet">
+          {% for subject in placementSchool.placementSubjects %}
+            <li>{{ subject }}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="govuk-body">Not known</p>
+      {% endif %}
+    {% endset %}
+
     {% if osMapsApiKey and placementSchool.address.latitude and placementSchool.address.longitude %}
       {# <div class="app-map-actions">
         <button
@@ -238,6 +250,14 @@
           },
           value: {
             html: educationPhaseHtml
+          }
+        },
+        {
+          key: {
+            text: "Subjects"
+          },
+          value: {
+            html: placementSubjectsHtml
           }
         },
         {
