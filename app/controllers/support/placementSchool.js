@@ -737,19 +737,19 @@ exports.placementSchoolPartnerships = async (req, res) => {
     where: { schoolId },
     include: [
       { model: Provider, as: 'provider', attributes: ['id', 'operatingName'] },
-      { model: AcademicYear, as: 'academicYear', attributes: ['id', 'name'] }
+      { model: AcademicYear, as: 'academicYear', attributes: ['id', 'name'] },
+      { model: Subject, as: 'subject', attributes: ['id', 'name'] }
     ],
     order: [
       [{ model: AcademicYear, as: 'academicYear' }, 'name', 'DESC'],
-      [{ model: Provider, as: 'provider' }, 'operatingName', 'ASC']
+      [{ model: Provider, as: 'provider' }, 'operatingName', 'ASC'],
+      [{ model: Subject, as: 'subject' }, 'name', 'ASC']
     ]
   })
 
-  const groupedPartnerships = groupPartnershipsByAcademicYear(partnerships)
-
-  res.render('support/placement-schools/partnerships', {
+  res.render('support/placement-schools/placements', {
     placementSchool,
-    groupedPartnerships,
+    partnerships,
     actions: {
       back: '/support/placement-schools'
     }
