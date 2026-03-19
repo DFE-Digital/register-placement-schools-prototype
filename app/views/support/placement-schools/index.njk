@@ -110,7 +110,135 @@
           {% endif %}
         {%- endset %}
 
-        {% set academicYearsHtml %}
+        {% set placementAcademicYearsHtml %}
+          {% if school.placementAcademicYears.length %}
+            {% if selectedAcademicYearNames.length %}
+              <ul class="govuk-list govuk-list--bullet">
+                {% for year in school.placementAcademicYears | reverse %}
+                  {% if year in selectedAcademicYearNames %}
+                    <li>{{ year }}</li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+              {% set hasUnmatchedYears = false %}
+              {% for year in school.placementAcademicYears | reverse %}
+                {% if year not in selectedAcademicYearNames %}
+                  {% set hasUnmatchedYears = true %}
+                {% endif %}
+              {% endfor %}
+              {% if hasUnmatchedYears %}
+                {% set moreAcademicYearsHtml %}
+                  <ul class="govuk-list govuk-list--bullet">
+                    {% for year in school.placementAcademicYears | reverse %}
+                      {% if year not in selectedAcademicYearNames %}
+                        <li>{{ year }}</li>
+                      {% endif %}
+                    {% endfor %}
+                  </ul>
+                {% endset %}
+                {{ govukDetails({
+                  summaryText: "More academic years",
+                  html: moreAcademicYearsHtml
+                }) }}
+              {% endif %}
+            {% elseif school.placementAcademicYears.length > 3 %}
+              <ul class="govuk-list govuk-list--bullet">
+                {% for year in school.placementAcademicYears | reverse %}
+                  {% if loop.index <= 3 %}
+                    <li>{{ year }}</li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+              {% set moreAcademicYearsHtml %}
+                <ul class="govuk-list govuk-list--bullet">
+                  {% for year in school.placementAcademicYears | reverse %}
+                    {% if loop.index > 3 %}
+                      <li>{{ year }}</li>
+                    {% endif %}
+                  {% endfor %}
+                </ul>
+              {% endset %}
+              {{ govukDetails({
+                summaryText: "More academic years",
+                html: moreAcademicYearsHtml
+              }) }}
+            {% else %}
+              <ul class="govuk-list govuk-list--bullet">
+                {% for year in school.placementAcademicYears | reverse %}
+                  <li>{{ year }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          {% else %}
+            <p class="govuk-body">The school has not hosted any trainees</p>
+          {% endif %}
+        {% endset %}
+
+        {% set placementSubjectsHtml %}
+          {% if school.placementSubjects.length %}
+            {% if selectedPlacementSubjectNames.length %}
+              <ul class="govuk-list govuk-list--bullet">
+                {% for subject in school.placementSubjects %}
+                  {% if subject in selectedPlacementSubjectNames %}
+                    <li>{{ subject }}</li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+              {% set hasUnmatchedSubjects = false %}
+              {% for subject in school.placementSubjects %}
+                {% if subject not in selectedPlacementSubjectNames %}
+                  {% set hasUnmatchedSubjects = true %}
+                {% endif %}
+              {% endfor %}
+              {% if hasUnmatchedSubjects %}
+                {% set moreSubjectsHtml %}
+                  <ul class="govuk-list govuk-list--bullet">
+                    {% for subject in school.placementSubjects %}
+                      {% if subject not in selectedPlacementSubjectNames %}
+                        <li>{{ subject }}</li>
+                      {% endif %}
+                    {% endfor %}
+                  </ul>
+                {% endset %}
+                {{ govukDetails({
+                  summaryText: "More subjects",
+                  html: moreSubjectsHtml
+                }) }}
+              {% endif %}
+            {% elseif school.placementSubjects.length > 3 %}
+              <ul class="govuk-list govuk-list--bullet">
+                {% for subject in school.placementSubjects %}
+                  {% if loop.index <= 3 %}
+                    <li>{{ subject }}</li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+              {% set moreSubjectsHtml %}
+                <ul class="govuk-list govuk-list--bullet">
+                  {% for subject in school.placementSubjects %}
+                    {% if loop.index > 3 %}
+                      <li>{{ subject }}</li>
+                    {% endif %}
+                  {% endfor %}
+                </ul>
+              {% endset %}
+              {{ govukDetails({
+                summaryText: "More subjects",
+                html: moreSubjectsHtml
+              }) }}
+            {% else %}
+              <ul class="govuk-list govuk-list--bullet">
+                {% for subject in school.placementSubjects %}
+                  <li>{{ subject }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          {% else %}
+            <p class="govuk-body">Not known</p>
+          {% endif %}
+        {% endset %}
+
+        {% set latestPartnershipsHtml %}
           <ul class="govuk-list govuk-list--spaced">
             {% for year in school.academicYears %}
               <li>
@@ -159,10 +287,26 @@
             },
             {
               key: {
+                text: "Subjects"
+              },
+              value: {
+                html: placementSubjectsHtml
+              }
+            },
+            {
+              key: {
+                text: "Academic years"
+              },
+              value: {
+                html: placementAcademicYearsHtml
+              }
+            },
+            {
+              key: {
                 text: "Latest partnership"
               },
               value: {
-                html: academicYearsHtml
+                html: latestPartnershipsHtml
               }
             }
           ]

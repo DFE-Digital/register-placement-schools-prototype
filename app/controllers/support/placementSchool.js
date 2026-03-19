@@ -8,8 +8,8 @@ const {
   SchoolEducationPhase,
   SchoolGroup,
   SchoolStatus,
-  SchoolType,
-  Sequelize
+  Subject,
+  SchoolType
 } = require('../../models')
 
 const Pagination = require('../../helpers/pagination')
@@ -29,6 +29,15 @@ const {
   getCheckboxValues,
   removeFilter
 } = require('../../helpers/search')
+const {
+  getAcademicYearOptions,
+  getAcademicYearLabel,
+  getCurrentAcademicYearCode
+} = require('../../helpers/academicYear')
+const {
+  getSubjectOptions,
+  getSubjectLabel
+} = require('../../helpers/subject')
 
 const { Op } = require('sequelize')
 
@@ -40,6 +49,7 @@ const groupPlacementSchools = (rows) => {
     const s = row.school
     const a = row.academicYear
     const p = row.provider
+    const subject = row.subject
 
     if (!grouped[s.id]) {
       grouped[s.id] = {
@@ -53,30 +63,64 @@ const groupPlacementSchools = (rows) => {
         educationPhase: s.schoolEducationPhase ? s.schoolEducationPhase.name : null,
         statutoryLowAge: s.schoolDetail ? s.schoolDetail.statutoryLowAge : null,
         statutoryHighAge: s.schoolDetail ? s.schoolDetail.statutoryHighAge : null,
-        academicYears: {}
+        address: s.schoolAddress || {
+          line1: '',
+          line2: '',
+          line3: '',
+          town: '',
+          county: '',
+          postcode: ''
+        },
+        academicYears: {},
+        placementAcademicYears: new Set(),
+        placementSubjects: new Set(),
+        latestAcademicYearCode: null,
+        latestAcademicYearId: null,
+        latestAcademicYearName: null,
+        latestAcademicYearProviders: {}
       }
     }
-    if (!grouped[s.id].academicYears[a.id]) {
-      grouped[s.id].academicYears[a.id] = {
-        id: a.id,
-        name: a.name,
-        providers: {}
-      }
+
+    if (a?.name) {
+      grouped[s.id].placementAcademicYears.add(a.name)
     }
-    if (!grouped[s.id].academicYears[a.id].providers[p.id]) {
-      grouped[s.id].academicYears[a.id].providers[p.id] = {
-        id: p.id,
-        name: p.operatingName
+
+    if (subject?.name) {
+      grouped[s.id].placementSubjects.add(subject.name)
+    }
+
+    const academicYearCode = Number(a?.code)
+    if (Number.isFinite(academicYearCode)) {
+      const currentLatest = grouped[s.id].latestAcademicYearCode
+      if (currentLatest === null || academicYearCode > currentLatest) {
+        grouped[s.id].latestAcademicYearCode = academicYearCode
+        grouped[s.id].latestAcademicYearId = a.id
+        grouped[s.id].latestAcademicYearName = a.name
+        grouped[s.id].latestAcademicYearProviders = {}
+      }
+
+      if (academicYearCode === grouped[s.id].latestAcademicYearCode) {
+        if (p?.id) {
+          grouped[s.id].latestAcademicYearProviders[p.id] = {
+            id: p.id,
+            name: p.operatingName
+          }
+        }
       }
     }
   })
 
   return Object.values(grouped).map(school => ({
     ...school,
-    academicYears: Object.values(school.academicYears).map(year => ({
-      ...year,
-      providers: Object.values(year.providers)
-    }))
+    academicYears: school.latestAcademicYearName
+      ? [{
+          id: school.latestAcademicYearId,
+          name: school.latestAcademicYearName,
+          providers: Object.values(school.latestAcademicYearProviders)
+        }]
+      : [],
+    placementAcademicYears: Array.from(school.placementAcademicYears),
+    placementSubjects: Array.from(school.placementSubjects).sort((a, b) => a.localeCompare(b))
   }))
 }
 
@@ -130,6 +174,8 @@ exports.placementSchoolsList = async (req, res) => {
   const schoolGroup = null
   const schoolStatus = null
   const schoolEducationPhase = null
+  const placementSubject = null
+  const academicYear = null
 
   let schoolTypes
   if (filters?.schoolType) {
@@ -151,10 +197,22 @@ exports.placementSchoolsList = async (req, res) => {
     schoolEducationPhases = getCheckboxValues(schoolEducationPhase, filters.schoolEducationPhase)
   }
 
+  let placementSubjects
+  if (filters?.placementSubject) {
+    placementSubjects = getCheckboxValues(placementSubject, filters.placementSubject)
+  }
+
+  let academicYears
+  if (filters?.academicYear) {
+    academicYears = getCheckboxValues(academicYear, filters.academicYear)
+  }
+
   const hasFilters = !!((schoolTypes?.length > 0)
    || (schoolGroups?.length > 0)
    || (schoolStatuses?.length > 0)
    || (schoolEducationPhases?.length > 0)
+   || (placementSubjects?.length > 0)
+   || (academicYears?.length > 0)
   )
 
   let selectedFilters = null
@@ -231,12 +289,50 @@ exports.placementSchoolsList = async (req, res) => {
         items: items
       })
     }
+
+    if (placementSubjects?.length) {
+      const items = await Promise.all(
+        placementSubjects.map(async (subjectCode) => {
+          const label = await getSubjectLabel(subjectCode)
+          return {
+            text: label,
+            href: `/support/placement-schools/remove-placement-subject-filter/${subjectCode}`
+          }
+        })
+      )
+
+      selectedFilters.categories.push({
+        heading: { text: 'Subject' },
+        items: items
+      })
+    }
+
+    if (academicYears?.length) {
+      const items = await Promise.all(
+        academicYears.map(async (yearCode) => {
+          const label = await getAcademicYearLabel(yearCode)
+          return {
+            text: label,
+            href: `/support/placement-schools/remove-academic-year-filter/${yearCode}`
+          }
+        })
+      )
+
+      selectedFilters.categories.push({
+        heading: { text: 'Academic year' },
+        items: items
+      })
+    }
   }
 
   const filterSchoolTypeItems = await getSchoolTypeOptions()
   const filterSchoolGroupItems = await getSchoolGroupOptions()
   const filterSchoolStatusItems = await getSchoolStatusOptions()
   const filterSchoolEducationPhaseItems = await getSchoolEducationPhaseOptions()
+  const filterAcademicYearItems = await getAcademicYearOptions({
+    maxCode: getCurrentAcademicYearCode()
+  })
+  const filterPlacementSubjectItems = await getSubjectOptions()
 
   let selectedSchoolType = []
   if (filters?.schoolType) {
@@ -258,7 +354,28 @@ exports.placementSchoolsList = async (req, res) => {
     selectedSchoolEducationPhase = filters.schoolEducationPhase
   }
 
-  const wherePlacementSchool = {}
+  let selectedAcademicYear = []
+  if (filters?.academicYear) {
+    selectedAcademicYear = filters.academicYear
+  }
+
+  let selectedPlacementSubject = []
+  if (filters?.placementSubject) {
+    selectedPlacementSubject = filters.placementSubject
+  }
+
+  const selectedAcademicYearNames = (selectedAcademicYear || []).length
+    ? filterAcademicYearItems
+      .filter((item) => selectedAcademicYear.includes(item.value))
+      .map((item) => item.text)
+    : []
+
+  const selectedPlacementSubjectNames = (selectedPlacementSubject || []).length
+    ? filterPlacementSubjectItems
+      .filter((item) => selectedPlacementSubject.includes(item.value))
+      .map((item) => item.text)
+    : []
+
   const whereSchool = {}
 
   if (schoolTypes?.length) {
@@ -282,13 +399,40 @@ exports.placementSchoolsList = async (req, res) => {
     ]
   }
 
+  const includeForSchoolIds = [
+    {
+      model: School,
+      as: 'school',
+      attributes: [],
+      where: whereSchool,
+      required: true
+    }
+  ]
+
+  if (academicYears?.length) {
+    includeForSchoolIds.push({
+      model: AcademicYear,
+      as: 'academicYear',
+      attributes: [],
+      where: { code: { [Op.in]: academicYears } },
+      required: true
+    })
+  }
+
+  if (placementSubjects?.length) {
+    includeForSchoolIds.push({
+      model: Subject,
+      as: 'subject',
+      attributes: [],
+      where: { code: { [Op.in]: placementSubjects } },
+      required: true
+    })
+  }
+
   // Step 1: get distinct school IDs for page
   const distinctSchools = await PlacementSchool.findAll({
     attributes: ['schoolId'],
-    include: [
-      { model: School, as: 'school', attributes: [], where: whereSchool },
-    ],
-    where: wherePlacementSchool,
+    include: includeForSchoolIds,
     group: ['schoolId'],
     order: [[{ model: School, as: 'school' }, 'name', 'ASC']],
     limit,
@@ -303,68 +447,13 @@ exports.placementSchoolsList = async (req, res) => {
   const totalCount = await PlacementSchool.count({
     distinct: true,
     col: 'school_id',
-    include: [
-      { model: School, as: 'school', attributes: [], where: whereSchool },
-    ],
-    where: wherePlacementSchool
+    include: includeForSchoolIds
   })
 
-  // Step 3: get latest academic year for each school based on code
-  const latestAcademicYears = await PlacementSchool.findAll({
-    attributes: [
-      'schoolId',
-      [Sequelize.fn('MAX', Sequelize.col('academicYear.code')), 'latestAcademicYearCode']
-    ],
-    include: [
-      {
-        model: AcademicYear,
-        as: 'academicYear',
-        attributes: []
-      }
-    ],
-    where: {
-      schoolId: { [Op.in]: pageSchoolIds },
-      ...wherePlacementSchool
-    },
-    group: ['schoolId'],
-    raw: true
-  })
-
-  // Turn into a lookup (schoolId -> latest academicYearCode)
-  const schoolToLatestYearCode = {}
-  latestAcademicYears.forEach(row => {
-    schoolToLatestYearCode[row.schoolId] = row.latestAcademicYearCode
-  })
-
-  // Now get the academic year IDs for those codes
-  const latestYearCodes = [...new Set(Object.values(schoolToLatestYearCode))]
-  const academicYears = await AcademicYear.findAll({
-    where: {
-      code: { [Op.in]: latestYearCodes }
-    },
-    attributes: ['id', 'code'],
-    raw: true
-  })
-
-  // Create a lookup (code -> academicYearId)
-  const codeToYearId = {}
-  academicYears.forEach(year => {
-    codeToYearId[year.code] = year.id
-  })
-
-  // Create final lookup (schoolId -> latest academicYearId)
-  const schoolToLatestYear = {}
-  Object.entries(schoolToLatestYearCode).forEach(([schoolId, code]) => {
-    schoolToLatestYear[schoolId] = codeToYearId[code]
-  })
-
-  // Step 4: fetch only latest academic year rows for those schools
+  // Step 3: fetch placement rows for those schools
   const rows = await PlacementSchool.findAll({
     where: {
-      [Op.or]: Object.entries(schoolToLatestYear).map(([schoolId, academicYearId]) => ({
-        schoolId,
-        academicYearId
-      }))
+      schoolId: { [Op.in]: pageSchoolIds }
     },
     include: [
       {
@@ -375,14 +464,17 @@ exports.placementSchoolsList = async (req, res) => {
           { model: SchoolGroup, as: 'schoolGroup' },
           { model: SchoolStatus, as: 'schoolStatus' },
           { model: SchoolEducationPhase, as: 'schoolEducationPhase' },
-          { model: SchoolDetail, as: 'schoolDetail' }
+          { model: SchoolDetail, as: 'schoolDetail' },
+          { model: SchoolAddress, as: 'schoolAddress' }
         ]
       },
       { model: Provider, as: 'provider' },
-      { model: AcademicYear, as: 'academicYear' }
+      { model: AcademicYear, as: 'academicYear' },
+      { model: Subject, as: 'subject' }
     ],
     order: [
       [{ model: School, as: 'school' }, 'name', 'ASC'],
+      [{ model: AcademicYear, as: 'academicYear' }, 'code', 'DESC'],
       [{ model: Provider, as: 'provider' }, 'operatingName', 'ASC']
     ]
   })
@@ -410,10 +502,16 @@ exports.placementSchoolsList = async (req, res) => {
     filterSchoolGroupItems,
     filterSchoolStatusItems,
     filterSchoolEducationPhaseItems,
+    filterAcademicYearItems,
+    filterPlacementSubjectItems,
     selectedSchoolType,
     selectedSchoolGroup,
     selectedSchoolStatus,
     selectedSchoolEducationPhase,
+    selectedAcademicYear,
+    selectedPlacementSubject,
+    selectedAcademicYearNames,
+    selectedPlacementSubjectNames,
     actions: {
       new: '/support/placement-schools/new/',
       view: '/support/placement-schools',
@@ -461,6 +559,24 @@ exports.removeSchoolEducationPhaseFilter = (req, res) => {
   filters.schoolEducationPhase = removeFilter(
     req.params.schoolEducationPhase,
     filters.schoolEducationPhase
+  )
+  res.redirect('/support/placement-schools')
+}
+
+exports.removeAcademicYearFilter = (req, res) => {
+  const { filters } = req.session.data
+  filters.academicYear = removeFilter(
+    req.params.academicYear,
+    filters.academicYear
+  )
+  res.redirect('/support/placement-schools')
+}
+
+exports.removePlacementSubjectFilter = (req, res) => {
+  const { filters } = req.session.data
+  filters.placementSubject = removeFilter(
+    req.params.placementSubject,
+    filters.placementSubject
   )
   res.redirect('/support/placement-schools')
 }
