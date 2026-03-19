@@ -37,11 +37,32 @@
     {% if placementSchools.length %}
 
       {% for school in placementSchools %}
+        {% if school.status | lower == "open" %}
+          {% set tagClass = "govuk-tag--green" %}
+        {% elif school.status | lower == "closed" %}
+          {% set tagClass = "govuk-tag--red" %}
+        {% elif school.status | lower == "open, but proposed to close" %}
+          {% set tagClass = "govuk-tag--orange" %}
+        {% elif school.status | lower == "proposed to open" %}
+          {% set tagClass = "govuk-tag--yellow" %}
+        {% else %}
+          {% set tagClass = "govuk-tag--grey" %}
+        {% endif %}
 
         {% set nameHtml %}
           <a href="{{ actions.view }}/{{ school.id }}" class="govuk-link">
             {{ school.name }}
           </a>
+          {{ govukTag({
+            text: school.status if school.status.length else "Not known",
+            classes: tagClass + " govuk-tag--no-max-width govuk-!-margin-left-1"
+          }) }}
+          {% if school.ukprn.length or school.urn.length %}
+            <p class="govuk-hint govuk-!-margin-top-1 govuk-!-margin-bottom-0">
+              {% if school.ukprn.length %}<b><abbr title="UK provider reference number">UKPRN</abbr>:</b> {{ school.ukprn }}{% endif %}
+              {% if school.urn.length %}<b><abbr title="unique reference number">URN</abbr>:</b> {{ school.urn }}{% endif %}
+            </p>
+          {% endif %}
         {% endset %}
 
         {% set schoolTypeGroupHtml %}
@@ -68,6 +89,27 @@
           </ul>
         {% endset %}
 
+        {% set addressHtml -%}
+          {% if school.address.line1.length %}
+            {{ school.address.line1 }}<br aria-hidden="true">
+          {% endif %}
+          {% if school.address.line2.length %}
+            {{ school.address.line2 }}<br aria-hidden="true">
+          {% endif %}
+          {% if school.address.line3.length %}
+            {{ school.address.line3 }}<br aria-hidden="true">
+          {% endif %}
+          {% if school.address.town.length %}
+            {{ school.address.town }}<br aria-hidden="true">
+          {% endif %}
+          {% if school.address.county.length %}
+            {{ school.address.county }}<br aria-hidden="true">
+          {% endif %}
+          {% if school.address.postcode.length %}
+            {{ school.address.postcode }}
+          {% endif %}
+        {%- endset %}
+
         {% set academicYearsHtml %}
           <ul class="govuk-list govuk-list--spaced">
             {% for year in school.academicYears %}
@@ -92,29 +134,11 @@
           rows: [
             {
               key: {
-                text: "School status"
+                text: "Address"
               },
               value: {
-                text: school.status if school.status.length else "Not known",
-                classes: "govuk-hint" if not school.status.length
-              }
-            },
-            {
-              key: {
-                text: "UK provider reference number (UKPRN)"
-              },
-              value: {
-                text: school.ukprn if school.ukprn.length else "Not known",
-                classes: "govuk-hint" if not school.ukprn.length
-              }
-            },
-            {
-              key: {
-                text: "Unique reference number (URN)"
-              },
-              value: {
-                text: school.urn if school.urn.length else "Not known",
-                classes: "govuk-hint" if not school.urn.length
+                html: addressHtml if (school.address.line1.length and school.address.town.length and school.address.postcode.length) else "Not known",
+                classes: "govuk-hint" if not (school.address.line1.length and school.address.town.length and school.address.postcode.length)
               }
             },
             {
