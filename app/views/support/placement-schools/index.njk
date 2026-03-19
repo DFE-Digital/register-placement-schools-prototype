@@ -238,19 +238,68 @@
           {% endif %}
         {% endset %}
 
-        {% set latestPartnershipsHtml %}
-          <ul class="govuk-list govuk-list--spaced">
-            {% for year in school.academicYears | reverse %}
-              <li>
-                {{ year.name }}
+        {% set placementProvidersHtml %}
+          {% if school.placementProviders.length %}
+            {% if selectedProviderNames.length %}
+              <ul class="govuk-list govuk-list--bullet">
+                {% for provider in school.placementProviders %}
+                  {% if provider in selectedProviderNames %}
+                    <li>{{ provider }}</li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+              {% set hasUnmatchedProviders = false %}
+              {% for provider in school.placementProviders %}
+                {% if provider not in selectedProviderNames %}
+                  {% set hasUnmatchedProviders = true %}
+                {% endif %}
+              {% endfor %}
+              {% if hasUnmatchedProviders %}
+                {% set moreProvidersHtml %}
+                  <ul class="govuk-list govuk-list--bullet">
+                    {% for provider in school.placementProviders %}
+                      {% if provider not in selectedProviderNames %}
+                        <li>{{ provider }}</li>
+                      {% endif %}
+                    {% endfor %}
+                  </ul>
+                {% endset %}
+                {{ govukDetails({
+                  summaryText: "More providers",
+                  html: moreProvidersHtml
+                }) }}
+              {% endif %}
+            {% elseif school.placementProviders.length > 3 %}
+              <ul class="govuk-list govuk-list--bullet">
+                {% for provider in school.placementProviders %}
+                  {% if loop.index <= 3 %}
+                    <li>{{ provider }}</li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+              {% set moreProvidersHtml %}
                 <ul class="govuk-list govuk-list--bullet">
-                  {% for provider in year.providers %}
-                    <li>{{ provider.name }}</li>
+                  {% for provider in school.placementProviders %}
+                    {% if loop.index > 3 %}
+                      <li>{{ provider }}</li>
+                    {% endif %}
                   {% endfor %}
                 </ul>
-              </li>
-            {% endfor %}
-          </ul>
+              {% endset %}
+              {{ govukDetails({
+                summaryText: "More providers",
+                html: moreProvidersHtml
+              }) }}
+            {% else %}
+              <ul class="govuk-list govuk-list--bullet">
+                {% for provider in school.placementProviders %}
+                  <li>{{ provider }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          {% else %}
+            <p class="govuk-body">Not known</p>
+          {% endif %}
         {% endset %}
 
         {{ govukSummaryList({
@@ -303,10 +352,10 @@
             },
             {
               key: {
-                text: "Latest partnership"
+                text: "Providers"
               },
               value: {
-                html: latestPartnershipsHtml
+                html: placementProvidersHtml
               }
             }
           ]

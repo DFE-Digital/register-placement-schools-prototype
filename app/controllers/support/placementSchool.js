@@ -38,6 +38,10 @@ const {
   getSubjectOptions,
   getSubjectLabel
 } = require('../../helpers/subject')
+const {
+  getProviderOptions,
+  getProviderLabel
+} = require('../../helpers/provider')
 
 const { Op } = require('sequelize')
 
@@ -74,6 +78,7 @@ const groupPlacementSchools = (rows) => {
         academicYears: {},
         placementAcademicYears: new Set(),
         placementSubjects: new Set(),
+        placementProviders: new Set(),
         latestAcademicYearCode: null,
         latestAcademicYearId: null,
         latestAcademicYearName: null,
@@ -87,6 +92,10 @@ const groupPlacementSchools = (rows) => {
 
     if (subject?.name) {
       grouped[s.id].placementSubjects.add(subject.name)
+    }
+
+    if (p?.operatingName) {
+      grouped[s.id].placementProviders.add(p.operatingName)
     }
 
     const academicYearCode = Number(a?.code)
@@ -120,7 +129,8 @@ const groupPlacementSchools = (rows) => {
         }]
       : [],
     placementAcademicYears: Array.from(school.placementAcademicYears),
-    placementSubjects: Array.from(school.placementSubjects).sort((a, b) => a.localeCompare(b))
+    placementSubjects: Array.from(school.placementSubjects).sort((a, b) => a.localeCompare(b)),
+    placementProviders: Array.from(school.placementProviders).sort((a, b) => a.localeCompare(b))
   }))
 }
 
@@ -176,6 +186,7 @@ exports.placementSchoolsList = async (req, res) => {
   const schoolEducationPhase = null
   const placementSubject = null
   const academicYear = null
+  const provider = null
 
   let schoolTypes
   if (filters?.schoolType) {
@@ -207,12 +218,18 @@ exports.placementSchoolsList = async (req, res) => {
     academicYears = getCheckboxValues(academicYear, filters.academicYear)
   }
 
+  let providers
+  if (filters?.provider) {
+    providers = getCheckboxValues(provider, filters.provider)
+  }
+
   const hasFilters = !!((schoolTypes?.length > 0)
    || (schoolGroups?.length > 0)
    || (schoolStatuses?.length > 0)
    || (schoolEducationPhases?.length > 0)
    || (placementSubjects?.length > 0)
    || (academicYears?.length > 0)
+   || (providers?.length > 0)
   )
 
   let selectedFilters = null
@@ -323,6 +340,23 @@ exports.placementSchoolsList = async (req, res) => {
         items: items
       })
     }
+
+    if (providers?.length) {
+      const items = await Promise.all(
+        providers.map(async (providerId) => {
+          const label = await getProviderLabel(providerId)
+          return {
+            text: label,
+            href: `/support/placement-schools/remove-provider-filter/${providerId}`
+          }
+        })
+      )
+
+      selectedFilters.categories.push({
+        heading: { text: 'Provider' },
+        items: items
+      })
+    }
   }
 
   const filterSchoolTypeItems = await getSchoolTypeOptions()
@@ -333,6 +367,7 @@ exports.placementSchoolsList = async (req, res) => {
     maxCode: getCurrentAcademicYearCode()
   })
   const filterPlacementSubjectItems = await getSubjectOptions()
+  const filterProviderItems = await getProviderOptions()
 
   let selectedSchoolType = []
   if (filters?.schoolType) {
@@ -364,6 +399,11 @@ exports.placementSchoolsList = async (req, res) => {
     selectedPlacementSubject = filters.placementSubject
   }
 
+  let selectedProvider = []
+  if (filters?.provider) {
+    selectedProvider = filters.provider
+  }
+
   const selectedAcademicYearNames = (selectedAcademicYear || []).length
     ? filterAcademicYearItems
       .filter((item) => selectedAcademicYear.includes(item.value))
@@ -373,6 +413,12 @@ exports.placementSchoolsList = async (req, res) => {
   const selectedPlacementSubjectNames = (selectedPlacementSubject || []).length
     ? filterPlacementSubjectItems
       .filter((item) => selectedPlacementSubject.includes(item.value))
+      .map((item) => item.text)
+    : []
+
+  const selectedProviderNames = (selectedProvider || []).length
+    ? filterProviderItems
+      .filter((item) => selectedProvider.includes(item.value))
       .map((item) => item.text)
     : []
 
@@ -425,6 +471,16 @@ exports.placementSchoolsList = async (req, res) => {
       as: 'subject',
       attributes: [],
       where: { code: { [Op.in]: placementSubjects } },
+      required: true
+    })
+  }
+
+  if (providers?.length) {
+    includeForSchoolIds.push({
+      model: Provider,
+      as: 'provider',
+      attributes: [],
+      where: { id: { [Op.in]: providers } },
       required: true
     })
   }
@@ -504,14 +560,17 @@ exports.placementSchoolsList = async (req, res) => {
     filterSchoolEducationPhaseItems,
     filterAcademicYearItems,
     filterPlacementSubjectItems,
+    filterProviderItems,
     selectedSchoolType,
     selectedSchoolGroup,
     selectedSchoolStatus,
     selectedSchoolEducationPhase,
     selectedAcademicYear,
     selectedPlacementSubject,
+    selectedProvider,
     selectedAcademicYearNames,
     selectedPlacementSubjectNames,
+    selectedProviderNames,
     actions: {
       new: '/support/placement-schools/new/',
       view: '/support/placement-schools',
@@ -577,6 +636,15 @@ exports.removePlacementSubjectFilter = (req, res) => {
   filters.placementSubject = removeFilter(
     req.params.placementSubject,
     filters.placementSubject
+  )
+  res.redirect('/support/placement-schools')
+}
+
+exports.removeProviderFilter = (req, res) => {
+  const { filters } = req.session.data
+  filters.provider = removeFilter(
+    req.params.provider,
+    filters.provider
   )
   res.redirect('/support/placement-schools')
 }

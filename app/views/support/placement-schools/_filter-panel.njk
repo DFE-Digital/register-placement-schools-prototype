@@ -189,6 +189,44 @@
   {% endif %}
 {% endif %}
 
+{% if filterProviderItems.length %}
+  {% if filterProviderItems.length > 5 %}
+    {{ appCheckboxFilter({
+      id: "filters-provider",
+      name: "filters[provider]",
+      fieldset: {
+        legend: {
+          html: 'Provider<span class="govuk-visually-hidden"> filter</span>',
+          isPageHeading: false,
+          classes: "govuk-fieldset__legend--s"
+        }
+      },
+      values: selectedProvider,
+      items: filterProviderItems,
+      showSelectedTags: false,
+      classes: "govuk-!-margin-bottom-7"
+    }) }}
+  {% else %}
+    {{ govukCheckboxes({
+      id: "filters-provider",
+      name: "filters[provider]",
+      fieldset: {
+        legend: {
+          html: 'Provider<span class="govuk-visually-hidden"> filter</span>',
+          isPageHeading: false,
+          classes: "govuk-fieldset__legend--s"
+        }
+      },
+      formGroup: {
+        classes: "app-filter__group"
+      },
+      classes: "govuk-checkboxes--small",
+      values: selectedProvider,
+      items: filterProviderItems
+    }) }}
+  {% endif %}
+{% endif %}
+
 {% if filterRegionItems.length %}
   {% if filterRegionItems.length > 5 %}
     {{ appCheckboxFilter({
