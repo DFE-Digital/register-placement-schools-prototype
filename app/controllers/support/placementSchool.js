@@ -690,6 +690,34 @@ exports.placementSchoolDetails = async (req, res) => {
    })
 }
 
+exports.placementSchoolLocation = async (req, res) => {
+  delete req.session.data.keywords
+  delete req.session.data.filters
+  delete req.session.data.find
+
+  const { schoolId } = req.params
+
+  const placementSchool = await School.findOne({
+    where: { id: schoolId },
+    include: [
+      { model: SchoolDetail, as: 'schoolDetail' },
+      { model: SchoolAddress, as: 'schoolAddress' },
+      { model: SchoolType, as: 'schoolType' },
+      { model: SchoolGroup, as: 'schoolGroup' },
+      { model: SchoolEducationPhase, as: 'schoolEducationPhase' },
+      { model: SchoolStatus, as: 'schoolStatus' }
+    ]
+  })
+
+  res.render('support/placement-schools/location', {
+    placementSchool,
+    osMapsApiKey: process.env.ORDNANCE_SURVEY_API_KEY,
+    actions: {
+      back: '/support/placement-schools'
+    }
+  })
+}
+
 exports.placementSchoolPartnerships = async (req, res) => {
   // Clear session provider data
   delete req.session.data.keywords
