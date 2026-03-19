@@ -747,7 +747,7 @@ exports.placementSchoolPartnerships = async (req, res) => {
 
   const groupedPartnerships = groupPartnershipsByAcademicYear(partnerships)
 
-  res.render('support/placement-schools/partnerships/index', {
+  res.render('support/placement-schools/partnerships', {
     placementSchool,
     groupedPartnerships,
     actions: {
