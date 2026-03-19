@@ -9,7 +9,8 @@ const {
   SchoolGroup,
   SchoolStatus,
   Subject,
-  SchoolType
+  SchoolType,
+  Sequelize
 } = require('../../models')
 
 const Pagination = require('../../helpers/pagination')
@@ -697,9 +698,6 @@ exports.placementSchoolLocation = async (req, res) => {
 
   const { schoolId } = req.params
   const page = parseInt(req.query.page, 10) || 1
-  const limit = parseInt(req.query.limit, 10) || 25
-  const offset = (page - 1) * limit
-
   const placementSchool = await School.findOne({
     where: { id: schoolId },
     include: [
@@ -731,6 +729,28 @@ exports.placementSchoolPlacements = async (req, res) => {
   const page = parseInt(req.query.page, 10) || 1
   const limit = parseInt(req.query.limit, 10) || 25
   const offset = (page - 1) * limit
+  const allowedSortKeys = ['academicYear', 'provider', 'subject']
+  const defaultSortKey = 'academicYear'
+  const defaultSortDirection = 'desc'
+  const sortKey = allowedSortKeys.includes(req.query.sort) ? req.query.sort : defaultSortKey
+  const sortDirection = (req.query.direction === 'asc' || req.query.direction === 'desc')
+    ? req.query.direction
+    : (sortKey === defaultSortKey ? defaultSortDirection : 'asc')
+  const sortDirectionLabel = sortDirection === 'asc' ? '▲' : '▼' // 'ascending' : 'descending'
+  const buildSortHref = (key) => {
+    const nextDirection = (sortKey === key && sortDirection === 'asc') ? 'desc' : 'asc'
+    const params = new URLSearchParams()
+    params.set('sort', key)
+    params.set('direction', nextDirection)
+    if (req.query.limit) params.set('limit', limit)
+    return `?${params.toString()}`
+  }
+
+  const sortLinks = {
+    academicYear: buildSortHref('academicYear'),
+    provider: buildSortHref('provider'),
+    subject: buildSortHref('subject')
+  }
 
   const placementSchool = await School.findOne({
     where: { id: schoolId },
@@ -743,6 +763,36 @@ exports.placementSchoolPlacements = async (req, res) => {
     where: { schoolId }
   })
 
+  let order = [
+    [{ model: AcademicYear, as: 'academicYear' }, 'name', 'DESC'],
+    [Sequelize.fn('LOWER', Sequelize.col('provider.operating_name')), 'ASC'],
+    [{ model: Subject, as: 'subject' }, 'name', 'ASC']
+  ]
+
+  if (sortKey === 'academicYear') {
+    order = [
+      [{ model: AcademicYear, as: 'academicYear' }, 'name', sortDirection.toUpperCase()],
+      [Sequelize.fn('LOWER', Sequelize.col('provider.operating_name')), 'ASC'],
+      [{ model: Subject, as: 'subject' }, 'name', 'ASC']
+    ]
+  }
+
+  if (sortKey === 'provider') {
+    order = [
+      [Sequelize.fn('LOWER', Sequelize.col('provider.operating_name')), sortDirection.toUpperCase()],
+      [{ model: AcademicYear, as: 'academicYear' }, 'name', 'DESC'],
+      [{ model: Subject, as: 'subject' }, 'name', 'ASC']
+    ]
+  }
+
+  if (sortKey === 'subject') {
+    order = [
+      [{ model: Subject, as: 'subject' }, 'name', sortDirection.toUpperCase()],
+      [{ model: AcademicYear, as: 'academicYear' }, 'name', 'DESC'],
+      [Sequelize.fn('LOWER', Sequelize.col('provider.operating_name')), 'ASC']
+    ]
+  }
+
   const placements = await PlacementSchool.findAll({
     where: { schoolId },
     include: [
@@ -750,21 +800,36 @@ exports.placementSchoolPlacements = async (req, res) => {
       { model: AcademicYear, as: 'academicYear', attributes: ['id', 'name'] },
       { model: Subject, as: 'subject', attributes: ['id', 'name'] }
     ],
-    order: [
-      [{ model: AcademicYear, as: 'academicYear' }, 'name', 'DESC'],
-      [{ model: Provider, as: 'provider' }, 'operatingName', 'ASC'],
-      [{ model: Subject, as: 'subject' }, 'name', 'ASC']
-    ],
+    order,
     limit,
     offset
   })
 
   const pagination = new Pagination(placements, totalCount, page, limit)
+  const paginationSortParams = new URLSearchParams()
+  if (sortKey) paginationSortParams.set('sort', sortKey)
+  if (sortDirection) paginationSortParams.set('direction', sortDirection)
+  if (limit) paginationSortParams.set('limit', limit)
+  const sortQueryString = paginationSortParams.toString()
+  if (sortQueryString) {
+    const appendSortParams = (item) => {
+      if (!item?.href) return
+      const separator = item.href.includes('?') ? '&' : '?'
+      item.href = `${item.href}${separator}${sortQueryString}`
+    }
+    if (pagination.previousPage) appendSortParams(pagination.previousPage)
+    if (pagination.nextPage) appendSortParams(pagination.nextPage)
+    pagination.pageItems?.forEach(appendSortParams)
+  }
 
   res.render('support/placement-schools/placements', {
     placementSchool,
     placements: pagination.getData(),
     pagination,
+    sortKey,
+    sortDirection,
+    sortDirectionLabel,
+    sortLinks,
     actions: {
       back: '/support/placement-schools'
     }

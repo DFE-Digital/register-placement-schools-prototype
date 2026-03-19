@@ -40,9 +40,27 @@
       <table class="govuk-table">
         <thead class="govuk-table__head">
           <tr class="govuk-table__row">
-            <th scope="col" class="govuk-table__header">Academic year</th>
-            <th scope="col" class="govuk-table__header">Provider name</th>
-            <th scope="col" class="govuk-table__header">Subject</th>
+            <th scope="col" class="govuk-table__header">
+              <a class="govuk-link" href="{{ sortLinks.academicYear }}">Academic year</a>
+              {% if sortKey == "academicYear" %}
+                <span class="govuk-visually-hidden"> (sorted {{ sortDirectionLabel }})</span>
+                <span aria-hidden="true"> {{ sortDirectionLabel }}</span>
+              {% endif %}
+            </th>
+            <th scope="col" class="govuk-table__header">
+              <a class="govuk-link" href="{{ sortLinks.provider }}">Provider name</a>
+              {% if sortKey == "provider" %}
+                <span class="govuk-visually-hidden"> (sorted {{ sortDirectionLabel }})</span>
+                <span aria-hidden="true"> {{ sortDirectionLabel }}</span>
+              {% endif %}
+            </th>
+            <th scope="col" class="govuk-table__header">
+              <a class="govuk-link" href="{{ sortLinks.subject }}">Subject</a>
+              {% if sortKey == "subject" %}
+                <span class="govuk-visually-hidden"> (sorted {{ sortDirectionLabel }})</span>
+                <span aria-hidden="true"> {{ sortDirectionLabel }}</span>
+              {% endif %}
+            </th>
           </tr>
         </thead>
         <tbody class="govuk-table__body">
