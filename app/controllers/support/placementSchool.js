@@ -699,7 +699,10 @@ exports.placementSchoolPartnerships = async (req, res) => {
   const { schoolId } = req.params
 
   const placementSchool = await School.findOne({
-    where: { id: schoolId }
+    where: { id: schoolId },
+    include: [
+      { model: SchoolStatus, as: 'schoolStatus' }
+    ]
   })
 
   const partnerships = await PlacementSchool.findAll({
@@ -715,7 +718,6 @@ exports.placementSchoolPartnerships = async (req, res) => {
   })
 
   const groupedPartnerships = groupPartnershipsByAcademicYear(partnerships)
-
 
   res.render('support/placement-schools/partnerships/index', {
     placementSchool,

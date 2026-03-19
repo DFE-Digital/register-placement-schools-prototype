@@ -1,0 +1,29 @@
+{% if placementSchool.schoolStatus.name | lower == "open" %}
+  {% set tagClass = "govuk-tag--green" %}
+{% elif placementSchool.schoolStatus.name | lower == "closed" %}
+  {% set tagClass = "govuk-tag--red" %}
+{% elif placementSchool.schoolStatus.name | lower == "open, but proposed to close" %}
+  {% set tagClass = "govuk-tag--orange" %}
+{% elif placementSchool.schoolStatus.name | lower == "proposed to open" %}
+  {% set tagClass = "govuk-tag--yellow" %}
+{% else %}
+  {% set tagClass = "govuk-tag--grey" %}
+{% endif %}
+
+{% set headingTag %}
+  {{ govukTag({
+    text: placementSchool.schoolStatus.name if placementSchool.schoolStatus.name.length else "Not known",
+    classes: tagClass + " govuk-tag__heading govuk-tag--no-max-width govuk-!-margin-left-1"
+  }) }}
+{% endset %}
+
+{% set headingClass = "govuk-!-margin-bottom-2" %}
+
+{% include "_includes/page-heading.njk" %}
+
+{% if placementSchool.ukprn.length or placementSchool.urn.length %}
+  <p class="govuk-hint">
+    {% if placementSchool.ukprn.length %}<b><abbr title="UK provider reference number">UKPRN</abbr>:</b> {{ placementSchool.ukprn }}{% endif %}
+    {% if placementSchool.urn.length %}<b><abbr title="unique reference number">URN</abbr>:</b> {{ placementSchool.urn }}{% endif %}
+  </p>
+{% endif %}
