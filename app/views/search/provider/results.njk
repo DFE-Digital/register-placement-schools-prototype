@@ -176,7 +176,36 @@
 
         {% set placementSubjectsHtml %}
           {% if placement.placementSubjects.length %}
-            {% if placement.placementSubjects.length > 3 %}
+            {% if selectedPlacementSubjectNames.length %}
+              <ul class="govuk-list govuk-list--bullet">
+                {% for subject in placement.placementSubjects %}
+                  {% if subject in selectedPlacementSubjectNames %}
+                    <li>{{ subject }}</li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+              {% set hasUnmatchedSubjects = false %}
+              {% for subject in placement.placementSubjects %}
+                {% if subject not in selectedPlacementSubjectNames %}
+                  {% set hasUnmatchedSubjects = true %}
+                {% endif %}
+              {% endfor %}
+              {% if hasUnmatchedSubjects %}
+                {% set moreSubjectsHtml %}
+                  <ul class="govuk-list govuk-list--bullet">
+                    {% for subject in placement.placementSubjects %}
+                      {% if subject not in selectedPlacementSubjectNames %}
+                        <li>{{ subject }}</li>
+                      {% endif %}
+                    {% endfor %}
+                  </ul>
+                {% endset %}
+                {{ govukDetails({
+                  summaryText: "More subjects",
+                  html: moreSubjectsHtml
+                }) }}
+              {% endif %}
+            {% elseif placement.placementSubjects.length > 3 %}
               <ul class="govuk-list govuk-list--bullet">
                 {% for subject in placement.placementSubjects %}
                   {% if loop.index <= 3 %}

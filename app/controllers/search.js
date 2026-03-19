@@ -279,6 +279,11 @@ exports.results_get = async (req, res, next) => {
         filterAcademicYearItems,
         filterPlacementSubjectItems
       } = await fetchFilterOptions('location')
+      const selectedPlacementSubjectNames = (selectedPlacementSubject || []).length
+        ? filterPlacementSubjectItems
+          .filter((item) => selectedPlacementSubject.includes(item.value))
+          .map((item) => item.text)
+        : []
 
       const placeId = session.location?.id
       if (!placeId) return res.redirect('/search/location')
@@ -324,6 +329,7 @@ exports.results_get = async (req, res, next) => {
         filterSchoolEducationPhaseItems,
         filterAcademicYearItems,
         filterPlacementSubjectItems,
+        selectedPlacementSubjectNames,
         selectedRadius,
         selectedSchoolType,
         selectedSchoolGroup,
@@ -374,6 +380,11 @@ exports.results_get = async (req, res, next) => {
         filterAcademicYearItems,
         filterPlacementSubjectItems
       } = await fetchFilterOptions('provider')
+      const selectedPlacementSubjectNames = (selectedPlacementSubject || []).length
+        ? filterPlacementSubjectItems
+          .filter((item) => selectedPlacementSubject.includes(item.value))
+          .map((item) => item.text)
+        : []
 
       const providerId = session.provider?.id
       if (!providerId) return res.redirect('/search/provider')
@@ -411,6 +422,7 @@ exports.results_get = async (req, res, next) => {
         filterSchoolEducationPhaseItems,
         filterAcademicYearItems,
         filterPlacementSubjectItems,
+        selectedPlacementSubjectNames,
         selectedRegion,
         selectedSchoolType,
         selectedSchoolGroup,
