@@ -153,11 +153,34 @@
 
         {% set placementSubjectsHtml %}
           {% if placement.placementSubjects.length %}
-            <ul class="govuk-list govuk-list--bullet">
-              {% for subject in placement.placementSubjects %}
-                <li>{{ subject }}</li>
-              {% endfor %}
-            </ul>
+            {% if placement.placementSubjects.length > 3 %}
+              <ul class="govuk-list govuk-list--bullet">
+                {% for subject in placement.placementSubjects %}
+                  {% if loop.index <= 3 %}
+                    <li>{{ subject }}</li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+              {% set moreSubjectsHtml %}
+                <ul class="govuk-list govuk-list--bullet">
+                  {% for subject in placement.placementSubjects %}
+                    {% if loop.index > 3 %}
+                      <li>{{ subject }}</li>
+                    {% endif %}
+                  {% endfor %}
+                </ul>
+              {% endset %}
+              {{ govukDetails({
+                summaryText: "More subjects",
+                html: moreSubjectsHtml
+              }) }}
+            {% else %}
+              <ul class="govuk-list govuk-list--bullet">
+                {% for subject in placement.placementSubjects %}
+                  <li>{{ subject }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
           {% else %}
             <p class="govuk-body">Not known</p>
           {% endif %}
