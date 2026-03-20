@@ -56,6 +56,52 @@
       <p class="govuk-body">Location information is not available for this school.</p>
     {% endif %}
 
+    {% set addressHtml %}
+      {% if placementSchool.schoolAddress.line1.length %}
+        {{ placementSchool.schoolAddress.line1 }}<br aria-hidden="true">
+      {% endif %}
+      {% if placementSchool.schoolAddress.line2.length %}
+        {{ placementSchool.schoolAddress.line2 }}<br aria-hidden="true">
+      {% endif %}
+      {% if placementSchool.schoolAddress.line3.length %}
+        {{ placementSchool.schoolAddress.line3 }}<br aria-hidden="true">
+      {% endif %}
+      {% if placementSchool.schoolAddress.town.length %}
+        {{ placementSchool.schoolAddress.town }}<br aria-hidden="true">
+      {% endif %}
+      {% if placementSchool.schoolAddress.county.length %}
+        {{ placementSchool.schoolAddress.county }}<br aria-hidden="true">
+      {% endif %}
+      {% if placementSchool.schoolAddress.postcode.length %}
+        {{ placementSchool.schoolAddress.postcode }}
+      {% endif %}
+    {% endset %}
+
+    {% set regionName = placementSchool.schoolDetail.region.name if placementSchool.schoolDetail and placementSchool.schoolDetail.region else '' %}
+
+    {{ govukSummaryList({
+      rows: [
+        {
+          key: {
+            text: "Region"
+          },
+          value: {
+            text: regionName if regionName.length else "Not known",
+            classes: "govuk-hint" if not regionName.length
+          }
+        },
+        {
+          key: {
+            text: "Address"
+          },
+          value: {
+            html: addressHtml if addressHtml.length else "Not known",
+            classes: "govuk-hint" if not addressHtml.length
+          }
+        }
+      ]
+    }) }}
+
   </div>
 </div>
 
