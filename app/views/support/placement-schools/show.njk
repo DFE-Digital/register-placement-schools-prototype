@@ -60,6 +60,9 @@
       </ul>
     {% endset %}
 
+    {% set boardingProvision = placementSchool.schoolDetail.boarder.name if placementSchool.schoolDetail and placementSchool.schoolDetail.boarder else '' %}
+    {% set nurseryProvision = placementSchool.schoolDetail.nurseryProvision.name if placementSchool.schoolDetail and placementSchool.schoolDetail.nurseryProvision else '' %}
+
     {% set addressHtml %}
       {% if placementSchool.schoolAddress.line1.length %}
         {{ placementSchool.schoolAddress.line1 }}<br aria-hidden="true">
@@ -81,6 +84,22 @@
       {% endif %}
     {% endset %}
 
+    {% set websiteHtml %}
+      <a class="govuk-link"
+        href="{{ placementSchool.website }}"
+        target="_blank"
+        rel="noreferrer nofollow">
+        {{ placementSchool.website }} (opens in new tab)
+      </a>
+    {% endset %}
+
+    {% set telephoneHtml %}
+      <a class="govuk-link"
+        href="tel:{{ placementSchool.telephone }}">
+        {{ placementSchool.telephone }}
+      </a>
+    {% endset %}
+
     {{ govukSummaryList({
       rows: [
         {
@@ -100,7 +119,7 @@
             text: placementSchool.ukprn if placementSchool.ukprn.length else "Not known",
             classes: "govuk-hint" if not placementSchool.ukprn.length
           }
-        },
+        } if 1==0,
         {
           key: {
             text: "Unique reference number (URN)"
@@ -109,7 +128,7 @@
             text: placementSchool.urn if placementSchool.urn.length else "Not known",
             classes: "govuk-hint" if not placementSchool.urn.length
           }
-        },
+        } if 1==0,
         {
           key: {
             text: "School type"
@@ -128,11 +147,54 @@
         },
         {
           key: {
+            text: "Boarding provision"
+          },
+          value: {
+            text: boardingProvision if boardingProvision.length else "Not known",
+            classes: "govuk-hint" if not boardingProvision.length
+          }
+        },
+        {
+          key: {
+            text: "Nursery provision"
+          },
+          value: {
+            text: nurseryProvision if nurseryProvision.length else "Not known",
+            classes: "govuk-hint" if not nurseryProvision.length
+          }
+        }
+      ]
+    }) }}
+
+    <h2 class="govuk-heading-m">Contact details</h2>
+
+    {{ govukSummaryList({
+      rows: [
+        {
+          key: {
             text: "Address"
           },
           value: {
             html: addressHtml if addressHtml.length else "Not known",
             classes: "govuk-hint" if not addressHtml.length
+          }
+        },
+        {
+          key: {
+            text: "Website"
+          },
+          value: {
+            html: websiteHtml if placementSchool.website and placementSchool.website.length else "Not known",
+            classes: "govuk-hint" if not placementSchool.website or not placementSchool.website.length
+          }
+        },
+        {
+          key: {
+            text: "Phone number"
+          },
+          value: {
+            html: telephoneHtml if placementSchool.telephone and placementSchool.telephone.length else "Not known",
+            classes: "govuk-hint" if not placementSchool.telephone or not placementSchool.telephone.length
           }
         }
       ]

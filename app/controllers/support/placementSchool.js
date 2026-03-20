@@ -4,9 +4,11 @@ const {
   Provider,
   School,
   SchoolAddress,
+  SchoolBoarder,
   SchoolDetail,
   SchoolEducationPhase,
   SchoolGroup,
+  SchoolNurseryProvision,
   Region,
   SchoolStatus,
   Subject,
@@ -675,7 +677,10 @@ exports.placementSchoolDetails = async (req, res) => {
   const placementSchool = await School.findOne({
     where: { id: schoolId },
     include: [
-      { model: SchoolDetail, as: 'schoolDetail' },
+      { model: SchoolDetail, as: 'schoolDetail', include: [
+        { model: SchoolBoarder, as: 'boarder' },
+        { model: SchoolNurseryProvision, as: 'nurseryProvision' }
+      ] },
       { model: SchoolAddress, as: 'schoolAddress' },
       { model: SchoolType, as: 'schoolType' },
       { model: SchoolGroup, as: 'schoolGroup' },

@@ -83,20 +83,20 @@
       rows: [
         {
           key: {
-            text: "Region"
-          },
-          value: {
-            text: regionName if regionName.length else "Not known",
-            classes: "govuk-hint" if not regionName.length
-          }
-        },
-        {
-          key: {
             text: "Address"
           },
           value: {
             html: addressHtml if addressHtml.length else "Not known",
             classes: "govuk-hint" if not addressHtml.length
+          }
+        },
+        {
+          key: {
+            text: "Region"
+          },
+          value: {
+            text: regionName if regionName.length else "Not known",
+            classes: "govuk-hint" if not regionName.length
           }
         }
       ]
