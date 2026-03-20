@@ -254,6 +254,23 @@ exports.placementSchoolsList = async (req, res) => {
       categories: []
     }
 
+    if (regions?.length) {
+      const items = await Promise.all(
+        regions.map(async (region) => {
+          const label = await getRegionLabel(region)
+          return {
+            text: label,
+            href: `/support/placement-schools/remove-region-filter/${region}`
+          }
+        })
+      )
+
+      selectedFilters.categories.push({
+        heading: { text: 'Region' },
+        items: items
+      })
+    }
+
     if (schoolGroups?.length) {
       const items = await Promise.all(
         schoolGroups.map(async (schoolGroup) => {
@@ -266,7 +283,7 @@ exports.placementSchoolsList = async (req, res) => {
       )
 
       selectedFilters.categories.push({
-        heading: { text: 'School group' },
+        heading: { text: 'School type' }, // this should really be 'School group' but that's an internal term
         items: items
       })
     }
@@ -369,23 +386,6 @@ exports.placementSchoolsList = async (req, res) => {
 
       selectedFilters.categories.push({
         heading: { text: 'Provider' },
-        items: items
-      })
-    }
-
-    if (regions?.length) {
-      const items = await Promise.all(
-        regions.map(async (region) => {
-          const label = await getRegionLabel(region)
-          return {
-            text: label,
-            href: `/support/placement-schools/remove-region-filter/${region}`
-          }
-        })
-      )
-
-      selectedFilters.categories.push({
-        heading: { text: 'Region' },
         items: items
       })
     }
