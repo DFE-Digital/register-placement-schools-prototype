@@ -44,3 +44,9 @@
     margin: 0;
   }
 }
+
+abbr[title] {
+  text-decoration: underline dotted;
+  text-decoration-color: govuk-colour("black", $variant: "tint-25");
+  text-underline-offset: 3px;
+}

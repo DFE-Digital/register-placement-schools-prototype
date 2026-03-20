@@ -316,8 +316,8 @@ function loadSubjects(filePath) {
   const data = JSON.parse(fs.readFileSync(filePath, "utf8"));
   const map = new Map();
   for (const entry of data) {
-    if (entry && entry.name && entry.id) {
-      map.set(normalizeSubject(entry.name), entry.id);
+    if (entry && entry.code && entry.id) {
+      map.set(normalizeSubject(entry.code), entry.id);
     }
   }
   return map;
@@ -385,7 +385,7 @@ function main() {
   const providers = loadProviders(providersPath);
   const schoolsByUrn = loadSchools(schoolsPath);
   const academicYearsByCode = loadAcademicYears(academicYearsPath);
-  const subjectsByName = loadSubjects(subjectsPath);
+  const subjectsByCode = loadSubjects(subjectsPath);
 
   const files = fs
     .readdirSync(srcDir)
@@ -466,7 +466,7 @@ function main() {
       }
 
       const subjectKey = normalizeSubject(row.subject_name);
-      const subjectId = subjectsByName.get(subjectKey);
+      const subjectId = subjectsByCode.get(subjectKey);
       if (!subjectId) {
         missingSubjects.add(normalizeKey(row.subject_name) || "(blank)");
         skippedRows += 1;

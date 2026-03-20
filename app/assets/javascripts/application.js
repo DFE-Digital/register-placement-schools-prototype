@@ -86,4 +86,13 @@ window.GOVUKPrototypeKit.documentReady(() => {
     })
     checkboxFilterAcademicYear.init()
   }
+
+  const providerContainer = document.querySelector('#filters-provider')
+  if (providerContainer) {
+    const checkboxFilterProvider = new CheckboxFilter({
+      container: providerContainer,
+      textBox: { label: 'Search for provider' }
+    })
+    checkboxFilterProvider.init()
+  }
 })

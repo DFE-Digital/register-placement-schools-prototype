@@ -160,12 +160,17 @@ router.get('/support/placement-schools/remove-school-type-filter/:schoolType', c
 router.get('/support/placement-schools/remove-school-group-filter/:schoolGroup', checkIsAuthenticated, supportPlacementSchoolController.removeSchoolGroupFilter)
 router.get('/support/placement-schools/remove-school-status-filter/:schoolStatus', checkIsAuthenticated, supportPlacementSchoolController.removeSchoolStatusFilter)
 router.get('/support/placement-schools/remove-school-education-phase-filter/:schoolEducationPhase', checkIsAuthenticated, supportPlacementSchoolController.removeSchoolEducationPhaseFilter)
+router.get('/support/placement-schools/remove-academic-year-filter/:academicYear', checkIsAuthenticated, supportPlacementSchoolController.removeAcademicYearFilter)
+router.get('/support/placement-schools/remove-placement-subject-filter/:placementSubject', checkIsAuthenticated, supportPlacementSchoolController.removePlacementSubjectFilter)
+router.get('/support/placement-schools/remove-provider-filter/:provider', checkIsAuthenticated, supportPlacementSchoolController.removeProviderFilter)
+router.get('/support/placement-schools/remove-region-filter/:region', checkIsAuthenticated, supportPlacementSchoolController.removeRegionFilter)
 
 router.get('/support/placement-schools/remove-all-filters', checkIsAuthenticated, supportPlacementSchoolController.removeAllFilters)
 
 router.get('/support/placement-schools/remove-keyword-search', checkIsAuthenticated, supportPlacementSchoolController.removeKeywordSearch)
 
-router.get('/support/placement-schools/:schoolId/partnerships', checkIsAuthenticated, supportPlacementSchoolController.placementSchoolPartnerships)
+router.get('/support/placement-schools/:schoolId/location', checkIsAuthenticated, supportPlacementSchoolController.placementSchoolLocation)
+router.get('/support/placement-schools/:schoolId/placements', checkIsAuthenticated, supportPlacementSchoolController.placementSchoolPlacements)
 
 router.get('/support/placement-schools/:schoolId', checkIsAuthenticated, supportPlacementSchoolController.placementSchoolDetails)
 

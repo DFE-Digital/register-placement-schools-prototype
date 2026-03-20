@@ -1,0 +1,93 @@
+{% extends "layouts/support.njk" %}
+
+{% set primaryNavId = "placementSchools" %}
+{% set secondaryNavId = "placements" %}
+
+{% set title = placementSchool.name %}
+{% set caption = "Placement school" %}
+
+{% block beforeContent %}
+{{ govukBackLink({
+  text: "Back",
+  href: actions.back
+}) }}
+{% endblock %}
+
+{% block content %}
+
+{% include "_includes/notification-banner.njk" %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% include "./_page-heading.njk" %}
+
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    {% include "./_secondary-navigation.njk" %}
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h2 class="govuk-heading-m">Placements ({{ pagination.totalCount | numeral("0,0") }})</h2>
+
+    {% if placements.length %}
+      <table class="govuk-table">
+        <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header govuk-!-width-one-third">
+              <a class="govuk-link" href="{{ sortLinks.academicYear }}">Academic year</a>
+              {% if sortKey == "academicYear" %}
+                <span class="govuk-visually-hidden"> (sorted {{ sortDirectionLabel }})</span>
+                <span aria-hidden="true"> {{ sortDirectionLabel }}</span>
+              {% endif %}
+            </th>
+            <th scope="col" class="govuk-table__header govuk-!-width-one-third">
+              <a class="govuk-link" href="{{ sortLinks.provider }}">Provider name</a>
+              {% if sortKey == "provider" %}
+                <span class="govuk-visually-hidden"> (sorted {{ sortDirectionLabel }})</span>
+                <span aria-hidden="true"> {{ sortDirectionLabel }}</span>
+              {% endif %}
+            </th>
+            <th scope="col" class="govuk-table__header govuk-!-width-one-third">
+              <a class="govuk-link" href="{{ sortLinks.subject }}">Subject</a>
+              {% if sortKey == "subject" %}
+                <span class="govuk-visually-hidden"> (sorted {{ sortDirectionLabel }})</span>
+                <span aria-hidden="true"> {{ sortDirectionLabel }}</span>
+              {% endif %}
+            </th>
+          </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+          {% for placement in placements %}
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell">
+                {{ placement.academicYear.name if placement.academicYear and placement.academicYear.name else "Not known" }}
+              </td>
+              <td class="govuk-table__cell">
+                {{ placement.provider.operatingName if placement.provider and placement.provider.operatingName else "Not known" }}
+              </td>
+              <td class="govuk-table__cell">
+                {{ placement.subject.name if placement.subject and placement.subject.name else "Not known" }}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% if pagination and pagination.totalCount > 25 %}
+        {% include "_includes/pagination.njk" %}
+      {% endif %}
+
+    {% else %}
+      <p class="govuk-body">There are no placements for {{ placementSchool.name if placementSchool.name else "this school" }}.</p>
+    {% endif %}
+
+  </div>
+</div>
+
+{% endblock %}

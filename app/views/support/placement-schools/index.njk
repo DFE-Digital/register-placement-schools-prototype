@@ -37,11 +37,32 @@
     {% if placementSchools.length %}
 
       {% for school in placementSchools %}
+        {% if school.status | lower == "open" %}
+          {% set tagClass = "govuk-tag--green" %}
+        {% elif school.status | lower == "closed" %}
+          {% set tagClass = "govuk-tag--red" %}
+        {% elif school.status | lower == "open, but proposed to close" %}
+          {% set tagClass = "govuk-tag--orange" %}
+        {% elif school.status | lower == "proposed to open" %}
+          {% set tagClass = "govuk-tag--yellow" %}
+        {% else %}
+          {% set tagClass = "govuk-tag--grey" %}
+        {% endif %}
 
         {% set nameHtml %}
           <a href="{{ actions.view }}/{{ school.id }}" class="govuk-link">
             {{ school.name }}
           </a>
+          {{ govukTag({
+            text: school.status if school.status.length else "Not known",
+            classes: tagClass + " govuk-tag--no-max-width govuk-!-margin-left-1"
+          }) }}
+          {% if school.ukprn.length or school.urn.length %}
+            <p class="govuk-hint govuk-!-margin-top-1 govuk-!-margin-bottom-0">
+              {% if school.ukprn.length %}<b><abbr title="UK provider reference number">UKPRN</abbr>:</b> {{ school.ukprn }}{% endif %}
+              {% if school.urn.length %}<b><abbr title="unique reference number">URN</abbr>:</b> {{ school.urn }}{% endif %}
+            </p>
+          {% endif %}
         {% endset %}
 
         {% set schoolTypeGroupHtml %}
@@ -68,19 +89,217 @@
           </ul>
         {% endset %}
 
-        {% set academicYearsHtml %}
-          <ul class="govuk-list govuk-list--spaced">
-            {% for year in school.academicYears %}
-              <li>
-                {{ year.name }}
+        {% set addressHtml -%}
+          {% if school.address.line1.length %}
+            {{ school.address.line1 }}<br aria-hidden="true">
+          {% endif %}
+          {% if school.address.line2.length %}
+            {{ school.address.line2 }}<br aria-hidden="true">
+          {% endif %}
+          {% if school.address.line3.length %}
+            {{ school.address.line3 }}<br aria-hidden="true">
+          {% endif %}
+          {% if school.address.town.length %}
+            {{ school.address.town }}<br aria-hidden="true">
+          {% endif %}
+          {% if school.address.county.length %}
+            {{ school.address.county }}<br aria-hidden="true">
+          {% endif %}
+          {% if school.address.postcode.length %}
+            {{ school.address.postcode }}
+          {% endif %}
+        {%- endset %}
+
+        {% set placementAcademicYearsHtml %}
+          {% if school.placementAcademicYears.length %}
+            {% if selectedAcademicYearNames.length %}
+              <ul class="govuk-list govuk-list--bullet">
+                {% for year in school.placementAcademicYears %}
+                  {% if year in selectedAcademicYearNames %}
+                    <li>{{ year }}</li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+              {% set hasUnmatchedYears = false %}
+              {% for year in school.placementAcademicYears %}
+                {% if year not in selectedAcademicYearNames %}
+                  {% set hasUnmatchedYears = true %}
+                {% endif %}
+              {% endfor %}
+              {% if hasUnmatchedYears %}
+                {% set moreAcademicYearsHtml %}
+                  <ul class="govuk-list govuk-list--bullet">
+                    {% for year in school.placementAcademicYears %}
+                      {% if year not in selectedAcademicYearNames %}
+                        <li>{{ year }}</li>
+                      {% endif %}
+                    {% endfor %}
+                  </ul>
+                {% endset %}
+                {{ govukDetails({
+                  summaryText: "More academic years",
+                  html: moreAcademicYearsHtml
+                }) }}
+              {% endif %}
+            {% elseif school.placementAcademicYears.length > 3 %}
+              <ul class="govuk-list govuk-list--bullet">
+                {% for year in school.placementAcademicYears %}
+                  {% if loop.index <= 3 %}
+                    <li>{{ year }}</li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+              {% set moreAcademicYearsHtml %}
                 <ul class="govuk-list govuk-list--bullet">
-                  {% for provider in year.providers %}
-                    <li>{{ provider.name }}</li>
+                  {% for year in school.placementAcademicYears %}
+                    {% if loop.index > 3 %}
+                      <li>{{ year }}</li>
+                    {% endif %}
                   {% endfor %}
                 </ul>
-              </li>
-            {% endfor %}
-          </ul>
+              {% endset %}
+              {{ govukDetails({
+                summaryText: "More academic years",
+                html: moreAcademicYearsHtml
+              }) }}
+            {% else %}
+              <ul class="govuk-list govuk-list--bullet">
+                {% for year in school.placementAcademicYears %}
+                  <li>{{ year }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          {% else %}
+            <p class="govuk-body">The school has not hosted any trainees</p>
+          {% endif %}
+        {% endset %}
+
+        {% set placementSubjectsHtml %}
+          {% if school.placementSubjects.length %}
+            {% if selectedPlacementSubjectNames.length %}
+              <ul class="govuk-list govuk-list--bullet">
+                {% for subject in school.placementSubjects %}
+                  {% if subject in selectedPlacementSubjectNames %}
+                    <li>{{ subject }}</li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+              {% set hasUnmatchedSubjects = false %}
+              {% for subject in school.placementSubjects %}
+                {% if subject not in selectedPlacementSubjectNames %}
+                  {% set hasUnmatchedSubjects = true %}
+                {% endif %}
+              {% endfor %}
+              {% if hasUnmatchedSubjects %}
+                {% set moreSubjectsHtml %}
+                  <ul class="govuk-list govuk-list--bullet">
+                    {% for subject in school.placementSubjects %}
+                      {% if subject not in selectedPlacementSubjectNames %}
+                        <li>{{ subject }}</li>
+                      {% endif %}
+                    {% endfor %}
+                  </ul>
+                {% endset %}
+                {{ govukDetails({
+                  summaryText: "More subjects",
+                  html: moreSubjectsHtml
+                }) }}
+              {% endif %}
+            {% elseif school.placementSubjects.length > 3 %}
+              <ul class="govuk-list govuk-list--bullet">
+                {% for subject in school.placementSubjects %}
+                  {% if loop.index <= 3 %}
+                    <li>{{ subject }}</li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+              {% set moreSubjectsHtml %}
+                <ul class="govuk-list govuk-list--bullet">
+                  {% for subject in school.placementSubjects %}
+                    {% if loop.index > 3 %}
+                      <li>{{ subject }}</li>
+                    {% endif %}
+                  {% endfor %}
+                </ul>
+              {% endset %}
+              {{ govukDetails({
+                summaryText: "More subjects",
+                html: moreSubjectsHtml
+              }) }}
+            {% else %}
+              <ul class="govuk-list govuk-list--bullet">
+                {% for subject in school.placementSubjects %}
+                  <li>{{ subject }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          {% else %}
+            <p class="govuk-body">Not known</p>
+          {% endif %}
+        {% endset %}
+
+        {% set placementProvidersHtml %}
+          {% if school.placementProviders.length %}
+            {% if selectedProviderNames.length %}
+              <ul class="govuk-list govuk-list--bullet">
+                {% for provider in school.placementProviders %}
+                  {% if provider in selectedProviderNames %}
+                    <li>{{ provider }}</li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+              {% set hasUnmatchedProviders = false %}
+              {% for provider in school.placementProviders %}
+                {% if provider not in selectedProviderNames %}
+                  {% set hasUnmatchedProviders = true %}
+                {% endif %}
+              {% endfor %}
+              {% if hasUnmatchedProviders %}
+                {% set moreProvidersHtml %}
+                  <ul class="govuk-list govuk-list--bullet">
+                    {% for provider in school.placementProviders %}
+                      {% if provider not in selectedProviderNames %}
+                        <li>{{ provider }}</li>
+                      {% endif %}
+                    {% endfor %}
+                  </ul>
+                {% endset %}
+                {{ govukDetails({
+                  summaryText: "More providers",
+                  html: moreProvidersHtml
+                }) }}
+              {% endif %}
+            {% elseif school.placementProviders.length > 3 %}
+              <ul class="govuk-list govuk-list--bullet">
+                {% for provider in school.placementProviders %}
+                  {% if loop.index <= 3 %}
+                    <li>{{ provider }}</li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+              {% set moreProvidersHtml %}
+                <ul class="govuk-list govuk-list--bullet">
+                  {% for provider in school.placementProviders %}
+                    {% if loop.index > 3 %}
+                      <li>{{ provider }}</li>
+                    {% endif %}
+                  {% endfor %}
+                </ul>
+              {% endset %}
+              {{ govukDetails({
+                summaryText: "More providers",
+                html: moreProvidersHtml
+              }) }}
+            {% else %}
+              <ul class="govuk-list govuk-list--bullet">
+                {% for provider in school.placementProviders %}
+                  <li>{{ provider }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          {% else %}
+            <p class="govuk-body">Not known</p>
+          {% endif %}
         {% endset %}
 
         {{ govukSummaryList({
@@ -92,29 +311,20 @@
           rows: [
             {
               key: {
-                text: "School status"
+                text: "Address"
               },
               value: {
-                text: school.status if school.status.length else "Not known",
-                classes: "govuk-hint" if not school.status.length
+                html: addressHtml if (school.address.line1.length and school.address.town.length and school.address.postcode.length) else "Not known",
+                classes: "govuk-hint" if not (school.address.line1.length and school.address.town.length and school.address.postcode.length)
               }
             },
             {
               key: {
-                text: "UK provider reference number (UKPRN)"
+                text: "Region"
               },
               value: {
-                text: school.ukprn if school.ukprn.length else "Not known",
-                classes: "govuk-hint" if not school.ukprn.length
-              }
-            },
-            {
-              key: {
-                text: "Unique reference number (URN)"
-              },
-              value: {
-                text: school.urn if school.urn.length else "Not known",
-                classes: "govuk-hint" if not school.urn.length
+                text: school.region if school.region else "Not known",
+                classes: "govuk-hint" if not school.region
               }
             },
             {
@@ -135,10 +345,26 @@
             },
             {
               key: {
-                text: "Latest partnership"
+                text: "Subjects"
               },
               value: {
-                html: academicYearsHtml
+                html: placementSubjectsHtml
+              }
+            },
+            {
+              key: {
+                text: "Academic years"
+              },
+              value: {
+                html: placementAcademicYearsHtml
+              }
+            },
+            {
+              key: {
+                text: "Providers"
+              },
+              value: {
+                html: placementProvidersHtml
               }
             }
           ]
