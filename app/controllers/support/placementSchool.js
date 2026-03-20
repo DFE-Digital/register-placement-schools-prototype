@@ -9,6 +9,7 @@ const {
   SchoolEducationPhase,
   SchoolGroup,
   SchoolNurseryProvision,
+  SchoolUrbanRuralLocation,
   Region,
   SchoolStatus,
   Subject,
@@ -733,7 +734,8 @@ exports.placementSchoolDetails = async (req, res) => {
     include: [
       { model: SchoolDetail, as: 'schoolDetail', include: [
         { model: SchoolBoarder, as: 'boarder' },
-        { model: SchoolNurseryProvision, as: 'nurseryProvision' }
+        { model: SchoolNurseryProvision, as: 'nurseryProvision' },
+        { model: SchoolUrbanRuralLocation, as: 'urbanRuralLocation' }
       ] },
       { model: SchoolAddress, as: 'schoolAddress' },
       { model: SchoolType, as: 'schoolType' },

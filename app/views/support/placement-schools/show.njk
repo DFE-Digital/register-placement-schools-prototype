@@ -62,6 +62,7 @@
 
     {% set boardingProvision = placementSchool.schoolDetail.boarder.name if placementSchool.schoolDetail and placementSchool.schoolDetail.boarder else '' %}
     {% set nurseryProvision = placementSchool.schoolDetail.nurseryProvision.name if placementSchool.schoolDetail and placementSchool.schoolDetail.nurseryProvision else '' %}
+    {% set urbanRuralLocation = placementSchool.schoolDetail.urbanRuralLocation.name if placementSchool.schoolDetail and placementSchool.schoolDetail.urbanRuralLocation else '' %}
 
     {% set addressHtml %}
       {% if placementSchool.schoolAddress.line1.length %}
@@ -145,6 +146,15 @@
             html: educationPhaseHtml
           }
         },
+        {
+          key: {
+            text: "Urban or rural"
+          },
+          value: {
+            text: urbanRuralLocation if urbanRuralLocation.length else "Not known",
+            classes: "govuk-hint" if not urbanRuralLocation.length
+          }
+        } if 1==0,
         {
           key: {
             text: "Boarding provision"
