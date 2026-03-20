@@ -320,6 +320,15 @@
             },
             {
               key: {
+                text: "Region"
+              },
+              value: {
+                text: school.region if school.region else "Not known",
+                classes: "govuk-hint" if not school.region
+              }
+            },
+            {
+              key: {
                 text: "School type"
               },
               value: {

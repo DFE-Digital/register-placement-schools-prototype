@@ -1,4 +1,43 @@
 {% set filterOptionsHtml %}
+
+{% if filterRegionItems.length %}
+  {% if filterRegionItems.length > 5 %}
+    {{ appCheckboxFilter({
+      id: "filters-region",
+      name: "filters[region]",
+      fieldset: {
+        legend: {
+          html: 'Region<span class="govuk-visually-hidden"> filter</span>',
+          isPageHeading: false,
+          classes: "govuk-fieldset__legend--s"
+        }
+      },
+      values: selectedRegion,
+      items: filterRegionItems,
+      showSelectedTags: false,
+      classes: "govuk-!-margin-bottom-7"
+    }) }}
+  {% else %}
+    {{ govukCheckboxes({
+      id: "filters-region",
+      name: "filters[region]",
+      fieldset: {
+        legend: {
+          html: 'Region<span class="govuk-visually-hidden"> filter</span>',
+          isPageHeading: false,
+          classes: "govuk-fieldset__legend--s"
+        }
+      },
+      formGroup: {
+        classes: "app-filter__group"
+      },
+      classes: "govuk-checkboxes--small",
+      values: selectedRegion,
+      items: filterRegionItems
+    }) }}
+  {% endif %}
+{% endif %}
+
 {% if filterSchoolGroupItems.length %}
   {% if filterSchoolGroupItems.length > 5 %}
     {{ appCheckboxFilter({
@@ -223,44 +262,6 @@
       classes: "govuk-checkboxes--small",
       values: selectedProvider,
       items: filterProviderItems
-    }) }}
-  {% endif %}
-{% endif %}
-
-{% if filterRegionItems.length %}
-  {% if filterRegionItems.length > 5 %}
-    {{ appCheckboxFilter({
-      id: "filters-region",
-      name: "filters[region]",
-      fieldset: {
-        legend: {
-          html: 'Region<span class="govuk-visually-hidden"> filter</span>',
-          isPageHeading: false,
-          classes: "govuk-fieldset__legend--s"
-        }
-      },
-      values: selectedRegion,
-      items: filterRegionItems,
-      showSelectedTags: false,
-      classes: "govuk-!-margin-bottom-7"
-    }) }}
-  {% else %}
-    {{ govukCheckboxes({
-      id: "filters-region",
-      name: "filters[region]",
-      fieldset: {
-        legend: {
-          html: 'Region<span class="govuk-visually-hidden"> filter</span>',
-          isPageHeading: false,
-          classes: "govuk-fieldset__legend--s"
-        }
-      },
-      formGroup: {
-        classes: "app-filter__group"
-      },
-      classes: "govuk-checkboxes--small",
-      values: selectedRegion,
-      items: filterRegionItems
     }) }}
   {% endif %}
 {% endif %}

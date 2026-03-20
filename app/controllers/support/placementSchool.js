@@ -26,7 +26,9 @@ const {
   getSchoolStatusOptions,
   getSchoolStatusLabel,
   getSchoolEducationPhaseOptions,
-  getSchoolEducationPhaseLabel
+  getSchoolEducationPhaseLabel,
+  getRegionOptions,
+  getRegionLabel
 } = require('../../helpers/gias')
 
 const {
@@ -71,6 +73,7 @@ const groupPlacementSchools = (rows) => {
         educationPhase: s.schoolEducationPhase ? s.schoolEducationPhase.name : null,
         statutoryLowAge: s.schoolDetail ? s.schoolDetail.statutoryLowAge : null,
         statutoryHighAge: s.schoolDetail ? s.schoolDetail.statutoryHighAge : null,
+        region: s.schoolDetail?.region?.name || null,
         address: s.schoolAddress || {
           line1: '',
           line2: '',
@@ -191,6 +194,7 @@ exports.placementSchoolsList = async (req, res) => {
   const placementSubject = null
   const academicYear = null
   const provider = null
+  const region = null
 
   let schoolTypes
   if (filters?.schoolType) {
@@ -227,6 +231,11 @@ exports.placementSchoolsList = async (req, res) => {
     providers = getCheckboxValues(provider, filters.provider)
   }
 
+  let regions
+  if (filters?.region) {
+    regions = getCheckboxValues(region, filters.region)
+  }
+
   const hasFilters = !!((schoolTypes?.length > 0)
    || (schoolGroups?.length > 0)
    || (schoolStatuses?.length > 0)
@@ -234,6 +243,7 @@ exports.placementSchoolsList = async (req, res) => {
    || (placementSubjects?.length > 0)
    || (academicYears?.length > 0)
    || (providers?.length > 0)
+   || (regions?.length > 0)
   )
 
   let selectedFilters = null
@@ -361,6 +371,23 @@ exports.placementSchoolsList = async (req, res) => {
         items: items
       })
     }
+
+    if (regions?.length) {
+      const items = await Promise.all(
+        regions.map(async (region) => {
+          const label = await getRegionLabel(region)
+          return {
+            text: label,
+            href: `/support/placement-schools/remove-region-filter/${region}`
+          }
+        })
+      )
+
+      selectedFilters.categories.push({
+        heading: { text: 'Region' },
+        items: items
+      })
+    }
   }
 
   const filterSchoolTypeItems = await getSchoolTypeOptions()
@@ -372,6 +399,7 @@ exports.placementSchoolsList = async (req, res) => {
   })
   const filterPlacementSubjectItems = await getSubjectOptions()
   const filterProviderItems = await getProviderOptions()
+  const filterRegionItems = await getRegionOptions()
 
   let selectedSchoolType = []
   if (filters?.schoolType) {
@@ -406,6 +434,11 @@ exports.placementSchoolsList = async (req, res) => {
   let selectedProvider = []
   if (filters?.provider) {
     selectedProvider = filters.provider
+  }
+
+  let selectedRegion = []
+  if (filters?.region) {
+    selectedRegion = filters.region
   }
 
   const selectedAcademicYearNames = (selectedAcademicYear || []).length
@@ -449,15 +482,25 @@ exports.placementSchoolsList = async (req, res) => {
     ]
   }
 
-  const includeForSchoolIds = [
-    {
-      model: School,
-      as: 'school',
+  const schoolInclude = {
+    model: School,
+    as: 'school',
+    attributes: [],
+    where: whereSchool,
+    required: true
+  }
+
+  if (regions?.length) {
+    schoolInclude.include = [{
+      model: SchoolDetail,
+      as: 'schoolDetail',
       attributes: [],
-      where: whereSchool,
+      where: { regionCode: { [Op.in]: regions } },
       required: true
-    }
-  ]
+    }]
+  }
+
+  const includeForSchoolIds = [schoolInclude]
 
   if (academicYears?.length) {
     includeForSchoolIds.push({
@@ -524,7 +567,7 @@ exports.placementSchoolsList = async (req, res) => {
           { model: SchoolGroup, as: 'schoolGroup' },
           { model: SchoolStatus, as: 'schoolStatus' },
           { model: SchoolEducationPhase, as: 'schoolEducationPhase' },
-          { model: SchoolDetail, as: 'schoolDetail' },
+          { model: SchoolDetail, as: 'schoolDetail', include: [{ model: Region, as: 'region' }] },
           { model: SchoolAddress, as: 'schoolAddress' }
         ]
       },
@@ -565,6 +608,7 @@ exports.placementSchoolsList = async (req, res) => {
     filterAcademicYearItems,
     filterPlacementSubjectItems,
     filterProviderItems,
+    filterRegionItems,
     selectedSchoolType,
     selectedSchoolGroup,
     selectedSchoolStatus,
@@ -572,6 +616,7 @@ exports.placementSchoolsList = async (req, res) => {
     selectedAcademicYear,
     selectedPlacementSubject,
     selectedProvider,
+    selectedRegion,
     selectedAcademicYearNames,
     selectedPlacementSubjectNames,
     selectedProviderNames,
@@ -649,6 +694,15 @@ exports.removeProviderFilter = (req, res) => {
   filters.provider = removeFilter(
     req.params.provider,
     filters.provider
+  )
+  res.redirect('/support/placement-schools')
+}
+
+exports.removeRegionFilter = (req, res) => {
+  const { filters } = req.session.data
+  filters.region = removeFilter(
+    req.params.region,
+    filters.region
   )
   res.redirect('/support/placement-schools')
 }
