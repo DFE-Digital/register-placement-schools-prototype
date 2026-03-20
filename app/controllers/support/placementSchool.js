@@ -283,7 +283,7 @@ exports.placementSchoolsList = async (req, res) => {
       )
 
       selectedFilters.categories.push({
-        heading: { text: 'School group' },
+        heading: { text: 'School type' }, // this should really be 'School group' but that's an internal term
         items: items
       })
     }
