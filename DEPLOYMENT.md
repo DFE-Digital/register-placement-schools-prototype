@@ -31,13 +31,13 @@ This document describes how to deploy the Register of placement schools prototyp
    Create a `.env` file in the root directory with the following variables:
    ```
    ORDNANCE_SURVEY_API_KEY=your_api_key
-   ORDNANCE_SURVEY_API_SECRET=your_api_secret
    GOOGLE_MAPS_API_KEY=your_google_maps_key
    SESSION_SECRET=a_random_secret_string
    USE_SIGN_IN_FORM=false
    ```
 
    **Note**: For local development and testing, you may not need the API keys immediately. The prototype will still function with limited features.
+   Avoid committing real keys to Git.
 
 4. **Run the application**
    ```bash
@@ -52,6 +52,7 @@ This document describes how to deploy the Register of placement schools prototyp
 - `npm run db:migrate` - Run database migrations
 - `npm run db:seed` - Seed database with initial data
 - `npm run db:build` - Run migrations and seeders together
+- `npm run db:build:dev` - Rebuild the local SQLite database from scratch
 
 ### Database management
 
@@ -59,7 +60,7 @@ The prototype uses SQLite for local development. The database file is created au
 
 **Resetting the database:**
 ```bash
-rm -f app/database/development.sqlite
+rm -f app/database/development.sqlite3
 npm run db:build
 ```
 
@@ -73,8 +74,7 @@ For local development, the application uses in-memory session storage, which is 
 
 | Variable | Required | Description |
 | --- | --- | --- |
-| `ORDNANCE_SURVEY_API_KEY` | Optional | API key for address lookup via Ordnance Survey Places API |
-| `ORDNANCE_SURVEY_API_SECRET` | Optional | API secret for Ordnance Survey Places API |
+| `ORDNANCE_SURVEY_API_KEY` | Optional | API key for address lookup via Ordnance Survey Places/Names APIs |
 | `GOOGLE_MAPS_API_KEY` | Optional | API key for Google Maps integration |
 | `SESSION_SECRET` | Recommended | Random string for session encryption. Generate with `openssl rand -base64 32` |
 | `USE_SIGN_IN_FORM` | Optional | Set to `true` for username/password login, `false` for persona selection (default: `false`) |
@@ -103,7 +103,6 @@ For local development, the application uses in-memory session storage, which is 
    ```bash
    heroku config:set NODE_ENV=production
    heroku config:set ORDNANCE_SURVEY_API_KEY=your_api_key
-   heroku config:set ORDNANCE_SURVEY_API_SECRET=your_api_secret
    heroku config:set GOOGLE_MAPS_API_KEY=your_google_maps_key
    heroku config:set SESSION_SECRET=$(openssl rand -base64 32)
    heroku config:set USE_SIGN_IN_FORM=false

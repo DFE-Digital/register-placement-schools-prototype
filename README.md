@@ -14,6 +14,14 @@ You can read more about this register on the [design history website](https://be
 - [Architecture](ARCHITECTURE.md) - Technical architecture and application structure
 - [Deployment](DEPLOYMENT.md) - Local and Heroku deployment instructions
 
+## Getting started
+
+1. Install dependencies: `npm install`
+2. Create `.env` with at least `SESSION_SECRET` and any API keys you need (see `DEPLOYMENT.md`)
+3. Run the prototype: `npm run dev`
+
+The app runs at `http://localhost:3000`.
+
 ## Tools
 
 If you’re using [Visual Studio (VS) Code](https://code.visualstudio.com/) for prototyping, we recommend you install the following extensions:
