@@ -10,23 +10,23 @@ The prototype is built using the [GOV.UK Prototype Kit](https://prototype-kit.se
 
 ### Core framework
 
-- **GOV.UK Prototype Kit** (v13.18.1) - Base framework
-- **GOV.UK Frontend** (v5.13.0) - Design system components and styling
+- **GOV.UK Prototype Kit** (v13.19.1) - Base framework
+- **GOV.UK Frontend** (v6.1.0) - Design system components and styling
 - **Node.js** (v22.x) - JavaScript runtime
 - **Express.js** - Web application framework
 
 ### Database
 
-- **Sequelize** (v6.37.7) - ORM (Object-Relational Mapping)
-- **SQLite3** (v5.1.7) - Database engine for local development
-- **Sequelize CLI** - Database migrations and seeding
+- **Sequelize** (v6.37.8) - ORM (Object-Relational Mapping)
+- **SQLite3** (v6.0.1) - Database engine for local development
+- **Sequelize CLI** (v6.6.5) - Database migrations and seeding
 
 ### Authentication
 
 - **Passport.js** (v0.7.0) - Authentication middleware
 - **Passport Local** (v1.0.0) - Local username/password strategy
 - **bcrypt** (v6.0.0) - Password hashing
-- **express-session** (v1.18.2) - Session management for Passport (also included by Prototype Kit)
+- **express-session** (v1.19.0) - Session management for Passport (also included by Prototype Kit)
 - **connect-flash** (v0.1.1) - Flash messaging for user feedback
 
 ### Template engine
@@ -42,8 +42,8 @@ The prototype is built using the [GOV.UK Prototype Kit](https://prototype-kit.se
 
 - **Luxon** (v3.7.2) - Date and time manipulation
 - **UUID** (v13.0.0) - Unique identifier generation
-- **csv-parse** (v6.1.0) - CSV data parsing
-- **marked** (v16.4.1) - Markdown rendering
+- **csv-parse** (v6.2.1) - CSV data parsing
+- **marked** (v17.0.5) - Markdown rendering
 
 ## Application structure
 
@@ -160,8 +160,7 @@ The search service (`placementSchoolSearch.js`) provides:
 
 The application uses environment variables for configuration:
 
-- `ORDNANCE_SURVEY_API_KEY` - Ordnance Survey API access
-- `ORDNANCE_SURVEY_API_SECRET` - Ordnance Survey API secret
+- `ORDNANCE_SURVEY_API_KEY` - Ordnance Survey Places/Names API access
 - `GOOGLE_MAPS_API_KEY` - Google Maps API access
 - `SESSION_SECRET` - Session encryption key
 - `USE_SIGN_IN_FORM` - Toggle between form login and persona selection
