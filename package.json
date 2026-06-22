@@ -22,7 +22,7 @@
     "dotenv": "^17.4.2",
     "express-session": "^1.19.0",
     "govuk-frontend": "^6.2.0",
-    "govuk-prototype-kit": "^13.20.1",
+    "govuk-prototype-kit": "^13.20.2",
     "gray-matter": "^4.0.3",
     "luxon": "^3.7.2",
     "marked": "^17.0.6",
